@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Peserta</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary: #7c3aed;
+        --success: #16a34a;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --soft: #f8fafc;
+        --border: #e2e8f0;
+        --card: rgba(255, 255, 255, 0.9);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+        color: var(--dark);
+        min-height: 100vh;
+        padding: 24px 16px 34px;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.2),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(124, 58, 237, 0.16),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at bottom left,
+            rgba(22, 163, 74, 0.14),
+            transparent 34%
+          ),
+          linear-gradient(135deg, #eef4ff 0%, #f8fbff 48%, #effaf5 100%);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to bottom, black, transparent 82%);
+      }
+
+      .page {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        padding: 26px;
+        margin-bottom: 18px;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #7c3aed);
+        color: white;
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -90px;
+        top: -90px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .hero h1 {
+        margin: 0 0 8px;
+        font-size: clamp(26px, 4vw, 40px);
+        font-weight: 900;
+        letter-spacing: -0.8px;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 720px;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.7;
+        font-weight: 600;
+      }
+
+      .hero-icon {
+        width: 74px;
+        height: 74px;
+        flex: 0 0 auto;
+        border-radius: 24px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        font-size: 34px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+
+      .link-btn,
+      .mini-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 15px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 14px;
+        transition: 0.2s ease;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+      }
+
+      .link-btn {
+        background: rgba(255, 255, 255, 0.82);
+        color: #334155;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      }
+
+      .link-btn:hover,
+      .mini-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        border-radius: 22px;
+        padding: 17px;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .stat-label {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+      }
+
+      .stat-chip {
+        display: inline-flex;
+        margin-top: 9px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        background: #eef2ff;
+        color: #3730a3;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .card {
+        position: relative;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--primary),
+          var(--secondary),
+          #22c55e
+        );
+      }
+
+      .section-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .section-kicker {
+        margin: 0 0 6px;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(21px, 3vw, 28px);
+        font-weight: 900;
+        letter-spacing: -0.4px;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.65;
+        font-weight: 600;
+      }
+
+      label {
+        display: block;
+        font-weight: 900;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 14px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr 1fr 1fr;
+        gap: 13px;
+      }
+
+      .field {
+        position: relative;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+        padding: 14px 15px;
+        border-radius: 17px;
+        font-size: 15px;
+        font-family: inherit;
+      }
+
+      input,
+      select,
+      textarea {
+        border: 1.5px solid #dbe4f0;
+        background: rgba(248, 250, 252, 0.9);
+        outline: none;
+        margin-bottom: 14px;
+        color: var(--dark);
+        font-weight: 700;
+        transition: 0.18s ease;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+        transform: translateY(-1px);
+      }
+
+      textarea {
+        min-height: 160px;
+        resize: vertical;
+        line-height: 1.6;
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      button {
+        border: none;
+        color: white;
+        font-weight: 900;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.22);
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #60a5fa);
+      }
+
+      .secondary-btn {
+        background: linear-gradient(135deg, #64748b, #475569);
+      }
+
+      .success-btn {
+        background: linear-gradient(135deg, #15803d, #22c55e);
+      }
+
+      .btn-row button {
+        width: auto;
+        min-width: 170px;
+      }
+
+      .message {
+        display: none;
+        margin-top: 14px;
+        padding: 13px 14px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .success {
+        display: block;
+        background: #e9fdf0;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .error {
+        display: block;
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+      }
+
+      .hint {
+        margin-top: 12px;
+        padding: 14px 15px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #f8fafc, #eef6ff);
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.65;
+        font-weight: 650;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr auto;
+        gap: 12px;
+        align-items: center;
+        margin: 18px 0;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        margin-bottom: 0;
+      }
+
+      .mini-btn {
+        width: auto;
+        border: none;
+        color: #334155;
+        background: #f1f5f9;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .table-wrap {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: white;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 13px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+
+      th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 900;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      tbody tr {
+        transition: 0.16s ease;
+      }
+
+      tbody tr:hover {
+        background: #f8fbff;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .name-cell {
+        font-weight: 900;
+        color: #0f172a;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .badge-male {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .badge-female {
+        background: #fce7f3;
+        color: #be185d;
+      }
+
+      .badge-neutral {
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      .badge-group {
+        background: #ede9fe;
+        color: #6d28d9;
+      }
+
+      .wa-link {
+        color: #15803d;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .wa-link:hover {
+        text-decoration: underline;
+      }
+
+      .action-wrap {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: none;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        width: auto;
+        margin: 0;
+      }
+
+      .edit-btn {
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        color: white;
+      }
+
+      .delete-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+      }
+
+      .empty-state {
+        padding: 26px 16px !important;
+        text-align: center;
+        color: #64748b;
+        font-weight: 800;
+      }
+
+      .loading-dot {
+        display: inline-block;
+        animation: pulse 1.2s infinite ease-in-out;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.35;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 900px) {
+        body {
+          padding: 14px 10px 26px;
+        }
+
+        .hero,
+        .card {
+          border-radius: 24px;
+          padding: 20px;
+        }
+
+        .hero-content {
+          align-items: flex-start;
+        }
+
+        .hero-icon {
+          width: 58px;
+          height: 58px;
+          border-radius: 20px;
+          font-size: 28px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+
+        .btn-row {
+          flex-direction: column;
+        }
+
+        .btn-row button {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .section-head {
+          flex-direction: column;
+        }
+
+        .table-wrap {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+          min-width: 760px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .hero-content {
+          flex-direction: column-reverse;
+        }
+
+        .hero h1 {
+          font-size: 27px;
+        }
+
+        .hero p,
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .top-actions a {
+          width: 100%;
+        }
+
+        .stat-card {
+          padding: 15px;
+        }
+
+        .card {
+          padding: 18px;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+          font-size: 14px;
+          border-radius: 15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="top-actions">
+        <a class="link-btn" href="/admin-session.html">
+          ← Kembali ke Daftar Sesi
+        </a>
+      </div>
+
+      <section class="hero">
+        <div class="hero-content">
+          <div>
+            <h1>Kelola Peserta</h1>
+            <p>
+              Tambahkan, edit, hapus, cari, dan kelola data peserta untuk sistem
+              absensi QR dinamis dengan tampilan yang lebih rapi dan responsif.
+            </p>
+          </div>
+          <div class="hero-icon">👥</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total Peserta</p>
+          <p class="stat-value" id="totalPeserta">0</p>
+          <span class="stat-chip">Semua data</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Laki-laki</p>
+          <p class="stat-value" id="totalLaki">0</p>
+          <span class="stat-chip">Peserta ikhwan</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Perempuan</p>
+          <p class="stat-value" id="totalPerempuan">0</p>
+          <span class="stat-chip">Peserta akhwat</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Kelompok</p>
+          <p class="stat-value" id="totalKelompok">0</p>
+          <span class="stat-chip">Data unik</span>
+        </div>
+      </section>
+
+      <main class="layout">
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Form Peserta</p>
+              <h2 id="formTitle">Tambah Peserta Baru</h2>
+              <p class="subtitle">
+                Isi data peserta satu per satu. Nomor WA akan otomatis
+                dinormalisasi ke format 62.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="namaInput">Nama Peserta</label>
+              <input
+                id="namaInput"
+                type="text"
+                placeholder="Contoh: Citra Lestari"
+              />
+            </div>
+
+            <div class="field">
+              <label for="genderInput">Gender</label>
+              <select id="genderInput">
+                <option value="">Pilih gender</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="kelompokInput">Kelompok</label>
+              <input
+                id="kelompokInput"
+                type="text"
+                placeholder="Contoh: Kutabumi"
+              />
+            </div>
+
+            <div class="field">
+              <label for="waInput">No WA</label>
+              <input
+                id="waInput"
+                type="text"
+                placeholder="Contoh: 6281234567890"
+              />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button
+              id="singleBtn"
+              class="primary-btn"
+              onclick="saveSingleParticipant()"
+            >
+              + Tambah Peserta
+            </button>
+
+            <button
+              id="cancelEditBtn"
+              class="secondary-btn"
+              type="button"
+              onclick="resetParticipantForm()"
+              style="display: none"
+            >
+              Batal Edit
+            </button>
+          </div>
+
+          <div id="singleMessage" class="message"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Input Massal</p>
+              <h2>Input Banyak Peserta</h2>
+              <p class="subtitle">
+                Cocok untuk memasukkan data peserta dari catatan, Excel, atau
+                daftar yang sudah disusun sebelumnya.
+              </p>
+            </div>
+          </div>
+
+          <label for="bulkInput"
+            >Format: nama | gender | kelompok | no_wa</label
+          >
+          <textarea
+            id="bulkInput"
+            placeholder="Citra Lestari | Perempuan | Kutabumi | 6281234567890
+Fadli Asyp | Laki-laki | Kutabumi | 6289876543210
+Budi Santoso | Laki-laki | Sangiang | 6281111111111"
+          ></textarea>
+
+          <div class="btn-row">
+            <button
+              id="bulkBtn"
+              class="success-btn"
+              onclick="addBulkParticipants()"
+            >
+              + Tambah Banyak Peserta
+            </button>
+          </div>
+
+          <div class="hint">
+            Gunakan tanda garis tegak <strong>|</strong> sebagai pemisah.
+            <br />
+            Format: <strong>nama | gender | kelompok | no_wa</strong>
+            <br />
+            Kolom <strong>no_wa</strong> boleh dikosongkan, tetapi lebih baik
+            diisi agar fitur WhatsApp peserta Alfa bisa digunakan.
+          </div>
+
+          <div id="bulkMessage" class="message"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Database Peserta</p>
+              <h2>Daftar Peserta</h2>
+              <p class="subtitle">
+                Cari berdasarkan nama/WA, filter berdasarkan kelompok, lalu edit
+                atau hapus data peserta.
+              </p>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Cari nama, gender, kelompok, atau no WA..."
+              oninput="renderParticipants()"
+            />
+
+            <select id="kelompokFilter" onchange="renderParticipants()">
+              <option value="">Semua kelompok</option>
+            </select>
+
+            <button class="mini-btn" type="button" onclick="resetFilter()">
+              Reset Filter
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>Gender</th>
+                  <th>Kelompok</th>
+                  <th>No WA</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="participantTable">
+                <tr>
+                  <td colspan="6" class="empty-state">
+                    Memuat data peserta<span class="loading-dot">...</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      protectAdminPage();
+    </script>
+
+    <script>
+      let editingParticipantId = null;
+      let allParticipants = [];
+
+      function safeText(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function showMessage(elementId, message, type) {
+        const box = document.getElementById(elementId);
+        box.textContent = message;
+        box.className = `message ${type}`;
+        box.style.display = "block";
+
+        setTimeout(() => {
+          box.style.display = "none";
+        }, 4500);
+      }
+
+      function normalizeWaNumber(number) {
+        if (!number) return null;
+
+        let cleaned = String(number).replace(/\D/g, "");
+
+        if (cleaned.startsWith("0")) {
+          cleaned = "62" + cleaned.substring(1);
+        }
+
+        return cleaned || null;
+      }
+
+      function getGenderBadge(gender) {
+        if (gender === "Laki-laki") {
+          return `<span class="badge badge-male">Laki-laki</span>`;
+        }
+
+        if (gender === "Perempuan") {
+          return `<span class="badge badge-female">Perempuan</span>`;
+        }
+
+        return `<span class="badge badge-neutral">-</span>`;
+      }
+
+      function updateStats() {
+        const total = allParticipants.length;
+
+        const laki = allParticipants.filter(
+          (item) => item.gender === "Laki-laki",
+        ).length;
+
+        const perempuan = allParticipants.filter(
+          (item) => item.gender === "Perempuan",
+        ).length;
+
+        const kelompok = new Set(
+          allParticipants
+            .map((item) => item.kelompok)
+            .filter(Boolean)
+            .map((item) => item.toLowerCase()),
+        ).size;
+
+        document.getElementById("totalPeserta").textContent = total;
+        document.getElementById("totalLaki").textContent = laki;
+        document.getElementById("totalPerempuan").textContent = perempuan;
+        document.getElementById("totalKelompok").textContent = kelompok;
+      }
+
+      function updateKelompokFilter() {
+        const filter = document.getElementById("kelompokFilter");
+        const currentValue = filter.value;
+
+        const groups = [
+          ...new Set(
+            allParticipants
+              .map((item) => item.kelompok)
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b)),
+          ),
+        ];
+
+        filter.innerHTML = `<option value="">Semua kelompok</option>`;
+
+        groups.forEach((group) => {
+          const option = document.createElement("option");
+          option.value = group;
+          option.textContent = group;
+          filter.appendChild(option);
+        });
+
+        filter.value = currentValue;
+      }
+
+      function resetFilter() {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("kelompokFilter").value = "";
+        renderParticipants();
+      }
+
+      async function saveParticipants(participants, messageId, buttonId) {
+        const btn = document.getElementById(buttonId);
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = "Menyimpan...";
+
+        try {
+          const response = await fetch("/api/participants", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ participants }),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(
+              messageId,
+              result.message || "Gagal menyimpan peserta.",
+              "error",
+            );
+            return;
+          }
+
+          showMessage(messageId, result.message, "success");
+
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: result.message || "Data peserta berhasil disimpan.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          await loadParticipants();
+        } catch (error) {
+          showMessage(
+            messageId,
+            "Terjadi kesalahan: " + error.message,
+            "error",
+          );
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      }
+
+      async function saveSingleParticipant() {
+        const nama = document.getElementById("namaInput").value.trim();
+        const gender = document.getElementById("genderInput").value;
+        const kelompok = document.getElementById("kelompokInput").value.trim();
+        const noWa = normalizeWaNumber(
+          document.getElementById("waInput").value,
+        );
+
+        if (!nama || !kelompok) {
+          showMessage(
+            "singleMessage",
+            "Nama dan kelompok wajib diisi.",
+            "error",
+          );
+
+          Swal.fire({
+            icon: "warning",
+            title: "Data belum lengkap",
+            text: "Nama dan kelompok wajib diisi.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        if (editingParticipantId) {
+          await updateParticipant(editingParticipantId, {
+            nama,
+            gender,
+            kelompok,
+            no_wa: noWa,
+          });
+        } else {
+          await saveParticipants(
+            [
+              {
+                nama,
+                gender,
+                kelompok,
+                no_wa: noWa,
+              },
+            ],
+            "singleMessage",
+            "singleBtn",
+          );
+        }
+
+        resetParticipantForm();
+      }
+
+      function resetParticipantForm() {
+        editingParticipantId = null;
+
+        document.getElementById("namaInput").value = "";
+        document.getElementById("genderInput").value = "";
+        document.getElementById("kelompokInput").value = "";
+        document.getElementById("waInput").value = "";
+
+        document.getElementById("formTitle").textContent =
+          "Tambah Peserta Baru";
+
+        const singleBtn = document.getElementById("singleBtn");
+        singleBtn.textContent = "+ Tambah Peserta";
+
+        document.getElementById("cancelEditBtn").style.display = "none";
+      }
+
+      function editParticipant(participant) {
+        editingParticipantId = participant.id;
+
+        document.getElementById("namaInput").value = participant.nama || "";
+        document.getElementById("genderInput").value = participant.gender || "";
+        document.getElementById("kelompokInput").value =
+          participant.kelompok || "";
+        document.getElementById("waInput").value = participant.no_wa || "";
+
+        document.getElementById("formTitle").textContent = "Edit Data Peserta";
+
+        const singleBtn = document.getElementById("singleBtn");
+        singleBtn.textContent = "Simpan Perubahan";
+
+        document.getElementById("cancelEditBtn").style.display = "inline-block";
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
+      async function updateParticipant(participantId, payload) {
+        const btn = document.getElementById("singleBtn");
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = "Menyimpan...";
+
+        try {
+          const response = await fetch(`/api/participants/${participantId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(
+              "singleMessage",
+              result.message || "Gagal memperbarui peserta.",
+              "error",
+            );
+            return;
+          }
+
+          showMessage("singleMessage", result.message, "success");
+
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: result.message || "Data peserta berhasil diperbarui.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          await loadParticipants();
+        } catch (error) {
+          showMessage(
+            "singleMessage",
+            "Terjadi kesalahan saat memperbarui peserta: " + error.message,
+            "error",
+          );
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      }
+
+      async function deleteParticipant(participantId, participantName) {
+        const confirmation = await Swal.fire({
+          icon: "warning",
+          title: "Hapus peserta?",
+          html: `Yakin ingin menghapus peserta <strong>${safeText(
+            participantName,
+          )}</strong>?<br><br>Jika peserta sudah memiliki riwayat absensi, data terkait bisa ikut terhapus.`,
+          showCancelButton: true,
+          confirmButtonText: "Ya, hapus",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#ef4444",
+          cancelButtonColor: "#64748b",
+          reverseButtons: true,
+        });
+
+        if (!confirmation.isConfirmed) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/participants/${participantId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: result.message || "Gagal menghapus peserta.",
+              confirmButtonColor: "#2563eb",
+            });
+            return;
+          }
+
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: "Peserta berhasil dihapus.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          await loadParticipants();
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Terjadi kesalahan",
+            text: "Gagal menghapus peserta: " + error.message,
+            confirmButtonColor: "#2563eb",
+          });
+        }
+      }
+
+      async function addBulkParticipants() {
+        const rawText = document.getElementById("bulkInput").value.trim();
+
+        if (!rawText) {
+          showMessage("bulkMessage", "Data peserta belum diisi.", "error");
+
+          Swal.fire({
+            icon: "warning",
+            title: "Data masih kosong",
+            text: "Silakan isi data peserta terlebih dahulu.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        const rows = rawText
+          .split("\n")
+          .map((row) => row.trim())
+          .filter(Boolean);
+
+        const participants = rows.map((row) => {
+          const parts = row.split("|").map((part) => part.trim());
+
+          return {
+            nama: parts[0] || "",
+            gender: parts[1] || "",
+            kelompok: parts[2] || "",
+            no_wa: normalizeWaNumber(parts[3] || ""),
+          };
+        });
+
+        const invalidRows = participants.filter(
+          (item) => !item.nama || !item.kelompok,
+        );
+
+        if (invalidRows.length > 0) {
+          showMessage(
+            "bulkMessage",
+            "Ada data yang belum lengkap. Minimal nama dan kelompok wajib diisi.",
+            "error",
+          );
+
+          Swal.fire({
+            icon: "warning",
+            title: "Format belum lengkap",
+            text: "Ada data yang belum lengkap. Minimal nama dan kelompok wajib diisi.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        await saveParticipants(participants, "bulkMessage", "bulkBtn");
+
+        document.getElementById("bulkInput").value = "";
+      }
+
+      async function loadParticipants() {
+        const table = document.getElementById("participantTable");
+
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              Memuat data peserta<span class="loading-dot">...</span>
+            </td>
+          </tr>
+        `;
+
+        try {
+          const response = await fetch("/api/all-participants");
+          const result = await response.json();
+
+          if (!result.success) {
+            table.innerHTML = `
+              <tr>
+                <td colspan="6" class="empty-state">
+                  ${safeText(result.message || "Gagal memuat peserta.")}
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          allParticipants = result.participants || [];
+
+          updateStats();
+          updateKelompokFilter();
+          renderParticipants();
+        } catch (error) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Gagal memuat peserta: ${safeText(error.message)}
+              </td>
+            </tr>
+          `;
+        }
+      }
+
+      function renderParticipants() {
+        const table = document.getElementById("participantTable");
+        const keyword = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+
+        const selectedKelompok =
+          document.getElementById("kelompokFilter").value;
+
+        let filtered = allParticipants;
+
+        if (selectedKelompok) {
+          filtered = filtered.filter(
+            (participant) => participant.kelompok === selectedKelompok,
+          );
+        }
+
+        if (keyword) {
+          filtered = filtered.filter((participant) => {
+            const searchable = [
+              participant.nama,
+              participant.gender,
+              participant.kelompok,
+              participant.no_wa,
+            ]
+              .join(" ")
+              .toLowerCase();
+
+            return searchable.includes(keyword);
+          });
+        }
+
+        table.innerHTML = "";
+
+        if (!filtered.length) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Tidak ada peserta yang sesuai dengan pencarian/filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((participant, index) => {
+          const row = document.createElement("tr");
+
+          const waValue = participant.no_wa
+            ? `<a class="wa-link" href="https://wa.me/${safeText(
+                participant.no_wa,
+              )}" target="_blank" rel="noopener">${safeText(
+                participant.no_wa,
+              )}</a>`
+            : "-";
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td class="name-cell">${safeText(participant.nama)}</td>
+            <td>${getGenderBadge(participant.gender)}</td>
+            <td><span class="badge badge-group">${safeText(
+              participant.kelompok || "-",
+            )}</span></td>
+            <td>${waValue}</td>
+            <td>
+              <div class="action-wrap">
+                <button class="action-btn edit-btn" type="button">Edit</button>
+                <button class="action-btn delete-btn" type="button">Hapus</button>
+              </div>
+            </td>
+          `;
+
+          table.appendChild(row);
+
+          const editBtn = row.querySelector(".edit-btn");
+          const deleteBtn = row.querySelector(".delete-btn");
+
+          editBtn.addEventListener("click", function () {
+            editParticipant(participant);
+          });
+
+          deleteBtn.addEventListener("click", function () {
+            deleteParticipant(participant.id, participant.nama);
+          });
+        });
+      }
+
+      loadParticipants();
+    </script>
+  </body>
+</html>

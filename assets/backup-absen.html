@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Absensi</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #eef4ff 0%,
+          #f7faff 45%,
+          #eefaf3 100%
+        );
+        min-height: 100vh;
+        padding: 24px 16px;
+        color: #1f2937;
+      }
+
+      .page {
+        max-width: 460px;
+        margin: 0 auto;
+      }
+
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 25px rgba(31, 41, 55, 0.08);
+        font-size: 13px;
+        font-weight: 600;
+        color: #2563eb;
+        margin-bottom: 18px;
+        backdrop-filter: blur(10px);
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        border-radius: 28px;
+        padding: 28px 22px 24px;
+        box-shadow: 0 20px 45px rgba(31, 41, 55, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .icon-wrap {
+        width: 68px;
+        height: 68px;
+        border-radius: 20px;
+        margin: 0 auto 5px;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
+        font-size: 30px;
+        color: white;
+      }
+
+      /* h1 {
+        margin: 0;
+        text-align: center;
+        font-size: 38px;
+        line-height: 1.1;
+        font-weight: 800;
+        color: #111827;
+      } */
+
+      .subtitle {
+        text-align: center;
+        color: #6b7280;
+        font-size: 17px;
+        line-height: 1.6;
+        margin: 14px 0 26px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .label {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 8px;
+      }
+
+      select,
+      button {
+        width: 100%;
+        border-radius: 18px;
+        font-size: 17px;
+        transition: all 0.2s ease;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 16px 18px;
+        border: 1.6px solid #dbe3f0;
+        background: #f9fbff;
+        color: #111827;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      select:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+
+      .select-wrap::after {
+        content: "⌄";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #6b7280;
+        pointer-events: none;
+      }
+
+      button {
+        border: none;
+        padding: 17px 18px;
+        margin-top: 8px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6);
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.28);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 30px rgba(37, 99, 235, 0.32);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+        box-shadow: none;
+      }
+
+      .message {
+        display: none;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 600;
+      }
+
+      .message.success {
+        display: block;
+        background: #e9fdf0;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .message.error {
+        display: block;
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 14px 15px;
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid #e5edf6;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .note strong {
+        color: #334155;
+      }
+
+      .footer-text {
+        text-align: center;
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 14px;
+        font-style: oblique;
+      }
+
+      .judul-utama {
+        font-family: "Quicksand", sans-serif;
+        font-size: 40px;
+        font-weight: 600;
+        font-style: oblique;
+        letter-spacing: 0em;
+        line-height: 1.4;
+        word-spacing: 0px;
+        text-transform: none;
+        text-decoration: underline;
+        text-align: center;
+        color: #5e7ac4;
+        text-shadow: 5px 0px 3px #56b6c6;
+        margin-bottom: 6px;
+        margin-top: 0;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 18px 12px;
+        }
+
+        .card {
+          padding: 24px 18px 20px;
+          border-radius: 24px;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+
+        .subtitle {
+          font-size: 16px;
+        }
+
+        select,
+        button {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header-badge">✅ Absensi Online</div>
+
+      <div class="card">
+        <div class="icon-wrap">📝</div>
+
+        <h1 class="judul-utama">Absenku!</h1>
+        <p class="subtitle">
+          Silakan pilih <strong>kelompok</strong> terlebih dahulu, lalu pilih
+          <strong>nama peserta</strong> untuk melakukan absensi.
+        </p>
+
+        <div class="form-group">
+          <label class="label" for="kelompokSelect">Kelompok</label>
+          <div class="select-wrap">
+            <select id="kelompokSelect">
+              <option value="">Pilih kelompok</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="participantSelect">Nama Peserta</label>
+          <div class="select-wrap">
+            <select id="participantSelect">
+              <option value="">Pilih nama peserta</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="submitBtn" onclick="submitAttendance()">Hadir</button>
+
+        <div id="messageBox" class="message"></div>
+
+        <div class="note">
+          <strong>Catatan:</strong> Satu perangkat hanya dapat digunakan untuk
+          satu kali absensi pada sesi ini.
+        </div>
+
+        <div class="footer-text">Asyp &copy; 2026</div>
+      </div>
+    </div>
+    <!-- ==================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session");
+      const token = urlParams.get("token");
+
+      let allParticipants = [];
+
+      /**
+       * Membuat local device ID.
+       * Ini disimpan di browser peserta.
+       */
+      function getLocalDeviceId() {
+        let deviceId = localStorage.getItem("attendance_local_device_id");
+
+        if (!deviceId) {
+          deviceId = crypto.randomUUID();
+          localStorage.setItem("attendance_local_device_id", deviceId);
+        }
+
+        return deviceId;
+      }
+
+      function showMessage(message, type) {
+        const box = document.getElementById("messageBox");
+        box.textContent = message;
+        box.className = `message ${type}`;
+        box.style.display = "block";
+      }
+
+      async function loadParticipants() {
+        try {
+          const response = await fetch(
+            `/api/participants?session=${sessionId}`,
+          );
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(
+              result.message || "Gagal mengambil daftar peserta.",
+              "error",
+            );
+            return;
+          }
+
+          allParticipants = result.participants || [];
+
+          renderKelompokOptions(allParticipants);
+          renderParticipants([]);
+
+          if (allParticipants.length === 0) {
+            showMessage("Belum ada data peserta yang tersedia.", "error");
+          }
+        } catch (error) {
+          showMessage(
+            "Terjadi kesalahan saat mengambil peserta: " + error.message,
+            "error",
+          );
+          console.error(error);
+        }
+      }
+
+      function getUserLocation() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("Browser tidak mendukung fitur lokasi."));
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+            },
+            function () {
+              reject(
+                new Error(
+                  "Lokasi wajib diaktifkan untuk melakukan absensi. Silakan izinkan akses lokasi.",
+                ),
+              );
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 15000,
+              maximumAge: 0,
+            },
+          );
+        });
+      }
+
+      function renderKelompokOptions(participants) {
+        const kelompokSelect = document.getElementById("kelompokSelect");
+
+        kelompokSelect.innerHTML = `<option value="">Pilih kelompok</option>`;
+
+        const kelompokList = [
+          ...new Set(
+            participants
+              .map((participant) => participant.kelompok)
+              .filter(Boolean),
+          ),
+        ];
+
+        kelompokList.sort();
+
+        kelompokList.forEach((kelompok) => {
+          const option = document.createElement("option");
+          option.value = kelompok;
+          option.textContent = kelompok;
+          kelompokSelect.appendChild(option);
+        });
+      }
+
+      function renderParticipants(participants) {
+        const select = document.getElementById("participantSelect");
+
+        select.innerHTML = `<option value="">Pilih nama peserta</option>`;
+
+        participants.forEach((participant) => {
+          const option = document.createElement("option");
+          option.value = participant.id;
+
+          const namaPeserta = participant.nama || participant.name || "-";
+          const kelompokPeserta = participant.kelompok
+            ? ` (${participant.kelompok})`
+            : "";
+
+          option.textContent = participant.isPresent
+            ? `${namaPeserta}${kelompokPeserta} - Sudah Hadir`
+            : `${namaPeserta}${kelompokPeserta}`;
+
+          option.disabled = participant.isPresent;
+
+          select.appendChild(option);
+        });
+      }
+
+      function filterParticipantsByKelompok() {
+        const selectedKelompok =
+          document.getElementById("kelompokSelect").value;
+
+        if (!selectedKelompok) {
+          renderParticipants([]);
+          return;
+        }
+
+        const filtered = allParticipants.filter((participant) => {
+          const kelompokPeserta = participant.kelompok || "";
+          return kelompokPeserta === selectedKelompok;
+        });
+
+        renderParticipants(filtered);
+      }
+
+      // ===== saat memakai search name ====
+      // document
+      //   .getElementById("kelompokSelect")
+      //   .addEventListener("change", function () {
+      //     document.getElementById("searchInput").value = "";
+      //     filterParticipantsByKelompokAndSearch();
+      //   });
+
+      // document
+      //   .getElementById("searchInput")
+      //   .addEventListener("input", function () {
+      //     filterParticipantsByKelompokAndSearch();
+      //   });
+
+      document
+        .getElementById("kelompokSelect")
+        .addEventListener("change", function () {
+          filterParticipantsByKelompok();
+        });
+
+      async function submitAttendance() {
+        const participantId =
+          document.getElementById("participantSelect").value;
+        const submitBtn = document.getElementById("submitBtn");
+        const selectedKelompok =
+          document.getElementById("kelompokSelect").value;
+
+        if (!sessionId || !token) {
+          showMessage(
+            "Link absensi tidak valid. Silakan scan QR terbaru.",
+            "error",
+          );
+          return;
+        }
+        if (!selectedKelompok) {
+          showMessage("Silakan pilih kelompok terlebih dahulu.", "error");
+          return;
+        }
+
+        if (!participantId) {
+          showMessage("Silakan pilih nama terlebih dahulu.", "error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Menyimpan...";
+
+        try {
+          const localDeviceId = getLocalDeviceId();
+
+          showMessage("Mengambil lokasi Anda...", "success");
+
+          const userLocation = await getUserLocation();
+
+          const response = await fetch("/api/attendance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionId,
+              token,
+              participantId,
+              localDeviceId,
+              userLatitude: userLocation.latitude,
+              userLongitude: userLocation.longitude,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(result.message, "error");
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Hadir";
+            return;
+          }
+
+          showMessage(
+            `${result.message} Alhamdulillah Jazakumullahu Khoiroh, ${result.data.name}😊`,
+            "success",
+          );
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sudah Absen";
+
+          await loadParticipants();
+        } catch (error) {
+          showMessage("Terjadi kesalahan saat menyimpan absensi.", "error");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Hadir";
+        }
+      }
+
+      loadParticipants();
+      getLocalDeviceId();
+    </script>
+  </body>
+</html>

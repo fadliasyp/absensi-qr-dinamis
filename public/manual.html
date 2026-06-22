@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input Manual Absensi</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --purple: #7c3aed;
+        --green: #16a34a;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --soft: #f8fafc;
+        --card: rgba(255, 255, 255, 0.92);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+        color: var(--dark);
+        min-height: 100vh;
+        padding: 24px 14px 32px;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.22),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(124, 58, 237, 0.17),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at bottom left,
+            rgba(22, 163, 74, 0.14),
+            transparent 36%
+          ),
+          linear-gradient(135deg, #eef4ff 0%, #f8fbff 48%, #eefaf3 100%);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to bottom, black, transparent 85%);
+      }
+
+      .page {
+        width: min(980px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 15px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.86);
+        color: #334155;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 14px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        transition: 0.2s ease;
+      }
+
+      .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 32px;
+        padding: 28px;
+        margin-bottom: 18px;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #7c3aed);
+        color: white;
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        right: -90px;
+        top: -100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .hero h1 {
+        margin: 0 0 9px;
+        font-size: clamp(27px, 4vw, 42px);
+        font-weight: 900;
+        letter-spacing: -0.9px;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 690px;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.7;
+        font-weight: 600;
+      }
+
+      .hero-icon {
+        width: 78px;
+        height: 78px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 36px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .summary-card {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .summary-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--purple));
+      }
+
+      .summary-label {
+        margin: 0 0 9px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .summary-value {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+      }
+
+      .summary-chip {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        background: #eef2ff;
+        color: #3730a3;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .card {
+        position: relative;
+        background: var(--card);
+        border-radius: 30px;
+        padding: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, #2563eb, #7c3aed, #22c55e);
+      }
+
+      .section-kicker {
+        margin: 0 0 6px;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(22px, 3vw, 29px);
+        font-weight: 900;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        margin: 9px 0 22px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.7;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 17px;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 900;
+        color: #334155;
+        margin-bottom: 8px;
+      }
+
+      select,
+      button {
+        width: 100%;
+        border-radius: 17px;
+        font-size: 15px;
+        font-family: inherit;
+      }
+
+      select {
+        appearance: none;
+        padding: 15px 44px 15px 16px;
+        border: 1.5px solid #dbe4f0;
+        background:
+          linear-gradient(45deg, transparent 50%, #64748b 50%) calc(100% - 20px)
+            50% / 7px 7px no-repeat,
+          linear-gradient(135deg, #f8fafc, #ffffff);
+        color: #111827;
+        outline: none;
+        font-weight: 750;
+        transition: 0.18s ease;
+      }
+
+      select:focus {
+        border-color: var(--primary);
+        background:
+          linear-gradient(45deg, transparent 50%, #2563eb 50%) calc(100% - 20px)
+            50% / 7px 7px no-repeat,
+          #ffffff;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+        transform: translateY(-1px);
+      }
+
+      .status-choice {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: -4px 0 18px;
+      }
+
+      .status-pill {
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #334155;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        padding: 13px 10px;
+        border-radius: 17px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+
+      .status-pill:hover {
+        transform: translateY(-2px);
+      }
+
+      .status-pill.active-hadir {
+        border-color: rgba(22, 163, 74, 0.4);
+        background: linear-gradient(135deg, #dcfce7, #f0fdf4);
+        color: #15803d;
+      }
+
+      .status-pill.active-izin {
+        border-color: rgba(245, 158, 11, 0.4);
+        background: linear-gradient(135deg, #fef3c7, #fffbeb);
+        color: #b45309;
+      }
+
+      .status-pill.active-alfa {
+        border-color: rgba(239, 68, 68, 0.38);
+        background: linear-gradient(135deg, #fee2e2, #fff1f2);
+        color: #be123c;
+      }
+
+      .submit-btn {
+        border: none;
+        padding: 16px 18px;
+        margin-top: 4px;
+        font-weight: 900;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #60a5fa);
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.25);
+        transition: 0.2s ease;
+      }
+
+      .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 38px rgba(37, 99, 235, 0.3);
+      }
+
+      .submit-btn:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.68;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .message {
+        display: none;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 17px;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 800;
+      }
+
+      .message.success {
+        display: block;
+        background: #e9fdf0;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .message.error {
+        display: block;
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+      }
+
+      .side-panel {
+        display: grid;
+        gap: 14px;
+      }
+
+      .info-box {
+        padding: 18px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+      }
+
+      .info-icon {
+        width: 46px;
+        height: 46px;
+        display: grid;
+        place-items: center;
+        border-radius: 16px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #dbeafe, #ede9fe);
+        font-size: 23px;
+      }
+
+      .info-box h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .info-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .warning-box {
+        background: linear-gradient(135deg, #fff7ed, #fffbeb);
+        border-color: #fed7aa;
+      }
+
+      .success-box {
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border-color: #bbf7d0;
+      }
+
+      .admin-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 900;
+        text-decoration: none;
+        transition: 0.2s ease;
+      }
+
+      .admin-link:hover {
+        transform: translateY(-2px);
+        background: #e2e8f0;
+      }
+
+      @media (max-width: 850px) {
+        body {
+          padding: 14px 10px 26px;
+        }
+
+        .hero,
+        .card {
+          border-radius: 25px;
+          padding: 21px;
+        }
+
+        .hero-content {
+          align-items: flex-start;
+        }
+
+        .hero-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 21px;
+          font-size: 29px;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .summary-card {
+          padding: 15px;
+          border-radius: 20px;
+        }
+
+        .summary-value {
+          font-size: 25px;
+        }
+
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .top-actions a {
+          width: 100%;
+        }
+
+        .hero-content {
+          flex-direction: column-reverse;
+        }
+
+        .hero h1 {
+          font-size: 28px;
+        }
+
+        .hero p,
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .status-choice {
+          grid-template-columns: 1fr;
+        }
+
+        select,
+        button {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="top-actions">
+        <a class="back-btn" id="adminLinkTop" href="#"
+          >← Kembali ke Rekap Admin</a
+        >
+      </div>
+
+      <section class="hero">
+        <div class="hero-content">
+          <div>
+            <h1>Absensi Manual</h1>
+            <p>
+              Halaman ini digunakan admin untuk mencatat peserta yang hadir,
+              izin, atau alfa secara manual pada sesi absensi yang sedang
+              dipilih.
+            </p>
+          </div>
+          <div class="hero-icon">📝</div>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <p class="summary-label">Total Peserta</p>
+          <p class="summary-value" id="totalPeserta">0</p>
+          <span class="summary-chip">Dalam sesi</span>
+        </div>
+
+        <div class="summary-card">
+          <p class="summary-label">Kelompok</p>
+          <p class="summary-value" id="totalKelompok">0</p>
+          <span class="summary-chip">Tersedia</span>
+        </div>
+
+        <div class="summary-card">
+          <p class="summary-label">Sudah Ada Data</p>
+          <p class="summary-value" id="totalSudahData">0</p>
+          <span class="summary-chip">Hadir/Izin/Alfa</span>
+        </div>
+      </section>
+
+      <main class="main-grid">
+        <section class="card">
+          <p class="section-kicker">Form Input</p>
+          <h2>Input Izin / Alfa / Hadir</h2>
+          <p class="subtitle">
+            Pilih kelompok terlebih dahulu, lalu pilih peserta dan status
+            keterangan yang ingin disimpan.
+          </p>
+
+          <div class="form-group">
+            <label for="kelompokSelect">👥 Kelompok</label>
+            <select id="kelompokSelect">
+              <option value="">Pilih kelompok</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="participantSelect">🙋 Nama Peserta</label>
+            <select id="participantSelect">
+              <option value="">Pilih nama peserta</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="keteranganSelect">📌 Keterangan</label>
+            <select id="keteranganSelect">
+              <option value="">Pilih keterangan</option>
+              <option value="Hadir">Hadir</option>
+              <option value="Izin">Izin</option>
+              <option value="Alfa">Alfa</option>
+            </select>
+          </div>
+
+          <div class="status-choice">
+            <button
+              class="status-pill"
+              type="button"
+              onclick="setKeterangan('Hadir')"
+              id="pillHadir"
+            >
+              ✅ Hadir
+            </button>
+
+            <button
+              class="status-pill"
+              type="button"
+              onclick="setKeterangan('Izin')"
+              id="pillIzin"
+            >
+              🟡 Izin
+            </button>
+
+            <button
+              class="status-pill"
+              type="button"
+              onclick="setKeterangan('Alfa')"
+              id="pillAlfa"
+            >
+              🔴 Alfa
+            </button>
+          </div>
+
+          <button
+            id="submitBtn"
+            class="submit-btn"
+            onclick="submitManualAttendance()"
+          >
+            Simpan Absensi Manual
+          </button>
+
+          <div id="messageBox" class="message"></div>
+        </section>
+
+        <aside class="side-panel">
+          <div class="info-box warning-box">
+            <div class="info-icon">⚠️</div>
+            <h3>Catatan Penting</h3>
+            <p>
+              Jika peserta sudah tercatat <strong>Hadir</strong> melalui QR,
+              data tidak akan diubah menjadi Izin/Alfa.
+            </p>
+          </div>
+
+          <div class="info-box success-box">
+            <div class="info-icon">✅</div>
+            <h3>Tips Penggunaan</h3>
+            <p>
+              Gunakan fitur ini untuk peserta yang izin, alfa, tidak membawa HP,
+              atau mengalami kendala saat scan QR.
+            </p>
+          </div>
+
+          <div class="info-box">
+            <div class="info-icon">📊</div>
+            <h3>Rekap Sesi</h3>
+            <p>
+              Setelah menyimpan data manual, kamu bisa kembali ke halaman rekap
+              admin untuk melihat hasil absensi terbaru.
+            </p>
+
+            <br />
+            <a class="admin-link" id="adminLink" href="#">
+              Kembali ke Rekap Admin →
+            </a>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      protectAdminPage();
+    </script>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session");
+
+      if (!sessionId) {
+        Swal.fire({
+          icon: "error",
+          title: "Session tidak ditemukan",
+          text: "Silakan buka halaman input manual dari halaman admin session.",
+          confirmButtonColor: "#2563eb",
+        }).then(() => {
+          window.location.href = "/admin-session.html";
+        });
+      }
+
+      const adminLink = document.getElementById("adminLink");
+      const adminLinkTop = document.getElementById("adminLinkTop");
+
+      if (sessionId) {
+        const targetUrl = `/admin.html?session=${sessionId}`;
+
+        if (adminLink) {
+          adminLink.href = targetUrl;
+        }
+
+        if (adminLinkTop) {
+          adminLinkTop.href = targetUrl;
+        }
+      }
+
+      let allParticipants = [];
+
+      function showMessage(message, type) {
+        const box = document.getElementById("messageBox");
+        box.textContent = message;
+        box.className = `message ${type}`;
+        box.style.display = "block";
+
+        setTimeout(() => {
+          box.style.display = "none";
+        }, 4500);
+      }
+
+      function updateSummary() {
+        const totalPeserta = allParticipants.length;
+
+        const kelompokCount = new Set(
+          allParticipants
+            .map((participant) => participant.kelompok)
+            .filter(Boolean),
+        ).size;
+
+        const sudahData = allParticipants.filter((participant) => {
+          return participant.isPresent;
+        }).length;
+
+        document.getElementById("totalPeserta").textContent = totalPeserta;
+        document.getElementById("totalKelompok").textContent = kelompokCount;
+        document.getElementById("totalSudahData").textContent = sudahData;
+      }
+
+      function setKeterangan(value) {
+        document.getElementById("keteranganSelect").value = value;
+        updateStatusPills();
+      }
+
+      function updateStatusPills() {
+        const value = document.getElementById("keteranganSelect").value;
+
+        const pillHadir = document.getElementById("pillHadir");
+        const pillIzin = document.getElementById("pillIzin");
+        const pillAlfa = document.getElementById("pillAlfa");
+
+        pillHadir.className = "status-pill";
+        pillIzin.className = "status-pill";
+        pillAlfa.className = "status-pill";
+
+        if (value === "Hadir") {
+          pillHadir.classList.add("active-hadir");
+        }
+
+        if (value === "Izin") {
+          pillIzin.classList.add("active-izin");
+        }
+
+        if (value === "Alfa") {
+          pillAlfa.classList.add("active-alfa");
+        }
+      }
+
+      document
+        .getElementById("keteranganSelect")
+        .addEventListener("change", updateStatusPills);
+
+      async function loadParticipants() {
+        try {
+          const response = await fetch(
+            `/api/participants?session=${sessionId}`,
+          );
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(result.message || "Gagal mengambil peserta.", "error");
+
+            Swal.fire({
+              icon: "error",
+              title: "Gagal mengambil peserta",
+              text: result.message || "Data peserta tidak berhasil dimuat.",
+              confirmButtonColor: "#2563eb",
+            });
+
+            return;
+          }
+
+          allParticipants = result.participants || [];
+
+          renderKelompokOptions(allParticipants);
+          renderParticipants([]);
+          updateSummary();
+
+          if (allParticipants.length === 0) {
+            showMessage("Belum ada data peserta.", "error");
+          }
+        } catch (error) {
+          showMessage(
+            "Terjadi kesalahan saat mengambil peserta: " + error.message,
+            "error",
+          );
+
+          Swal.fire({
+            icon: "error",
+            title: "Terjadi kesalahan",
+            text: "Gagal mengambil peserta: " + error.message,
+            confirmButtonColor: "#2563eb",
+          });
+        }
+      }
+
+      function renderKelompokOptions(participants) {
+        const kelompokSelect = document.getElementById("kelompokSelect");
+
+        kelompokSelect.innerHTML = `<option value="">Pilih kelompok</option>`;
+
+        const kelompokList = [
+          ...new Set(
+            participants
+              .map((participant) => participant.kelompok)
+              .filter(Boolean),
+          ),
+        ];
+
+        kelompokList.sort((a, b) => a.localeCompare(b));
+
+        kelompokList.forEach((kelompok) => {
+          const option = document.createElement("option");
+          option.value = kelompok;
+          option.textContent = kelompok;
+          kelompokSelect.appendChild(option);
+        });
+      }
+
+      function renderParticipants(participants) {
+        const participantSelect = document.getElementById("participantSelect");
+
+        participantSelect.innerHTML = `<option value="">Pilih nama peserta</option>`;
+
+        participants.forEach((participant) => {
+          const option = document.createElement("option");
+          option.value = participant.id;
+
+          const namaPeserta = participant.nama || participant.name || "-";
+          const genderPeserta = participant.gender
+            ? ` - ${participant.gender}`
+            : "";
+
+          option.textContent = participant.isPresent
+            ? `${namaPeserta}${genderPeserta} - Sudah Ada Data`
+            : `${namaPeserta}${genderPeserta}`;
+
+          participantSelect.appendChild(option);
+        });
+      }
+
+      function filterParticipantsByKelompok() {
+        const selectedKelompok =
+          document.getElementById("kelompokSelect").value;
+
+        if (!selectedKelompok) {
+          renderParticipants([]);
+          return;
+        }
+
+        const filtered = allParticipants.filter((participant) => {
+          return participant.kelompok === selectedKelompok;
+        });
+
+        renderParticipants(filtered);
+      }
+
+      document
+        .getElementById("kelompokSelect")
+        .addEventListener("change", function () {
+          document.getElementById("participantSelect").value = "";
+          filterParticipantsByKelompok();
+        });
+
+      async function submitManualAttendance() {
+        const participantId =
+          document.getElementById("participantSelect").value;
+
+        const keterangan = document.getElementById("keteranganSelect").value;
+
+        const selectedKelompok =
+          document.getElementById("kelompokSelect").value;
+
+        const submitBtn = document.getElementById("submitBtn");
+
+        if (!selectedKelompok) {
+          showMessage("Silakan pilih kelompok terlebih dahulu.", "error");
+
+          Swal.fire({
+            icon: "warning",
+            title: "Kelompok belum dipilih",
+            text: "Silakan pilih kelompok terlebih dahulu.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        if (!participantId) {
+          showMessage("Silakan pilih nama peserta terlebih dahulu.", "error");
+
+          Swal.fire({
+            icon: "warning",
+            title: "Peserta belum dipilih",
+            text: "Silakan pilih nama peserta terlebih dahulu.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        if (!keterangan) {
+          showMessage("Silakan pilih keterangan terlebih dahulu.", "error");
+
+          Swal.fire({
+            icon: "warning",
+            title: "Keterangan belum dipilih",
+            text: "Silakan pilih Hadir, Izin, atau Alfa terlebih dahulu.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          return;
+        }
+
+        const selectedParticipant = allParticipants.find((participant) => {
+          return participant.id === participantId;
+        });
+
+        const namaPeserta =
+          selectedParticipant?.nama || selectedParticipant?.name || "peserta";
+
+        const confirmation = await Swal.fire({
+          icon: "question",
+          title: "Simpan absensi manual?",
+          html: `
+            Peserta: <strong>${namaPeserta}</strong><br>
+            Kelompok: <strong>${selectedKelompok}</strong><br>
+            Keterangan: <strong>${keterangan}</strong>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Ya, simpan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#2563eb",
+          cancelButtonColor: "#64748b",
+          reverseButtons: true,
+        });
+
+        if (!confirmation.isConfirmed) {
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Menyimpan...";
+
+        try {
+          const response = await fetch("/api/manual-attendance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionId,
+              participantId,
+              keterangan,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(result.message || "Gagal menyimpan data.", "error");
+
+            Swal.fire({
+              icon: "error",
+              title: "Gagal menyimpan",
+              text: result.message || "Gagal menyimpan data absensi manual.",
+              confirmButtonColor: "#2563eb",
+            });
+
+            return;
+          }
+
+          showMessage(result.message || "Data berhasil disimpan.", "success");
+
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: result.message || "Absensi manual berhasil disimpan.",
+            confirmButtonColor: "#2563eb",
+          });
+
+          document.getElementById("participantSelect").value = "";
+          document.getElementById("keteranganSelect").value = "";
+          updateStatusPills();
+
+          await loadParticipants();
+        } catch (error) {
+          showMessage("Terjadi kesalahan: " + error.message, "error");
+
+          Swal.fire({
+            icon: "error",
+            title: "Terjadi kesalahan",
+            text: "Gagal menyimpan absensi manual: " + error.message,
+            confirmButtonColor: "#2563eb",
+          });
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Simpan Absensi Manual";
+        }
+      }
+
+      loadParticipants();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Approval Admin</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --purple: #7c3aed;
+        --green: #16a34a;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --line: #e5e7eb;
+        --soft: #f8fafc;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.18),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(124, 58, 237, 0.16),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(22, 163, 74, 0.16),
+            transparent 30%
+          ),
+          linear-gradient(135deg, #eef4ff, #f8fbff 45%, #f5f3ff);
+        padding: 24px 16px;
+        color: var(--dark);
+      }
+
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 900;
+        font-size: 22px;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--purple),
+          #22c55e
+        );
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+      }
+
+      .brand-title {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.15;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .brand-subtitle {
+        color: var(--muted);
+        margin-top: 6px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 11px 15px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.86);
+        color: #334155;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 14px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+      }
+
+      .nav-btn.primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark),
+          var(--primary)
+        );
+        color: white;
+        border: none;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        border-radius: 22px;
+        padding: 18px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(10px);
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .stat-card.total {
+        border-left: 5px solid var(--primary);
+      }
+
+      .stat-card.approved {
+        border-left: 5px solid var(--green);
+      }
+
+      .stat-card.pending {
+        border-left: 5px solid var(--orange);
+      }
+
+      .stat-card.rejected {
+        border-left: 5px solid var(--red);
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+      }
+
+      .card-desc {
+        color: var(--muted);
+        margin: 8px 0 0;
+        line-height: 1.6;
+        font-size: 14px;
+      }
+
+      .filter-box {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        border: none;
+        min-height: 40px;
+        padding: 9px 13px;
+        border-radius: 999px;
+        font-weight: 900;
+        cursor: pointer;
+        color: #334155;
+        background: #f1f5f9;
+      }
+
+      .filter-btn.active {
+        background: linear-gradient(135deg, var(--primary), var(--purple));
+        color: white;
+      }
+
+      .message {
+        display: none;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .message.success {
+        display: block;
+        background: #e9fdf0;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .message.error {
+        display: block;
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: white;
+      }
+
+      table {
+        width: 100%;
+        min-width: 860px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 13px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+
+      th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.035em;
+        font-weight: 900;
+      }
+
+      tbody tr:hover {
+        background: #fbfdff;
+      }
+
+      .admin-name {
+        font-weight: 900;
+        color: #111827;
+      }
+
+      .admin-email {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 3px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .badge.approved {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .badge.rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .badge.role {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+
+      .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        min-width: 230px;
+      }
+
+      .action-btn {
+        border: none;
+        padding: 9px 11px;
+        border-radius: 11px;
+        color: white;
+        font-weight: 900;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .approve-btn {
+        background: linear-gradient(135deg, #15803d, #16a34a);
+      }
+
+      .pending-btn {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+      }
+
+      .reject-btn {
+        background: linear-gradient(135deg, #b91c1c, #ef4444);
+      }
+
+      .empty-state {
+        padding: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      @media (max-width: 860px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 16px 10px;
+        }
+
+        .topbar {
+          display: block;
+        }
+
+        .brand {
+          align-items: flex-start;
+        }
+
+        .brand-title {
+          font-size: 25px;
+        }
+
+        .brand-subtitle {
+          font-size: 13px;
+        }
+
+        .top-actions {
+          margin-top: 14px;
+          width: 100%;
+        }
+
+        .nav-btn {
+          width: 100%;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .stat-card {
+          padding: 15px;
+          border-radius: 18px;
+        }
+
+        .stat-value {
+          font-size: 24px;
+        }
+
+        .card {
+          padding: 18px 14px;
+          border-radius: 22px;
+        }
+
+        .card-title {
+          font-size: 21px;
+        }
+
+        .filter-box {
+          width: 100%;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .filter-btn {
+          width: 100%;
+        }
+
+        .table-wrap {
+          border-radius: 16px;
+        }
+
+        table {
+          min-width: 820px;
+        }
+
+        th,
+        td {
+          padding: 11px 10px;
+          font-size: 13px;
+        }
+      }
+
+      .logout-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-height: 44px;
+        padding: 11px 15px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #b91c1c, #ef4444);
+        color: white;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+      }
+
+      @media (max-width: 640px) {
+        .logout-btn {
+          width: 100%;
+        }
+      }
+
+      .delete-btn {
+        background: linear-gradient(135deg, #7f1d1d, #dc2626, #ef4444);
+      }
+
+      .disabled-btn {
+        background: #cbd5e1;
+        color: #64748b;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-icon">🛡️</div>
+          <div>
+            <h1 class="brand-title">Approval Admin</h1>
+            <div class="brand-subtitle">
+              Kelola akun admin yang sudah register. Hanya super admin yang
+              dapat mengubah status.
+            </div>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <a class="nav-btn" href="/admin-session.html">← Kembali ke Admin</a>
+          <a class="nav-btn primary" href="/register.html">+ Register Admin</a>
+          <button type="button" class="logout-btn" onclick="logoutAdmin()">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <div class="stat-label">Total Admin</div>
+          <div class="stat-value" id="totalCount">0</div>
+        </div>
+
+        <div class="stat-card approved">
+          <div class="stat-label">Approved</div>
+          <div class="stat-value" id="approvedCount">0</div>
+        </div>
+
+        <div class="stat-card pending">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="pendingCount">0</div>
+        </div>
+
+        <div class="stat-card rejected">
+          <div class="stat-label">Rejected</div>
+          <div class="stat-value" id="rejectedCount">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Daftar Akun Admin</h2>
+            <p class="card-desc">
+              Ubah status admin menjadi approved, pending, atau rejected sesuai
+              kebutuhan.
+            </p>
+          </div>
+
+          <div class="filter-box">
+            <button class="filter-btn active" type="button" data-filter="all">
+              Semua
+            </button>
+            <button class="filter-btn" type="button" data-filter="pending">
+              Pending
+            </button>
+            <button class="filter-btn" type="button" data-filter="approved">
+              Approved
+            </button>
+            <button class="filter-btn" type="button" data-filter="rejected">
+              Rejected
+            </button>
+          </div>
+        </div>
+
+        <div id="messageBox" class="message"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Tanggal Daftar</th>
+                <th>Approved At</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="adminTable">
+              <tr>
+                <td colspan="6" class="empty-state">Memuat data admin...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+
+    <script>
+      let allAdmins = [];
+      let currentFilter = "all";
+      let currentUserId = null;
+
+      function showMessage(message, type) {
+        const box = document.getElementById("messageBox");
+        box.textContent = message;
+        box.className = `message ${type}`;
+        box.style.display = "block";
+
+        setTimeout(() => {
+          box.style.display = "none";
+        }, 3500);
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "-";
+
+        return (
+          new Date(dateString).toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }) + " WIB"
+        );
+      }
+
+      async function deleteAdmin(adminId, adminEmail) {
+        const confirmation = confirm(
+          `Yakin ingin menghapus admin "${adminEmail}"?\n\nAkun ini akan dihapus dari daftar admin dan juga dari Authentication → Users.`,
+        );
+
+        if (!confirmation) {
+          return;
+        }
+
+        const {
+          data: { session },
+        } = await authClient.auth.getSession();
+
+        if (!session) {
+          showMessage(
+            "Sesi login tidak ditemukan. Silakan login ulang.",
+            "error",
+          );
+          window.location.href = "/login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/admin-users/${adminId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(result.message || "Gagal menghapus admin.", "error");
+            return;
+          }
+
+          showMessage(result.message, "success");
+          await loadAdmins();
+        } catch (error) {
+          showMessage(
+            "Terjadi kesalahan saat menghapus admin: " + error.message,
+            "error",
+          );
+        }
+      }
+
+      function statusBadge(status) {
+        const cleanStatus = status || "pending";
+        return `<span class="badge ${cleanStatus}">${cleanStatus}</span>`;
+      }
+
+      function updateStats(admins) {
+        document.getElementById("totalCount").textContent = admins.length;
+        document.getElementById("approvedCount").textContent = admins.filter(
+          (item) => item.status === "approved",
+        ).length;
+        document.getElementById("pendingCount").textContent = admins.filter(
+          (item) => item.status === "pending",
+        ).length;
+        document.getElementById("rejectedCount").textContent = admins.filter(
+          (item) => item.status === "rejected",
+        ).length;
+      }
+
+      async function checkSuperAdmin() {
+        const {
+          data: { session },
+        } = await authClient.auth.getSession();
+
+        if (!session) {
+          window.location.href = "/login.html";
+          return false;
+        }
+
+        currentUserId = session.user.id;
+
+        const { data, error } = await authClient
+          .from("admin_users")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+
+        if (error || !data) {
+          window.location.href = "/login.html";
+          return false;
+        }
+
+        if (data.status !== "approved" || data.role !== "super_admin") {
+          alert("Halaman ini hanya dapat diakses oleh super admin.");
+          window.location.href = "/admin-session.html";
+          return false;
+        }
+
+        return true;
+      }
+
+      function renderAdmins() {
+        const table = document.getElementById("adminTable");
+        table.innerHTML = "";
+
+        const filteredAdmins =
+          currentFilter === "all"
+            ? allAdmins
+            : allAdmins.filter((admin) => admin.status === currentFilter);
+
+        if (!filteredAdmins || filteredAdmins.length === 0) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Tidak ada data admin untuk filter ini.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filteredAdmins.forEach((admin) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>
+              <div class="admin-name">${admin.nama_lengkap || "-"}</div>
+              <div class="admin-email">${admin.email}</div>
+            </td>
+            <td><span class="badge role">${admin.role || "admin"}</span></td>
+            <td>${statusBadge(admin.status)}</td>
+            <td>${formatDate(admin.created_at)}</td>
+            <td>${formatDate(admin.approved_at)}</td>
+            <td>
+  <div class="actions">
+    <button class="action-btn approve-btn" type="button">Approved</button>
+    <button class="action-btn pending-btn" type="button">Pending</button>
+    <button class="action-btn reject-btn" type="button">Rejected</button>
+    ${
+      admin.user_id === currentUserId
+        ? `<button class="action-btn disabled-btn" type="button" disabled>Akun Ini</button>`
+        : `<button class="action-btn delete-btn" type="button">Hapus</button>`
+    }
+  </div>
+</td>
+          `;
+
+          table.appendChild(row);
+
+          row.querySelector(".approve-btn").addEventListener("click", () => {
+            updateAdminStatus(admin.id, "approved");
+          });
+
+          row.querySelector(".pending-btn").addEventListener("click", () => {
+            updateAdminStatus(admin.id, "pending");
+          });
+
+          row.querySelector(".reject-btn").addEventListener("click", () => {
+            updateAdminStatus(admin.id, "rejected");
+          });
+          const deleteBtn = row.querySelector(".delete-btn");
+
+          if (deleteBtn) {
+            deleteBtn.addEventListener("click", () => {
+              deleteAdmin(admin.id, admin.email);
+            });
+          }
+        });
+      }
+
+      async function loadAdmins() {
+        const allowed = await checkSuperAdmin();
+
+        if (!allowed) return;
+
+        try {
+          const { data, error } = await authClient
+            .from("admin_users")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (error) {
+            document.getElementById("adminTable").innerHTML = `
+              <tr>
+                <td colspan="6" class="empty-state">
+                  Gagal memuat admin: ${error.message}
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          allAdmins = data || [];
+          updateStats(allAdmins);
+          renderAdmins();
+        } catch (error) {
+          document.getElementById("adminTable").innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Terjadi kesalahan: ${error.message}
+              </td>
+            </tr>
+          `;
+        }
+      }
+
+      async function updateAdminStatus(adminId, status) {
+        const payload = {
+          status,
+          approved_at: status === "approved" ? new Date().toISOString() : null,
+        };
+
+        const { error } = await authClient
+          .from("admin_users")
+          .update(payload)
+          .eq("id", adminId);
+
+        if (error) {
+          showMessage("Gagal mengubah status admin: " + error.message, "error");
+          return;
+        }
+
+        showMessage(
+          "Status admin berhasil diubah menjadi " + status + ".",
+          "success",
+        );
+        await loadAdmins();
+      }
+
+      document.querySelectorAll(".filter-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          document.querySelectorAll(".filter-btn").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+
+          this.classList.add("active");
+          currentFilter = this.dataset.filter;
+          renderAdmins();
+        });
+      });
+
+      loadAdmins();
+    </script>
+  </body>
+</html>

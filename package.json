@@ -1,0 +1,24 @@
+{
+  "name": "absensi-qr-dinamis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node api/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "pdfkit": "^0.18.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "vercel": "^48.0.0"
+  }
+}

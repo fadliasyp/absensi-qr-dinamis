@@ -1,0 +1,1694 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Sesi Absensi</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --green: #16a34a;
+        --purple: #7c3aed;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --line: #dbe4f0;
+        --soft: #f8fafc;
+        --card: rgba(255, 255, 255, 0.92);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 22px 14px 34px;
+        font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+        color: var(--dark);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.22),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(124, 58, 237, 0.15),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at bottom left,
+            rgba(22, 163, 74, 0.14),
+            transparent 35%
+          ),
+          linear-gradient(135deg, #eef4ff 0%, #f8fbff 48%, #eefaf3 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to bottom, black, transparent 84%);
+      }
+
+      .page {
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .brand-icon {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 auto;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 900;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          #60a5fa,
+          var(--purple)
+        );
+        box-shadow: 0 14px 30px rgba(37, 99, 235, 0.25);
+      }
+
+      .brand-title {
+        font-size: clamp(20px, 3vw, 26px);
+        font-weight: 900;
+        letter-spacing: -0.4px;
+      }
+
+      .brand-subtitle {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 3px;
+        font-weight: 650;
+        line-height: 1.5;
+      }
+
+      .nav-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .link-btn,
+      .logout-btn,
+      .refresh-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 44px;
+        padding: 11px 15px;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        text-decoration: none;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .link-btn,
+      .refresh-btn {
+        background: rgba(255, 255, 255, 0.84);
+        color: #334155;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      }
+
+      .logout-btn {
+        color: white;
+        border: none;
+        background: linear-gradient(135deg, #b91c1c, #ef4444);
+        box-shadow: 0 12px 24px rgba(239, 68, 68, 0.22);
+      }
+
+      .link-btn:hover,
+      .logout-btn:hover,
+      .refresh-btn:hover,
+      button:hover:not(:disabled),
+      .action-link:hover {
+        transform: translateY(-2px);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 30px;
+        margin-bottom: 18px;
+        color: white;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #7c3aed);
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        right: -115px;
+        top: -125px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .hero h1 {
+        margin: 0 0 10px;
+        font-size: clamp(30px, 4.5vw, 48px);
+        line-height: 1.1;
+        font-weight: 900;
+        letter-spacing: -1px;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 790px;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.75;
+        font-weight: 650;
+      }
+
+      .hero-icon {
+        width: 86px;
+        height: 86px;
+        display: grid;
+        place-items: center;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 42px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--purple));
+      }
+
+      .stat-label {
+        margin: 0 0 9px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+      }
+
+      .stat-chip {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        background: #eef2ff;
+        color: #3730a3;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.22fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        border-radius: 30px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--primary),
+          var(--purple),
+          #22c55e
+        );
+      }
+
+      .card-header {
+        margin-bottom: 20px;
+      }
+
+      .badge-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: var(--primary-dark);
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 12px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(23px, 3vw, 31px);
+        line-height: 1.15;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        color: #111827;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin: 10px 0 0;
+        line-height: 1.7;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .form-section {
+        margin-top: 16px;
+        padding: 18px;
+        border: 1px solid #e8eef8;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        border-radius: 23px;
+      }
+
+      .section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        font-weight: 900;
+        color: #1e293b;
+        font-size: 15px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 13px;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+
+      label {
+        display: block;
+        font-weight: 900;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 14px;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        max-width: 100%;
+        min-height: 50px;
+        padding: 13px 15px;
+        border-radius: 17px;
+        font-size: 15px;
+        font-family: inherit;
+      }
+
+      input,
+      select {
+        border: 1.5px solid var(--line);
+        background: #f9fbff;
+        color: #111827;
+        outline: none;
+        font-weight: 700;
+        transition: 0.18s ease;
+      }
+
+      input::placeholder {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        background:
+          linear-gradient(45deg, transparent 50%, #64748b 50%) calc(100% - 20px)
+            50% / 7px 7px no-repeat,
+          linear-gradient(135deg, #f9fbff, #ffffff);
+        padding-right: 42px;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12);
+        transform: translateY(-1px);
+      }
+
+      input[type="datetime-local"] {
+        width: 100%;
+        min-width: 0;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      button {
+        border: none;
+        color: white;
+        font-weight: 900;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.68;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark),
+          var(--primary),
+          #60a5fa
+        );
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.25);
+        margin-top: 18px;
+      }
+
+      .btn-green {
+        background: linear-gradient(135deg, #15803d, var(--green), #22c55e);
+        box-shadow: 0 14px 28px rgba(22, 163, 74, 0.22);
+      }
+
+      .btn-purple {
+        background: linear-gradient(135deg, #6d28d9, var(--purple), #a855f7);
+        box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
+      }
+
+      .btn-red {
+        background: linear-gradient(135deg, #b91c1c, #ef4444, #f87171);
+        box-shadow: 0 14px 28px rgba(239, 68, 68, 0.22);
+      }
+
+      .location-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 4px;
+      }
+
+      .message {
+        display: none;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 17px;
+        font-weight: 800;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .success {
+        display: block;
+        background: #e9fdf0;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .error {
+        display: block;
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+      }
+
+      .table-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 0.72fr auto;
+        gap: 10px;
+        margin: 17px 0 14px;
+      }
+
+      .table-toolbar input,
+      .table-toolbar select {
+        min-height: 47px;
+        margin: 0;
+      }
+
+      .reset-filter-btn {
+        border: none;
+        border-radius: 16px;
+        background: #f1f5f9;
+        color: #334155;
+        padding: 12px 14px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 22px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      }
+
+      table {
+        width: 100%;
+        min-width: 820px;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      th,
+      td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        font-size: 14px;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f8fafc;
+        color: #334155;
+        font-weight: 900;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      tbody tr {
+        transition: 0.16s ease;
+      }
+
+      tbody tr:hover {
+        background: #fbfdff;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .session-title {
+        font-weight: 900;
+        color: #0f172a;
+      }
+
+      .location-name {
+        font-weight: 800;
+        color: #334155;
+      }
+
+      small {
+        color: var(--muted);
+        font-weight: 750;
+        line-height: 1.55;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .active {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .inactive {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .upcoming {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .action-cell {
+        min-width: 250px;
+      }
+
+      .action-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .action-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: none;
+        text-decoration: none;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 900;
+        color: white;
+        background: var(--primary);
+        width: auto;
+        min-height: auto;
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+
+      .manual {
+        background: var(--orange);
+      }
+
+      .delete {
+        background: var(--red);
+      }
+
+      .pdf {
+        background: var(--purple);
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--muted);
+        font-weight: 800;
+        padding: 24px 10px !important;
+      }
+
+      @media (max-width: 1100px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 760px) {
+        body {
+          padding: 14px 9px 28px;
+        }
+
+        .topbar {
+          align-items: flex-start;
+        }
+
+        .brand {
+          width: 100%;
+          align-items: flex-start;
+        }
+
+        .brand-icon {
+          width: 48px;
+          height: 48px;
+          flex: 0 0 48px;
+        }
+
+        .nav-actions {
+          width: 100%;
+          margin-top: 4px;
+        }
+
+        .link-btn,
+        .logout-btn,
+        .refresh-btn {
+          width: 100%;
+        }
+
+        .hero,
+        .card {
+          border-radius: 25px;
+          padding: 20px;
+        }
+
+        .hero-content {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 22px;
+          font-size: 32px;
+        }
+
+        .hero h1 {
+          font-size: 31px;
+        }
+
+        .hero p,
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .grid,
+        .location-actions,
+        .table-toolbar {
+          grid-template-columns: 1fr;
+        }
+
+        .form-section {
+          padding: 15px;
+          border-radius: 20px;
+        }
+
+        h2 {
+          font-size: 25px;
+        }
+
+        input,
+        select,
+        button {
+          min-height: 49px;
+          font-size: 14px;
+          padding: 12px 13px;
+          border-radius: 15px;
+        }
+
+        table {
+          min-width: 800px;
+        }
+
+        th,
+        td {
+          padding: 11px 10px;
+          font-size: 13px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .card {
+          padding: 17px;
+        }
+
+        .hero {
+          padding: 18px;
+        }
+
+        .brand-title {
+          font-size: 19px;
+        }
+
+        .brand-subtitle {
+          font-size: 12px;
+        }
+
+        .stat-card {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-icon">QR</div>
+          <div>
+            <div class="brand-title">Kelola Sesi Absensi</div>
+            <div class="brand-subtitle">
+              Buat sesi, pilih lokasi, buka QR, dan kelola rekap absensi.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <a href="/admin-approval.html" class="link-btn">🛡️ Approval Admin</a>
+          <a href="/peserta.html" class="link-btn">👥 Kelola Peserta</a>
+          <button
+            type="button"
+            class="refresh-btn"
+            onclick="refreshDashboard()"
+          >
+            🔄 Refresh
+          </button>
+          <button type="button" class="logout-btn" onclick="logoutAdmin()">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <section class="hero">
+        <div class="hero-content">
+          <div>
+            <h1>Dashboard Sesi Absensi</h1>
+            <p>
+              Buat sesi baru, tentukan titik lokasi absensi, atur radius, buka
+              QR untuk peserta, input manual izin/alfa, export PDF, dan hapus
+              sesi yang sudah tidak digunakan.
+            </p>
+          </div>
+
+          <div class="hero-icon">📲</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total Sesi</p>
+          <p class="stat-value" id="totalSesi">0</p>
+          <span class="stat-chip">Semua data</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Aktif</p>
+          <p class="stat-value" id="totalAktif">0</p>
+          <span class="stat-chip">Sedang berjalan</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Akan Datang</p>
+          <p class="stat-value" id="totalUpcoming">0</p>
+          <span class="stat-chip">Belum mulai</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Lokasi Utama</p>
+          <p class="stat-value" id="totalLokasi">0</p>
+          <span class="stat-chip">Tersimpan</span>
+        </div>
+      </section>
+
+      <div class="layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="badge-top">✨ Form Sesi Baru</div>
+            <h2>Buat Sesi Absensi</h2>
+            <p class="subtitle">
+              Isi detail pertemuan, pilih lokasi utama, atau gunakan lokasi saat
+              ini agar peserta hanya bisa absen dalam radius yang ditentukan.
+            </p>
+          </div>
+
+          <div class="form-section">
+            <div class="section-label">📝 Informasi Sesi</div>
+
+            <div class="field">
+              <label for="judulInput">Judul Sesi</label>
+              <input
+                type="text"
+                id="judulInput"
+                placeholder="Contoh: Pengajian Minggu Rumah Fadli"
+              />
+            </div>
+
+            <div class="grid">
+              <div class="field">
+                <label for="startInput">Waktu Mulai</label>
+                <input type="datetime-local" id="startInput" />
+              </div>
+
+              <div class="field">
+                <label for="endInput">Waktu Selesai</label>
+                <input type="datetime-local" id="endInput" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-label">📍 Lokasi Absensi</div>
+
+            <div class="field">
+              <label for="savedLocationSelect">Pilih Lokasi Utama</label>
+              <select id="savedLocationSelect" onchange="applySavedLocation()">
+                <option value="">Pilih lokasi tersimpan</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="locationNameInput">Nama Lokasi</label>
+              <input
+                type="text"
+                id="locationNameInput"
+                placeholder="Contoh: Masjid Periuk Jaya"
+              />
+            </div>
+
+            <div class="grid">
+              <div class="field">
+                <label for="latitudeInput">Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="latitudeInput"
+                  placeholder="-6.178123"
+                />
+              </div>
+
+              <div class="field">
+                <label for="longitudeInput">Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="longitudeInput"
+                  placeholder="106.631234"
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="radiusInput">Radius Absensi Meter</label>
+              <input type="number" id="radiusInput" value="50" min="1" />
+            </div>
+
+            <div class="location-actions">
+              <button
+                type="button"
+                class="btn-green"
+                onclick="getAdminLocation()"
+              >
+                Gunakan Lokasi Saat Ini
+              </button>
+
+              <button
+                type="button"
+                class="btn-purple"
+                onclick="saveCurrentLocationAsMain()"
+              >
+                Simpan Lokasi Utama
+              </button>
+
+              <button
+                type="button"
+                class="btn-red"
+                onclick="deleteSelectedLocation()"
+              >
+                Hapus Lokasi Utama
+              </button>
+            </div>
+          </div>
+
+          <button id="createBtn" class="btn-primary" onclick="createSession()">
+            Buat Sesi
+          </button>
+
+          <div id="messageBox" class="message"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="badge-top">📋 Daftar Sesi</div>
+            <h2>Sesi Tersimpan</h2>
+            <p class="subtitle">
+              Buka QR, input manual, export PDF, atau hapus sesi yang sudah
+              tidak digunakan.
+            </p>
+          </div>
+
+          <div class="table-toolbar">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Cari judul atau lokasi sesi..."
+              oninput="renderSessions()"
+            />
+
+            <select id="statusFilter" onchange="renderSessions()">
+              <option value="">Semua status</option>
+              <option value="active">Aktif</option>
+              <option value="upcoming">Akan datang</option>
+              <option value="inactive">Tidak aktif</option>
+            </select>
+
+            <button
+              type="button"
+              class="reset-filter-btn"
+              onclick="resetFilter()"
+            >
+              Reset
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Lokasi</th>
+                  <th>Mulai</th>
+                  <th>Selesai</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody id="sessionTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/admin-auth.js"></script>
+
+    <script>
+      protectAdminPage();
+    </script>
+
+    <script>
+      let savedLocations = [];
+      let allSessions = [];
+
+      function safeText(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function popupSuccess(message, title = "Berhasil") {
+        return Swal.fire({
+          icon: "success",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#2563eb",
+        });
+      }
+
+      function popupError(message, title = "Gagal") {
+        return Swal.fire({
+          icon: "error",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#ef4444",
+        });
+      }
+
+      function popupInfo(message, title = "Informasi") {
+        return Swal.fire({
+          icon: "info",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#2563eb",
+        });
+      }
+
+      async function popupConfirm(message, title = "Apakah Anda yakin?") {
+        const result = await Swal.fire({
+          icon: "warning",
+          title,
+          text: message,
+          showCancelButton: true,
+          confirmButtonText: "Ya, lanjutkan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#ef4444",
+          cancelButtonColor: "#64748b",
+          reverseButtons: true,
+        });
+
+        return result.isConfirmed;
+      }
+
+      function showMessage(message, type) {
+        const box = document.getElementById("messageBox");
+        box.textContent = message;
+        box.className = `message ${type}`;
+        box.style.display = "block";
+
+        setTimeout(() => {
+          box.style.display = "none";
+        }, 4500);
+      }
+
+      function formatDateTime(dateString) {
+        if (!dateString) return "-";
+
+        return (
+          new Date(dateString).toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }) + " WIB"
+        );
+      }
+
+      function toISOStringFromLocalInput(value) {
+        if (!value) return null;
+        return new Date(value).toISOString();
+      }
+
+      function getSessionStatus(session) {
+        const now = new Date();
+        const start = session.start_time ? new Date(session.start_time) : null;
+        const end = session.end_time ? new Date(session.end_time) : null;
+
+        const isUpcoming = session.is_active && start && now < start;
+        const isRunning =
+          session.is_active && (!start || now >= start) && (!end || now <= end);
+
+        if (isRunning) {
+          return {
+            key: "active",
+            label: "Aktif",
+            className: "active",
+            icon: "🟢",
+          };
+        }
+
+        if (isUpcoming) {
+          return {
+            key: "upcoming",
+            label: "Akan Datang",
+            className: "upcoming",
+            icon: "🔵",
+          };
+        }
+
+        return {
+          key: "inactive",
+          label: "Tidak Aktif",
+          className: "inactive",
+          icon: "🔴",
+        };
+      }
+
+      function updateStats() {
+        const total = allSessions.length;
+
+        const active = allSessions.filter((session) => {
+          return getSessionStatus(session).key === "active";
+        }).length;
+
+        const upcoming = allSessions.filter((session) => {
+          return getSessionStatus(session).key === "upcoming";
+        }).length;
+
+        document.getElementById("totalSesi").textContent = total;
+        document.getElementById("totalAktif").textContent = active;
+        document.getElementById("totalUpcoming").textContent = upcoming;
+        document.getElementById("totalLokasi").textContent =
+          savedLocations.length;
+      }
+
+      function resetFilter() {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("statusFilter").value = "";
+        renderSessions();
+      }
+
+      async function refreshDashboard() {
+        await Promise.all([loadLocations(), loadSessions()]);
+
+        Swal.fire({
+          icon: "success",
+          title: "Data diperbarui",
+          timer: 1200,
+          showConfirmButton: false,
+        });
+      }
+
+      async function loadLocations() {
+        try {
+          const response = await fetch("/api/locations");
+          const result = await response.json();
+
+          if (!result.success) {
+            showMessage(
+              result.message || "Gagal mengambil daftar lokasi.",
+              "error",
+            );
+            return;
+          }
+
+          savedLocations = result.locations || [];
+
+          const select = document.getElementById("savedLocationSelect");
+          select.innerHTML = `<option value="">Pilih lokasi tersimpan</option>`;
+
+          savedLocations.forEach((location) => {
+            const option = document.createElement("option");
+            option.value = location.id;
+            option.textContent = `${location.location_name} (${location.radius_meters || 50} m)`;
+            select.appendChild(option);
+          });
+
+          updateStats();
+        } catch (error) {
+          showMessage(
+            "Terjadi kesalahan saat mengambil lokasi: " + error.message,
+            "error",
+          );
+        }
+      }
+
+      function applySavedLocation() {
+        const selectedId = document.getElementById("savedLocationSelect").value;
+
+        if (!selectedId) return;
+
+        const location = savedLocations.find((item) => item.id === selectedId);
+
+        if (!location) {
+          showMessage("Lokasi tidak ditemukan.", "error");
+          return;
+        }
+
+        document.getElementById("locationNameInput").value =
+          location.location_name;
+        document.getElementById("latitudeInput").value = location.latitude;
+        document.getElementById("longitudeInput").value = location.longitude;
+        document.getElementById("radiusInput").value =
+          location.radius_meters || 50;
+
+        showMessage(
+          `Lokasi "${location.location_name}" berhasil digunakan.`,
+          "success",
+        );
+      }
+
+      async function saveCurrentLocationAsMain() {
+        const locationName = document
+          .getElementById("locationNameInput")
+          .value.trim();
+
+        const latitude = document.getElementById("latitudeInput").value;
+        const longitude = document.getElementById("longitudeInput").value;
+        const radiusMeters = document.getElementById("radiusInput").value;
+
+        if (!locationName || !latitude || !longitude) {
+          popupError(
+            "Nama lokasi, latitude, dan longitude wajib diisi sebelum disimpan.",
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/locations", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              locationName,
+              latitude,
+              longitude,
+              radiusMeters,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal menyimpan lokasi utama.");
+            return;
+          }
+
+          await popupSuccess(
+            result.message || "Lokasi utama berhasil disimpan.",
+          );
+
+          await loadLocations();
+        } catch (error) {
+          popupError(
+            "Terjadi kesalahan saat menyimpan lokasi: " + error.message,
+          );
+        }
+      }
+
+      async function deleteSelectedLocation() {
+        const select = document.getElementById("savedLocationSelect");
+        const selectedId = select.value;
+
+        if (!selectedId) {
+          popupError("Pilih lokasi utama yang ingin dihapus terlebih dahulu.");
+          return;
+        }
+
+        const location = savedLocations.find((item) => item.id === selectedId);
+        const locationName = location?.location_name || "lokasi ini";
+
+        const confirmation = await popupConfirm(
+          `Yakin ingin menghapus lokasi utama "${locationName}"? Lokasi ini akan hilang dari daftar lokasi tersimpan, tetapi sesi yang sudah dibuat tetap aman.`,
+          "Hapus lokasi utama?",
+        );
+
+        if (!confirmation) return;
+
+        try {
+          const response = await fetch(`/api/locations/${selectedId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal menghapus lokasi utama.");
+            return;
+          }
+
+          await popupSuccess(
+            result.message || "Lokasi utama berhasil dihapus.",
+          );
+
+          document.getElementById("savedLocationSelect").value = "";
+          document.getElementById("locationNameInput").value = "";
+          document.getElementById("latitudeInput").value = "";
+          document.getElementById("longitudeInput").value = "";
+          document.getElementById("radiusInput").value = "50";
+
+          await loadLocations();
+        } catch (error) {
+          popupError(
+            "Terjadi kesalahan saat menghapus lokasi: " + error.message,
+          );
+        }
+      }
+
+      async function getAdminLocation() {
+        if (!navigator.geolocation) {
+          popupError("Browser tidak mendukung geolocation.");
+          return;
+        }
+
+        await popupInfo(
+          "Sistem akan meminta izin lokasi untuk mengambil titik koordinat lokasi utama.",
+          "Ambil Lokasi Saat Ini",
+        );
+
+        showMessage("Mengambil lokasi admin...", "success");
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            document.getElementById("latitudeInput").value =
+              position.coords.latitude;
+            document.getElementById("longitudeInput").value =
+              position.coords.longitude;
+
+            popupSuccess(
+              "Lokasi berhasil diambil. Silakan isi nama lokasi dan radius.",
+              "Lokasi Berhasil",
+            );
+          },
+          function () {
+            popupError(
+              "Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan di browser.",
+            );
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+          },
+        );
+      }
+
+      async function createSession() {
+        const judul = document.getElementById("judulInput").value.trim();
+        const startValue = document.getElementById("startInput").value;
+        const endValue = document.getElementById("endInput").value;
+        const locationName = document
+          .getElementById("locationNameInput")
+          .value.trim();
+
+        const latitude = document.getElementById("latitudeInput").value;
+        const longitude = document.getElementById("longitudeInput").value;
+        const radiusMeters = document.getElementById("radiusInput").value;
+        const createBtn = document.getElementById("createBtn");
+
+        if (!judul) {
+          popupError("Judul sesi wajib diisi.");
+          return;
+        }
+
+        if (!startValue || !endValue) {
+          popupError("Waktu mulai dan selesai wajib diisi.");
+          return;
+        }
+
+        const startTime = toISOStringFromLocalInput(startValue);
+        const endTime = toISOStringFromLocalInput(endValue);
+
+        if (new Date(endTime) <= new Date(startTime)) {
+          popupError("Waktu selesai harus lebih besar dari waktu mulai.");
+          return;
+        }
+
+        if (!locationName || !latitude || !longitude) {
+          popupError("Nama lokasi, latitude, dan longitude wajib diisi.");
+          return;
+        }
+
+        createBtn.disabled = true;
+        createBtn.textContent = "Membuat...";
+
+        try {
+          const response = await fetch("/api/sessions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              judul,
+              startTime,
+              endTime,
+              locationName,
+              latitude,
+              longitude,
+              radiusMeters,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal membuat sesi.");
+            return;
+          }
+
+          await popupSuccess("Sesi berhasil dibuat.");
+
+          document.getElementById("judulInput").value = "";
+          document.getElementById("startInput").value = "";
+          document.getElementById("endInput").value = "";
+          document.getElementById("locationNameInput").value = "";
+          document.getElementById("latitudeInput").value = "";
+          document.getElementById("longitudeInput").value = "";
+          document.getElementById("radiusInput").value = "50";
+          document.getElementById("savedLocationSelect").value = "";
+
+          await loadSessions();
+        } catch (error) {
+          popupError("Terjadi kesalahan: " + error.message);
+        } finally {
+          createBtn.disabled = false;
+          createBtn.textContent = "Buat Sesi";
+        }
+      }
+
+      async function loadSessions() {
+        const table = document.getElementById("sessionTable");
+
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">Memuat data sesi...</td>
+          </tr>
+        `;
+
+        try {
+          const response = await fetch("/api/sessions");
+          const contentType = response.headers.get("content-type") || "";
+
+          if (!contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(
+              "Endpoint /api/sessions tidak mengembalikan JSON. Isi response: " +
+                text.slice(0, 120),
+            );
+          }
+
+          const result = await response.json();
+
+          if (!result.success) {
+            table.innerHTML = `
+              <tr>
+                <td colspan="6" class="empty-state">
+                  ${safeText(result.message || "Gagal memuat sesi.")}
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          allSessions = result.sessions || [];
+
+          updateStats();
+          renderSessions();
+        } catch (error) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Gagal memuat sesi: ${safeText(error.message)}
+              </td>
+            </tr>
+          `;
+        }
+      }
+
+      function renderSessions() {
+        const table = document.getElementById("sessionTable");
+        const keyword = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+
+        const selectedStatus = document.getElementById("statusFilter").value;
+
+        let filtered = allSessions;
+
+        if (selectedStatus) {
+          filtered = filtered.filter((session) => {
+            return getSessionStatus(session).key === selectedStatus;
+          });
+        }
+
+        if (keyword) {
+          filtered = filtered.filter((session) => {
+            const searchable = [
+              session.judul,
+              session.location_name,
+              session.radius_meters,
+            ]
+              .join(" ")
+              .toLowerCase();
+
+            return searchable.includes(keyword);
+          });
+        }
+
+        table.innerHTML = "";
+
+        if (!filtered.length) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Tidak ada sesi yang sesuai dengan pencarian/filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((session) => {
+          const status = getSessionStatus(session);
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>
+              <div class="session-title">${safeText(session.judul)}</div>
+              <small>ID: ${safeText(session.id).slice(0, 8)}...</small>
+            </td>
+
+            <td>
+              <div class="location-name">${safeText(
+                session.location_name || "-",
+              )}</div>
+              <small>Radius ${safeText(
+                session.radius_meters || 50,
+              )} meter</small>
+            </td>
+
+            <td>${formatDateTime(session.start_time)}</td>
+
+            <td>${formatDateTime(session.end_time)}</td>
+
+            <td>
+              <span class="status ${status.className}">
+                ${status.icon} ${status.label}
+              </span>
+            </td>
+
+            <td class="action-cell">
+              <div class="action-wrap">
+                <a class="action-link" href="/admin.html?session=${session.id}">
+                  Buka QR
+                </a>
+
+                <a class="action-link manual" href="/manual.html?session=${session.id}">
+                  Izin/Alfa
+                </a>
+
+                <a
+                  class="action-link pdf"
+                  href="/api/sessions/${session.id}/export-pdf"
+                  target="_blank"
+                >
+                  Export PDF
+                </a>
+
+                <button
+                  class="action-link delete delete-session-btn"
+                  data-id="${session.id}"
+                  data-title="${safeText(session.judul)}"
+                  type="button"
+                >
+                  Hapus
+                </button>
+              </div>
+            </td>
+          `;
+
+          table.appendChild(row);
+
+          const deleteBtn = row.querySelector(".delete-session-btn");
+
+          deleteBtn.addEventListener("click", function () {
+            const id = this.dataset.id;
+            const title = this.dataset.title;
+            deleteSession(id, title);
+          });
+        });
+      }
+
+      async function deleteSession(sessionId, sessionTitle) {
+        const confirmation = await popupConfirm(
+          `Data rekap absensi dan QR token pada sesi "${sessionTitle}" juga akan ikut terhapus.`,
+          "Hapus sesi ini?",
+        );
+
+        if (!confirmation) return;
+
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal menghapus sesi.");
+            return;
+          }
+
+          await popupSuccess("Sesi berhasil dihapus.");
+          await loadSessions();
+        } catch (error) {
+          popupError("Terjadi kesalahan saat menghapus sesi: " + error.message);
+        }
+      }
+
+      loadLocations();
+      loadSessions();
+    </script>
+  </body>
+</html>

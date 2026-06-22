@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WA Peserta Alfa</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --purple: #7c3aed;
+        --green: #16a34a;
+        --wa: #22c55e;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --soft: #f8fafc;
+        --card: rgba(255, 255, 255, 0.92);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px 14px 34px;
+        font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+        color: var(--dark);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.2),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(34, 197, 94, 0.18),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at bottom left,
+            rgba(124, 58, 237, 0.12),
+            transparent 35%
+          ),
+          linear-gradient(135deg, #eef4ff 0%, #f8fbff 48%, #eefaf3 100%);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to bottom, black, transparent 84%);
+      }
+
+      .page {
+        width: min(1060px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .btn-link,
+      button {
+        font-family: inherit;
+      }
+
+      .btn-link,
+      .top-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 12px 15px;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .btn-admin {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+      }
+
+      .btn-session {
+        background: rgba(255, 255, 255, 0.86);
+        color: #334155;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      }
+
+      .top-btn {
+        border: none;
+        color: white;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        box-shadow: 0 14px 30px rgba(34, 197, 94, 0.22);
+      }
+
+      .btn-link:hover,
+      .top-btn:hover,
+      .wa-link:hover,
+      .copy-btn:hover,
+      .preview-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 30px;
+        margin-bottom: 18px;
+        color: white;
+        background: linear-gradient(135deg, #15803d, #16a34a, #2563eb);
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        right: -115px;
+        top: -125px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .top-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 13px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 13px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4.5vw, 48px);
+        line-height: 1.1;
+        font-weight: 900;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        max-width: 760px;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 15px;
+        line-height: 1.75;
+        font-weight: 650;
+      }
+
+      .hero-icon {
+        width: 86px;
+        height: 86px;
+        display: grid;
+        place-items: center;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 42px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, #22c55e, #2563eb, #7c3aed);
+      }
+
+      .stat-label {
+        margin: 0 0 9px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+      }
+
+      .stat-chip {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        background: var(--card);
+        border-radius: 30px;
+        padding: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, #22c55e, #2563eb, #7c3aed);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .section-kicker {
+        margin: 0 0 6px;
+        color: var(--green);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(22px, 3vw, 29px);
+        font-weight: 900;
+        letter-spacing: -0.5px;
+      }
+
+      .section-desc {
+        margin: 9px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 15px;
+        font-weight: 650;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr 0.75fr auto;
+        gap: 10px;
+        margin: 18px 0;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        width: 100%;
+        min-height: 48px;
+        border: 1.5px solid #dbe4f0;
+        border-radius: 17px;
+        padding: 13px 14px;
+        background: #f8fafc;
+        color: var(--dark);
+        font-family: inherit;
+        font-weight: 750;
+        font-size: 14px;
+        outline: none;
+      }
+
+      .toolbar input:focus,
+      .toolbar select:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+      }
+
+      .reset-btn {
+        border: none;
+        border-radius: 17px;
+        background: #f1f5f9;
+        color: #334155;
+        padding: 12px 14px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      #alfaBox {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .alfa-card {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff, #fffaf3);
+        border: 1px solid #fed7aa;
+        border-radius: 24px;
+        padding: 17px;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+        transition: 0.2s ease;
+      }
+
+      .alfa-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.11);
+      }
+
+      .alfa-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+      }
+
+      .alfa-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .alfa-number {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 900;
+        background: linear-gradient(135deg, #f97316, #ef4444);
+        box-shadow: 0 10px 22px rgba(239, 68, 68, 0.2);
+      }
+
+      .alfa-name {
+        flex: 1;
+        font-size: 19px;
+        font-weight: 900;
+        color: #111827;
+        line-height: 1.25;
+      }
+
+      .alfa-meta {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.65;
+        font-weight: 700;
+      }
+
+      .meta-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .badge-group {
+        background: #ede9fe;
+        color: #6d28d9;
+      }
+
+      .badge-male {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .badge-female {
+        background: #fce7f3;
+        color: #be185d;
+      }
+
+      .badge-empty {
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 14px;
+      }
+
+      .wa-link,
+      .copy-btn,
+      .preview-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 43px;
+        padding: 10px 12px;
+        border-radius: 15px;
+        border: none;
+        color: white;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: 0.2s ease;
+        text-align: center;
+      }
+
+      .wa-link {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.22);
+      }
+
+      .copy-btn {
+        background: linear-gradient(135deg, #2563eb, #60a5fa);
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+      }
+
+      .preview-btn {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        box-shadow: 0 12px 24px rgba(124, 58, 237, 0.18);
+        grid-column: 1 / -1;
+      }
+
+      .missing-wa {
+        margin-top: 13px;
+        padding: 12px;
+        border-radius: 16px;
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        color: #be123c;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .empty {
+        grid-column: 1 / -1;
+        padding: 22px;
+        border-radius: 22px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        color: #64748b;
+        line-height: 1.7;
+        font-weight: 750;
+        text-align: center;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 15px 16px;
+        border-radius: 19px;
+        background: linear-gradient(135deg, #f8fafc, #eef6ff);
+        border: 1px solid #e5edf6;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.65;
+        font-weight: 650;
+      }
+
+      .note strong {
+        color: #334155;
+      }
+
+      @media (max-width: 880px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        #alfaBox {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        body {
+          padding: 14px 9px 28px;
+        }
+
+        .top-actions {
+          align-items: stretch;
+        }
+
+        .btn-link,
+        .top-btn {
+          width: 100%;
+        }
+
+        .hero,
+        .card {
+          border-radius: 25px;
+          padding: 20px;
+        }
+
+        .hero-content {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 22px;
+          font-size: 32px;
+        }
+
+        h1 {
+          font-size: 31px;
+        }
+
+        .subtitle,
+        .section-desc {
+          font-size: 14px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .card-header {
+          flex-direction: column;
+        }
+
+        .card-actions {
+          grid-template-columns: 1fr;
+        }
+
+        .preview-btn {
+          grid-column: auto;
+        }
+
+        .alfa-card {
+          border-radius: 21px;
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="top-actions">
+        <a id="adminLinkTop" class="btn-link btn-admin" href="#">
+          ← Kembali ke Rekap Admin
+        </a>
+
+        <a class="btn-link btn-session" href="/admin-session.html">
+          📋 Daftar Sesi
+        </a>
+
+        <button class="top-btn" type="button" onclick="loadAlfaList(true)">
+          🔄 Refresh Data Alfa
+        </button>
+      </div>
+
+      <section class="hero">
+        <div class="hero-content">
+          <div>
+            <div class="top-badge">💬 WhatsApp Peserta Alfa</div>
+            <h1>Daftar WA Peserta Alfa</h1>
+
+            <p class="subtitle">
+              Halaman ini menampilkan peserta yang berstatus
+              <strong>Alfa</strong> pada sesi absensi ini. Klik
+              <strong>Kirim WA</strong> untuk membuka WhatsApp dengan pesan yang
+              sudah terisi otomatis.
+            </p>
+          </div>
+
+          <div class="hero-icon">📲</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total Alfa</p>
+          <p class="stat-value" id="totalAlfa">0</p>
+          <span class="stat-chip">Peserta</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Nomor WA Ada</p>
+          <p class="stat-value" id="totalWaAda">0</p>
+          <span class="stat-chip">Bisa dikirim</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Nomor WA Kosong</p>
+          <p class="stat-value" id="totalWaKosong">0</p>
+          <span class="stat-chip">Perlu dilengkapi</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Tanggal Sesi</p>
+          <p class="stat-value" id="tanggalSesiStat" style="font-size: 18px">
+            -
+          </p>
+          <span class="stat-chip">Absensi</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">Daftar Peserta</p>
+            <h2>Peserta Berstatus Alfa</h2>
+            <p class="section-desc">
+              Gunakan pencarian dan filter kelompok untuk mempercepat proses
+              menghubungi peserta.
+            </p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Cari nama, kelompok, gender, atau nomor WA..."
+            oninput="renderAlfaList()"
+          />
+
+          <select id="kelompokFilter" onchange="renderAlfaList()">
+            <option value="">Semua kelompok</option>
+          </select>
+
+          <button class="reset-btn" type="button" onclick="resetFilter()">
+            Reset
+          </button>
+        </div>
+
+        <div id="alfaBox">
+          <div class="empty">Memuat data peserta Alfa...</div>
+        </div>
+
+        <div class="note">
+          <strong>Catatan:</strong> fitur ini menggunakan WhatsApp link gratis,
+          sehingga pesan tidak terkirim otomatis. Admin tetap perlu menekan
+          tombol <strong>Send/Kirim</strong> di WhatsApp.
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      protectAdminPage();
+    </script>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session");
+
+      let alfaData = [];
+      let currentTanggalSesi = "hari ini";
+
+      if (!sessionId) {
+        Swal.fire({
+          icon: "error",
+          title: "Session ID tidak ditemukan",
+          text: "Silakan buka dari halaman admin session.",
+          confirmButtonText: "Ke Daftar Sesi",
+          confirmButtonColor: "#2563eb",
+        }).then(() => {
+          window.location.href = "/admin-session.html";
+        });
+      }
+
+      const adminLinkTop = document.getElementById("adminLinkTop");
+
+      if (adminLinkTop && sessionId) {
+        adminLinkTop.href = `/admin.html?session=${sessionId}`;
+      }
+
+      function escapeHtml(text = "") {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function normalizeWaNumber(number) {
+        if (!number) return "";
+
+        let cleaned = String(number).replace(/\D/g, "");
+
+        if (cleaned.startsWith("0")) {
+          cleaned = "62" + cleaned.substring(1);
+        }
+
+        return cleaned;
+      }
+
+      function formatTanggalSesi(dateString) {
+        if (!dateString) return "hari ini";
+
+        return new Date(dateString).toLocaleDateString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
+
+      function getSapaan(gender) {
+        const cleanGender = (gender || "").toLowerCase();
+
+        if (
+          cleanGender.includes("laki") ||
+          cleanGender === "l" ||
+          cleanGender === "pria"
+        ) {
+          return "Mas";
+        }
+
+        if (
+          cleanGender.includes("perempuan") ||
+          cleanGender === "p" ||
+          cleanGender === "wanita"
+        ) {
+          return "Mba";
+        }
+
+        return "Kak";
+      }
+
+      function createWaMessage(name, gender, kelompok, tanggalSesi) {
+        const sapaan = getSapaan(gender);
+        const infoKelompok = kelompok ? ` kelompok ${kelompok}` : "";
+        const tanggalText = tanggalSesi || "hari ini";
+
+        return `Assalamu’alaikum, ${sapaan} *${name}*${infoKelompok}.
+
+Kami dari pengurus muda/i desa Periuk Jaya ingin mengabarkan bahwa pada ${tanggalText}, ${sapaan} *${name}* tercatat *Tidak Hadir* di sambung muda/i desa.
+
+Semoga di pertemuan berikutnya bisa kembali hadir dan sambung bersama ya.
+
+Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dalam segala urusan. Aamiin`;
+      }
+
+      function getGenderBadge(gender) {
+        const cleanGender = (gender || "").toLowerCase();
+
+        if (cleanGender.includes("laki")) {
+          return `<span class="badge badge-male">Laki-laki</span>`;
+        }
+
+        if (cleanGender.includes("perempuan")) {
+          return `<span class="badge badge-female">Perempuan</span>`;
+        }
+
+        return `<span class="badge badge-empty">Gender belum diisi</span>`;
+      }
+
+      function updateStats() {
+        const total = alfaData.length;
+        const waAda = alfaData.filter((item) =>
+          normalizeWaNumber(item.no_wa),
+        ).length;
+        const waKosong = total - waAda;
+
+        document.getElementById("totalAlfa").textContent = total;
+        document.getElementById("totalWaAda").textContent = waAda;
+        document.getElementById("totalWaKosong").textContent = waKosong;
+        document.getElementById("tanggalSesiStat").textContent =
+          currentTanggalSesi || "-";
+      }
+
+      function updateKelompokFilter() {
+        const filter = document.getElementById("kelompokFilter");
+        const currentValue = filter.value;
+
+        const groups = [
+          ...new Set(
+            alfaData
+              .map((item) => item.kelompok)
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b)),
+          ),
+        ];
+
+        filter.innerHTML = `<option value="">Semua kelompok</option>`;
+
+        groups.forEach((group) => {
+          const option = document.createElement("option");
+          option.value = group;
+          option.textContent = group;
+          filter.appendChild(option);
+        });
+
+        filter.value = currentValue;
+      }
+
+      function resetFilter() {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("kelompokFilter").value = "";
+        renderAlfaList();
+      }
+
+      async function copyMessage(message, name) {
+        try {
+          await navigator.clipboard.writeText(message);
+
+          Swal.fire({
+            icon: "success",
+            title: "Pesan disalin",
+            text: `Pesan untuk ${name} berhasil disalin.`,
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal menyalin",
+            text: "Pesan tidak berhasil disalin: " + error.message,
+            confirmButtonColor: "#ef4444",
+          });
+        }
+      }
+
+      function previewMessage(message, name) {
+        Swal.fire({
+          icon: "info",
+          title: `Preview Pesan untuk ${name}`,
+          html: `<div style="text-align:left; white-space:pre-line; line-height:1.6;">${escapeHtml(
+            message,
+          )}</div>`,
+          confirmButtonText: "Tutup",
+          confirmButtonColor: "#2563eb",
+          width: 560,
+        });
+      }
+
+      async function loadAlfaList(showPopup = false) {
+        const alfaBox = document.getElementById("alfaBox");
+        alfaBox.innerHTML = `<div class="empty">Memuat data peserta Alfa...</div>`;
+
+        try {
+          const response = await fetch(`/api/attendance/${sessionId}/alfa`);
+          const result = await response.json();
+
+          if (!result.success) {
+            alfaBox.innerHTML = `
+              <div class="empty">
+                ${escapeHtml(result.message || "Gagal mengambil data Alfa.")}
+              </div>
+            `;
+            return;
+          }
+
+          alfaData = result.alfa || [];
+          currentTanggalSesi = formatTanggalSesi(result.session?.start_time);
+
+          updateStats();
+          updateKelompokFilter();
+          renderAlfaList();
+
+          if (showPopup) {
+            Swal.fire({
+              icon: "success",
+              title: "Data diperbarui",
+              timer: 1200,
+              showConfirmButton: false,
+            });
+          }
+        } catch (error) {
+          alfaBox.innerHTML = `
+            <div class="empty">
+              Terjadi kesalahan: ${escapeHtml(error.message)}
+            </div>
+          `;
+        }
+      }
+
+      function renderAlfaList() {
+        const alfaBox = document.getElementById("alfaBox");
+        const keyword = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+
+        const selectedKelompok =
+          document.getElementById("kelompokFilter").value;
+
+        let filtered = alfaData;
+
+        if (selectedKelompok) {
+          filtered = filtered.filter(
+            (item) => item.kelompok === selectedKelompok,
+          );
+        }
+
+        if (keyword) {
+          filtered = filtered.filter((item) => {
+            const searchable = [
+              item.nama,
+              item.gender,
+              item.kelompok,
+              item.no_wa,
+            ]
+              .join(" ")
+              .toLowerCase();
+
+            return searchable.includes(keyword);
+          });
+        }
+
+        alfaBox.innerHTML = "";
+
+        if (!filtered.length) {
+          alfaBox.innerHTML = `
+            <div class="empty">
+              Tidak ada peserta Alfa yang sesuai dengan pencarian/filter.
+            </div>
+          `;
+          return;
+        }
+
+        filtered.forEach((item, index) => {
+          const noWa = normalizeWaNumber(item.no_wa);
+          const nama = item.nama || "-";
+          const kelompok = item.kelompok || "-";
+          const message = createWaMessage(
+            nama,
+            item.gender,
+            item.kelompok,
+            currentTanggalSesi,
+          );
+
+          const waUrl = noWa
+            ? `https://wa.me/${noWa}?text=${encodeURIComponent(message)}`
+            : "";
+
+          const card = document.createElement("div");
+          card.className = "alfa-card";
+
+          card.innerHTML = `
+            <div class="alfa-top">
+              <div class="alfa-number">${index + 1}</div>
+              <div class="alfa-name">${escapeHtml(nama)}</div>
+            </div>
+
+            <div class="alfa-meta">
+              No WA: ${item.no_wa ? escapeHtml(item.no_wa) : "Belum ada nomor WA"}
+            </div>
+
+            <div class="meta-row">
+              <span class="badge badge-group">${escapeHtml(kelompok)}</span>
+              ${getGenderBadge(item.gender)}
+            </div>
+
+            ${
+              noWa
+                ? `
+                  <div class="card-actions">
+                    <a class="wa-link" href="${waUrl}" target="_blank" rel="noopener">
+                      Kirim WA
+                    </a>
+
+                    <button class="copy-btn" type="button">
+                      Salin Pesan
+                    </button>
+
+                    <button class="preview-btn" type="button">
+                      Preview Pesan
+                    </button>
+                  </div>
+                `
+                : `
+                  <div class="missing-wa">
+                    Nomor WA belum tersedia. Silakan lengkapi nomor peserta di halaman Kelola Peserta.
+                  </div>
+
+                  <div class="card-actions">
+                    <button class="copy-btn" type="button">
+                      Salin Pesan
+                    </button>
+
+                    <button class="preview-btn" type="button">
+                      Preview Pesan
+                    </button>
+                  </div>
+                `
+            }
+          `;
+
+          alfaBox.appendChild(card);
+
+          const copyBtn = card.querySelector(".copy-btn");
+          const previewBtn = card.querySelector(".preview-btn");
+
+          copyBtn.addEventListener("click", function () {
+            copyMessage(message, nama);
+          });
+
+          previewBtn.addEventListener("click", function () {
+            previewMessage(message, nama);
+          });
+        });
+      }
+
+      loadAlfaList();
+    </script>
+  </body>
+</html>

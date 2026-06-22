@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Absensi QR</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap");
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --purple: #7c3aed;
+        --green: #16a34a;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --soft: #f8fafc;
+        --card: rgba(255, 255, 255, 0.92);
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px 14px 36px;
+        font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+        color: var(--dark);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(37, 99, 235, 0.2),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(124, 58, 237, 0.16),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at bottom left,
+            rgba(22, 163, 74, 0.13),
+            transparent 36%
+          ),
+          linear-gradient(135deg, #eef4ff 0%, #f8fbff 48%, #eefaf3 100%);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to bottom, black, transparent 82%);
+      }
+
+      .page {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .back-session-btn,
+      .small-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .back-session-btn {
+        color: #ffffff;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+      }
+
+      .small-action-btn {
+        color: #334155;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      }
+
+      .back-session-btn:hover,
+      .small-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        padding: 30px;
+        margin-bottom: 18px;
+        color: white;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb, #7c3aed);
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 310px;
+        height: 310px;
+        right: -110px;
+        top: -120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .judul-utama {
+        font-family: "Quicksand", sans-serif;
+        font-size: clamp(42px, 7vw, 68px);
+        font-weight: 700;
+        font-style: oblique;
+        letter-spacing: 0;
+        line-height: 1.1;
+        word-spacing: 0px;
+        text-transform: none;
+        text-decoration: underline;
+        text-align: left;
+        color: #ffffff;
+        text-shadow: 5px 0px 3px rgba(86, 182, 198, 0.7);
+        margin: 0 0 8px;
+      }
+
+      .sub-title {
+        margin: 0;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.7;
+        font-weight: 650;
+      }
+
+      .hero-icon {
+        width: 86px;
+        height: 86px;
+        display: grid;
+        place-items: center;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 42px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--purple));
+      }
+
+      .stat-label {
+        margin: 0 0 9px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+      }
+
+      .stat-chip {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        background: #eef2ff;
+        color: #3730a3;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        background: var(--card);
+        border-radius: 30px;
+        padding: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 5px;
+        background: linear-gradient(90deg, #2563eb, #7c3aed, #22c55e);
+      }
+
+      .section-kicker {
+        margin: 0 0 6px;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: clamp(22px, 3vw, 29px);
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        color: #111827;
+      }
+
+      .section-desc {
+        margin: 9px 0 20px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.7;
+        font-weight: 600;
+      }
+
+      .qr-card {
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        padding: 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+      }
+
+      .qr-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 13px;
+        font-weight: 900;
+        margin-bottom: 15px;
+      }
+
+      #qrImage {
+        width: min(330px, 100%);
+        height: auto;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto 18px;
+        display: block;
+        border: 1px solid #dbe3f0;
+        border-radius: 24px;
+        padding: 15px;
+        background: #ffffff;
+        box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+      }
+
+      .timer-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 13px 14px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #fff7ed, #fffbeb);
+        border: 1px solid #fed7aa;
+      }
+
+      .timer-label {
+        color: #9a3412;
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .timer {
+        color: #ea580c;
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 0.6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .url-box {
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        word-break: break-all;
+        border-radius: 18px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #475569;
+        font-weight: 650;
+        text-align: left;
+      }
+
+      .url-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .copy-btn {
+        width: 100%;
+        border: none;
+        padding: 12px 14px;
+        border-radius: 16px;
+        color: #334155;
+        background: #f1f5f9;
+        font-weight: 900;
+        font-family: inherit;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .copy-btn:hover {
+        transform: translateY(-2px);
+        background: #e2e8f0;
+      }
+
+      .action-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .manual-link,
+      .wa-btn,
+      .finalize-btn,
+      .download-pdf-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        padding: 13px 16px;
+        border-radius: 17px;
+        border: none;
+        text-decoration: none;
+        color: white;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s ease;
+        text-align: center;
+      }
+
+      .manual-link:hover,
+      .wa-btn:hover,
+      .finalize-btn:hover,
+      .download-pdf-btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.98;
+      }
+
+      .manual-link {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+      }
+
+      .wa-btn {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.24);
+      }
+
+      .finalize-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 12px 24px rgba(239, 68, 68, 0.22);
+      }
+
+      .download-pdf-btn {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        box-shadow: 0 12px 24px rgba(124, 58, 237, 0.22);
+      }
+
+      .table-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 0.7fr auto;
+        gap: 10px;
+        margin: 18px 0 14px;
+      }
+
+      .table-toolbar input,
+      .table-toolbar select {
+        width: 100%;
+        border: 1.5px solid #dbe4f0;
+        border-radius: 16px;
+        background: #f8fafc;
+        padding: 13px 14px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 750;
+        outline: none;
+      }
+
+      .table-toolbar input:focus,
+      .table-toolbar select:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+      }
+
+      .reset-btn {
+        border: none;
+        border-radius: 16px;
+        background: #f1f5f9;
+        color: #334155;
+        padding: 13px 14px;
+        font-family: inherit;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .table-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 22px;
+        overflow-x: auto;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+      }
+
+      th,
+      td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+
+      th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+
+      tbody tr {
+        transition: 0.16s ease;
+      }
+
+      tbody tr:hover {
+        background: #fafcff;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .name-cell {
+        font-weight: 900;
+        color: #0f172a;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        color: white;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .badge-hadir {
+        background: #22c55e;
+      }
+
+      .badge-izin {
+        background: #f59e0b;
+      }
+
+      .badge-alfa {
+        background: #ef4444;
+      }
+
+      .gender-badge,
+      .group-badge {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .gender-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .gender-badge.female {
+        background: #fce7f3;
+        color: #be185d;
+      }
+
+      .group-badge {
+        background: #ede9fe;
+        color: #6d28d9;
+      }
+
+      .empty-state {
+        color: #64748b;
+        text-align: center;
+        padding: 22px 10px !important;
+        font-weight: 800;
+      }
+
+      @media (max-width: 980px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 14px 10px 28px;
+        }
+
+        .hero,
+        .card {
+          border-radius: 25px;
+          padding: 20px;
+        }
+
+        .hero-content {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 22px;
+          font-size: 32px;
+        }
+
+        .judul-utama {
+          text-align: left;
+          font-size: 44px;
+        }
+
+        .top-actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .back-session-btn,
+        .small-action-btn {
+          width: 100%;
+        }
+
+        .action-group {
+          grid-template-columns: 1fr;
+        }
+
+        .table-toolbar {
+          grid-template-columns: 1fr;
+        }
+
+        .timer {
+          font-size: 20px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          padding: 19px;
+        }
+
+        .judul-utama {
+          font-size: 39px;
+        }
+
+        .sub-title,
+        .section-desc {
+          font-size: 14px;
+        }
+
+        #qrImage {
+          padding: 12px;
+          border-radius: 20px;
+        }
+
+        .card {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="top-actions">
+        <a href="/admin-session.html" class="back-session-btn">
+          ← Kembali ke Kelola Sesi
+        </a>
+
+        <button class="small-action-btn" type="button" onclick="refreshAll()">
+          🔄 Refresh Data
+        </button>
+      </div>
+
+      <section class="hero">
+        <div class="hero-content">
+          <div>
+            <h1 class="judul-utama">Absenku!</h1>
+            <p class="sub-title">
+              Muda-Mudi Periuk Jaya Ayoo Kita Mengaji !!! Kelola QR, input
+              manual, finalisasi sesi, dan pantau rekap absensi secara langsung.
+            </p>
+          </div>
+
+          <div class="hero-icon">📲</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total Data</p>
+          <p class="stat-value" id="totalData">0</p>
+          <span class="stat-chip">Semua rekap</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Hadir</p>
+          <p class="stat-value" id="totalHadir">0</p>
+          <span class="stat-chip">Scan / manual</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Izin</p>
+          <p class="stat-value" id="totalIzin">0</p>
+          <span class="stat-chip">Input manual</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Alfa</p>
+          <p class="stat-value" id="totalAlfa">0</p>
+          <span class="stat-chip">Finalisasi</span>
+        </div>
+      </section>
+
+      <main class="main-grid">
+        <section class="card">
+          <p class="section-kicker">QR Absensi</p>
+          <h2 class="section-title">Scan QR Sesi</h2>
+          <p class="section-desc">
+            Tampilkan QR ini kepada peserta. QR berlaku sampai waktu sesi
+            berakhir.
+          </p>
+
+          <div class="qr-card">
+            <div class="qr-label">📷 Scan QR untuk membuka form absensi</div>
+
+            <img id="qrImage" src="" alt="QR Code" />
+
+            <div class="timer-box">
+              <span class="timer-label">Sesi berakhir dalam</span>
+              <span class="timer" id="countdown">-</span>
+            </div>
+          </div>
+
+          <div class="url-box" id="qrUrl">Memuat URL QR...</div>
+
+          <div class="url-actions">
+            <button class="copy-btn" type="button" onclick="copyQrUrl()">
+              Salin Link QR
+            </button>
+          </div>
+
+          <div class="action-group">
+            <a id="manualLink" href="#" class="manual-link">
+              Input Izin / Alfa Manual
+            </a>
+
+            <a id="alfaWaLink" class="wa-btn" href="#">
+              Daftar WA Peserta Alfa
+            </a>
+
+            <button class="finalize-btn" onclick="finalizeSession()">
+              Finalisasi Sesi
+            </button>
+
+            <a id="downloadQrPdfLink" class="download-pdf-btn" href="#">
+              Download QR PDF
+            </a>
+          </div>
+        </section>
+
+        <section class="card">
+          <p class="section-kicker">Rekap Sesi</p>
+          <h2 class="section-title">Rekap Hadir</h2>
+          <p class="section-desc">
+            Data akan diperbarui otomatis setiap beberapa detik. Kamu juga bisa
+            mencari nama atau memfilter berdasarkan keterangan.
+          </p>
+
+          <div class="table-toolbar">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Cari nama, gender, kelompok..."
+              oninput="renderAttendance()"
+            />
+
+            <select id="statusFilter" onchange="renderAttendance()">
+              <option value="">Semua status</option>
+              <option value="Hadir">Hadir</option>
+              <option value="Izin">Izin</option>
+              <option value="Alfa">Alfa</option>
+            </select>
+
+            <button class="reset-btn" type="button" onclick="resetFilter()">
+              Reset
+            </button>
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Waktu Hadir</th>
+                  <th>Nama</th>
+                  <th>Gender</th>
+                  <th>Kelompok</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+
+              <tbody id="attendanceTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Belum ada data.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/admin-auth.js"></script>
+
+    <script>
+      protectAdminPage();
+    </script>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session");
+
+      let countdownInterval;
+      let attendanceData = [];
+
+      function safeText(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function popupSuccess(message, title = "Berhasil") {
+        return Swal.fire({
+          icon: "success",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#2563eb",
+        });
+      }
+
+      function popupError(message, title = "Gagal") {
+        return Swal.fire({
+          icon: "error",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#ef4444",
+        });
+      }
+
+      async function popupConfirm(message, title = "Apakah Anda yakin?") {
+        const result = await Swal.fire({
+          icon: "warning",
+          title,
+          text: message,
+          showCancelButton: true,
+          confirmButtonText: "Ya, lanjutkan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#ef4444",
+          cancelButtonColor: "#64748b",
+          reverseButtons: true,
+        });
+
+        return result.isConfirmed;
+      }
+
+      if (!sessionId) {
+        Swal.fire({
+          icon: "error",
+          title: "Session ID tidak ditemukan",
+          text: "Silakan buka sesi dari halaman Kelola Sesi.",
+          confirmButtonText: "Ke Kelola Sesi",
+          confirmButtonColor: "#2563eb",
+        }).then(() => {
+          window.location.href = "/admin-session.html";
+        });
+      }
+
+      const downloadQrPdfLink = document.getElementById("downloadQrPdfLink");
+      const alfaWaLink = document.getElementById("alfaWaLink");
+      const manualLink = document.getElementById("manualLink");
+
+      if (sessionId) {
+        downloadQrPdfLink.href = `/api/sessions/${sessionId}/qr-pdf`;
+        alfaWaLink.href = `/alfa-wa.html?session=${sessionId}`;
+        manualLink.href = `/manual.html?session=${sessionId}`;
+      }
+
+      function updateStats() {
+        const total = attendanceData.length;
+
+        const totalHadir = attendanceData.filter(
+          (item) => item.keterangan === "Hadir",
+        ).length;
+
+        const totalIzin = attendanceData.filter(
+          (item) => item.keterangan === "Izin",
+        ).length;
+
+        const totalAlfa = attendanceData.filter(
+          (item) => item.keterangan === "Alfa",
+        ).length;
+
+        document.getElementById("totalData").textContent = total;
+        document.getElementById("totalHadir").textContent = totalHadir;
+        document.getElementById("totalIzin").textContent = totalIzin;
+        document.getElementById("totalAlfa").textContent = totalAlfa;
+      }
+
+      function resetFilter() {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("statusFilter").value = "";
+        renderAttendance();
+      }
+
+      function getBadgeClass(keterangan) {
+        if (keterangan === "Hadir") return "badge-hadir";
+        if (keterangan === "Izin") return "badge-izin";
+        return "badge-alfa";
+      }
+
+      function getGenderBadge(gender) {
+        if (gender === "Perempuan") {
+          return `<span class="gender-badge female">Perempuan</span>`;
+        }
+
+        if (gender === "Laki-laki") {
+          return `<span class="gender-badge">Laki-laki</span>`;
+        }
+
+        return "-";
+      }
+
+      function formatWaktu(waktu) {
+        if (!waktu) return "-";
+
+        return (
+          new Date(waktu).toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }) + " WIB"
+        );
+      }
+
+      function renderAttendance() {
+        const table = document.getElementById("attendanceTable");
+        const keyword = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+
+        const selectedStatus = document.getElementById("statusFilter").value;
+
+        let filtered = attendanceData;
+
+        if (selectedStatus) {
+          filtered = filtered.filter((item) => {
+            return item.keterangan === selectedStatus;
+          });
+        }
+
+        if (keyword) {
+          filtered = filtered.filter((item) => {
+            const searchable = [
+              item.nama,
+              item.gender,
+              item.kelompok,
+              item.keterangan,
+            ]
+              .join(" ")
+              .toLowerCase();
+
+            return searchable.includes(keyword);
+          });
+        }
+
+        table.innerHTML = "";
+
+        if (filtered.length === 0) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                Belum ada data yang sesuai.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((item, index) => {
+          const row = document.createElement("tr");
+          const badgeClass = getBadgeClass(item.keterangan);
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formatWaktu(item.waktu_hadir)}</td>
+            <td class="name-cell">${safeText(item.nama)}</td>
+            <td>${getGenderBadge(item.gender)}</td>
+            <td><span class="group-badge">${safeText(item.kelompok || "-")}</span></td>
+            <td>
+              <span class="badge ${badgeClass}">
+                ${safeText(item.keterangan || "-")}
+              </span>
+            </td>
+          `;
+
+          table.appendChild(row);
+        });
+      }
+
+      async function refreshAll() {
+        await Promise.all([loadQr(), loadAttendance()]);
+
+        Swal.fire({
+          icon: "success",
+          title: "Data diperbarui",
+          timer: 1200,
+          showConfirmButton: false,
+        });
+      }
+
+      async function finalizeSession() {
+        const confirmation = await popupConfirm(
+          "Peserta yang belum tercatat Hadir/Izin/Alfa akan otomatis dicatat sebagai Alfa.",
+          "Finalisasi sesi ini?",
+        );
+
+        if (!confirmation) return;
+
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}/finalize`, {
+            method: "POST",
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal finalisasi sesi.");
+            return;
+          }
+
+          await popupSuccess(result.message || "Sesi berhasil difinalisasi.");
+          await loadAttendance();
+        } catch (error) {
+          popupError(
+            "Terjadi kesalahan saat finalisasi sesi: " + error.message,
+          );
+        }
+      }
+
+      async function loadQr() {
+        try {
+          const response = await fetch(`/api/qr/${sessionId}`);
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal memuat QR.");
+            return;
+          }
+
+          if (!result.expiredAt) {
+            popupError("Expired time QR tidak ditemukan dari server.");
+            return;
+          }
+
+          document.getElementById("qrImage").src = result.qrImage;
+          document.getElementById("qrUrl").textContent = result.url;
+
+          startCountdown(result.expiredAt);
+        } catch (error) {
+          popupError("Terjadi kesalahan saat memuat QR: " + error.message);
+        }
+      }
+
+      function startCountdown(expiredAt) {
+        clearInterval(countdownInterval);
+
+        const expiredTime = new Date(expiredAt).getTime();
+
+        countdownInterval = setInterval(() => {
+          const diff = expiredTime - Date.now();
+
+          if (diff <= 0) {
+            clearInterval(countdownInterval);
+            document.getElementById("countdown").textContent = "Sesi berakhir";
+            return;
+          }
+
+          const totalSeconds = Math.floor(diff / 1000);
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+
+          const formatted =
+            `${String(hours).padStart(2, "0")}:` +
+            `${String(minutes).padStart(2, "0")}:` +
+            `${String(seconds).padStart(2, "0")}`;
+
+          document.getElementById("countdown").textContent = formatted;
+        }, 1000);
+      }
+
+      async function loadAttendance() {
+        try {
+          const response = await fetch(`/api/attendance/${sessionId}`);
+          const result = await response.json();
+
+          attendanceData = result.hadir || [];
+
+          updateStats();
+          renderAttendance();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function copyQrUrl() {
+        const text = document.getElementById("qrUrl").textContent.trim();
+
+        if (!text || text === "Memuat URL QR...") {
+          popupError("Link QR belum tersedia.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(text);
+
+          Swal.fire({
+            icon: "success",
+            title: "Link QR disalin",
+            text: "Link QR berhasil disalin ke clipboard.",
+            timer: 1400,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          popupError("Gagal menyalin link QR: " + error.message);
+        }
+      }
+
+      loadQr();
+      loadAttendance();
+
+      setInterval(loadAttendance, 3000);
+    </script>
+  </body>
+</html>

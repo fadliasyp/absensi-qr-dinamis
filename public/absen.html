@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Absensi</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #eef4ff 0%,
+          #f6f9ff 48%,
+          #effaf5 100%
+        );
+        min-height: 100vh;
+        padding: 24px 16px;
+        color: #1f2937;
+      }
+
+      .page {
+        max-width: 470px;
+        margin: 0 auto;
+      }
+
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 15px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+        font-size: 13px;
+        font-weight: 700;
+        color: #2563eb;
+        margin-bottom: 18px;
+        backdrop-filter: blur(10px);
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        border-radius: 30px;
+        padding: 30px 22px 24px;
+        box-shadow: 0 18px 45px rgba(31, 41, 55, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 115px;
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.09),
+          rgba(16, 185, 129, 0.06)
+        );
+        pointer-events: none;
+      }
+
+      .icon-wrap {
+        position: relative;
+        z-index: 1;
+        width: 74px;
+        height: 74px;
+        border-radius: 24px;
+        margin: 0 auto 8px;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.25);
+        font-size: 32px;
+        color: white;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #6b7280;
+        font-size: 17px;
+        line-height: 1.7;
+        margin: 12px 0 28px;
+      }
+
+      .form-group {
+        margin-bottom: 17px;
+      }
+
+      .label {
+        display: block;
+        font-size: 14px;
+        font-weight: 800;
+        color: #374151;
+        margin-bottom: 9px;
+      }
+
+      select,
+      button {
+        width: 100%;
+        border-radius: 18px;
+        font-size: 17px;
+        transition: all 0.2s ease;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 16px 18px;
+        border: 1.6px solid #dbe3f0;
+        background: #f9fbff;
+        color: #111827;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      }
+
+      select:focus {
+        border-color: #60a5fa;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+
+      .select-wrap::after {
+        content: "⌄";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #6b7280;
+        pointer-events: none;
+      }
+
+      .picker-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        padding: 16px 18px;
+        border-radius: 20px;
+        border: 1.8px solid #cfe0ff;
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
+        color: #0f172a;
+        text-align: left;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.08);
+        cursor: pointer;
+      }
+
+      .picker-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.12);
+      }
+
+      .picker-btn.empty {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+
+      .picker-btn .picker-arrow {
+        font-size: 20px;
+        color: #64748b;
+        flex-shrink: 0;
+      }
+
+      .field-hint {
+        margin-top: 8px;
+        font-size: 12.5px;
+        color: #64748b;
+        line-height: 1.5;
+      }
+
+      button#submitBtn {
+        border: none;
+        padding: 17px 18px;
+        margin-top: 8px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(135deg, #4f7ce8, #5f95f0);
+        box-shadow: 0 16px 28px rgba(79, 124, 232, 0.24);
+      }
+
+      button#submitBtn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 30px rgba(79, 124, 232, 0.3);
+      }
+
+      button#submitBtn:disabled {
+        cursor: not-allowed;
+        opacity: 0.75;
+        box-shadow: none;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 15px 16px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e5edf6;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .note strong {
+        color: #334155;
+      }
+
+      .footer-text {
+        text-align: center;
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 16px;
+        font-style: oblique;
+      }
+
+      /* Custom style isi popup daftar peserta */
+      .swal2-popup .participant-modal-list {
+        max-height: 320px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+        padding-right: 4px;
+      }
+
+      .swal2-popup .swal-participant-item {
+        width: 100%;
+        border: 1px solid #dbe7f7;
+        background: #f8fbff;
+        border-radius: 16px;
+        padding: 13px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        text-align: left;
+      }
+
+      .swal2-popup .swal-participant-item:hover {
+        background: #eef5ff;
+        border-color: #93c5fd;
+        transform: translateY(-1px);
+      }
+
+      .swal2-popup .swal-participant-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .swal2-popup .swal-participant-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .judul-utama {
+        font-family: "Quicksand", sans-serif;
+        font-size: 40px;
+        font-weight: 600;
+        font-style: oblique;
+        letter-spacing: 0em;
+        line-height: 1.4;
+        word-spacing: 0px;
+        text-transform: none;
+        text-decoration: underline;
+        text-align: center;
+        color: #5e7ac4;
+        text-shadow: 5px 0px 3px #56b6c6;
+        margin-bottom: 6px;
+        margin-top: 17px;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 18px 12px;
+        }
+
+        .card {
+          padding: 24px 18px 20px;
+          border-radius: 24px;
+        }
+
+        .subtitle {
+          font-size: 16px;
+        }
+
+        select,
+        button,
+        .picker-btn {
+          font-size: 16px;
+        }
+      }
+
+      .swal2-popup .kelompok-modal-list {
+        max-height: 330px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+        padding-right: 4px;
+      }
+
+      .swal2-popup .swal-kelompok-item {
+        width: 100%;
+        border: 1px solid #dbe7f7;
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
+        border-radius: 17px;
+        padding: 14px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        text-align: left;
+      }
+
+      .swal2-popup .swal-kelompok-item:hover {
+        background: #eef5ff;
+        border-color: #93c5fd;
+        transform: translateY(-1px);
+      }
+
+      .swal2-popup .swal-kelompok-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #2563eb, #60a5fa);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+
+      .swal2-popup .swal-kelompok-name {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1f2937;
+      }
+
+      .swal2-popup .swal-kelompok-count {
+        margin-left: auto;
+        font-size: 12px;
+        color: #64748b;
+        background: #eef2ff;
+        padding: 5px 8px;
+        border-radius: 999px;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header-badge">✅ Absensi Online</div>
+
+      <div class="card">
+        <div class="icon-wrap">📝</div>
+
+        <h1 class="judul-utama">Absenku!</h1>
+        <p class="subtitle">
+          Silakan pilih <strong>kelompok</strong> terlebih dahulu, lalu pilih
+          <strong>nama peserta</strong> untuk melakukan absensi.
+        </p>
+
+        <div class="form-group">
+          <label class="label" for="kelompokPickerBtn">Kelompok</label>
+
+          <button
+            type="button"
+            id="kelompokPickerBtn"
+            class="picker-btn empty"
+            onclick="openKelompokPicker()"
+          >
+            <span id="kelompokPickerText">Pilih kelompok</span>
+            <span class="picker-arrow">›</span>
+          </button>
+
+          <div class="field-hint" id="kelompokHint">
+            Pilih kelompok sesuai daftar yang tersedia.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="participantPickerBtn">Nama Peserta</label>
+          <button
+            type="button"
+            id="participantPickerBtn"
+            class="picker-btn empty"
+            onclick="openParticipantPicker()"
+          >
+            <span id="participantPickerText">Pilih nama peserta</span>
+            <span class="picker-arrow">›</span>
+          </button>
+          <div class="field-hint" id="participantHint">
+            Pilih kelompok terlebih dahulu.
+          </div>
+        </div>
+
+        <button id="submitBtn" type="button" onclick="submitAttendance()">
+          Hadir
+        </button>
+
+        <div class="note">
+          <strong>Catatan:</strong> Satu perangkat hanya dapat digunakan untuk
+          satu kali absensi pada sesi ini.
+        </div>
+
+        <div class="footer-text">Asyp &copy; 2026</div>
+      </div>
+    </div>
+    <!-- ==================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session");
+      const token = urlParams.get("token");
+
+      let allParticipants = [];
+
+      let kelompokList = [];
+      let selectedKelompok = "";
+
+      let filteredParticipants = [];
+      let selectedParticipantId = "";
+      let selectedParticipantName = "";
+
+      function escapeHtml(text = "") {
+        return String(text)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function popupSuccess(message, title = "Berhasil") {
+        return Swal.fire({
+          icon: "success",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#2563eb",
+        });
+      }
+
+      function popupError(message, title = "HAHA Ketauan") {
+        return Swal.fire({
+          icon: "error",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#ef4444",
+        });
+      }
+
+      function popupInfo(message, title = "Informasi") {
+        return Swal.fire({
+          icon: "info",
+          title,
+          text: message,
+          confirmButtonText: "Oke",
+          confirmButtonColor: "#2563eb",
+        });
+      }
+
+      function showLoadingPopup(
+        title = "Memproses...",
+        text = "Mohon tunggu sebentar.",
+      ) {
+        Swal.fire({
+          title,
+          text,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+      }
+
+      /**
+       * Membuat local device ID.
+       * Ini disimpan di browser peserta.
+       */
+      function getLocalDeviceId() {
+        let deviceId = localStorage.getItem("attendance_local_device_id");
+
+        if (!deviceId) {
+          deviceId = crypto.randomUUID();
+          localStorage.setItem("attendance_local_device_id", deviceId);
+        }
+
+        return deviceId;
+      }
+
+      async function loadParticipants() {
+        try {
+          const response = await fetch(
+            `/api/participants?session=${sessionId}`,
+          );
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal mengambil daftar peserta.");
+            return;
+          }
+
+          allParticipants = result.participants || [];
+
+          renderKelompokOptions(allParticipants);
+          renderParticipants([]);
+
+          if (allParticipants.length === 0) {
+            popupInfo("Belum ada data peserta yang tersedia.");
+          }
+        } catch (error) {
+          popupError(
+            "Terjadi kesalahan saat mengambil peserta: " + error.message,
+          );
+          console.error(error);
+        }
+      }
+
+      function getUserLocation() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("Browser tidak mendukung fitur lokasi."));
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+            },
+            function () {
+              reject(
+                new Error(
+                  "Lokasi wajib diaktifkan untuk melakukan absensi. Silakan izinkan akses lokasi.",
+                ),
+              );
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 15000,
+              maximumAge: 0,
+            },
+          );
+        });
+      }
+
+      function renderKelompokOptions(participants) {
+        kelompokList = [
+          ...new Set(
+            participants
+              .map((participant) => participant.kelompok)
+              .filter(Boolean),
+          ),
+        ];
+
+        kelompokList.sort();
+
+        selectedKelompok = "";
+        updateKelompokPicker();
+      }
+
+      function updateKelompokPicker() {
+        const btn = document.getElementById("kelompokPickerBtn");
+        const text = document.getElementById("kelompokPickerText");
+        const hint = document.getElementById("kelompokHint");
+
+        if (!selectedKelompok) {
+          btn.classList.add("empty");
+          text.textContent = "Pilih kelompok";
+          hint.textContent =
+            kelompokList.length > 0
+              ? `${kelompokList.length} kelompok tersedia.`
+              : "Belum ada kelompok tersedia.";
+          return;
+        }
+
+        const totalPeserta = allParticipants.filter(
+          (participant) => participant.kelompok === selectedKelompok,
+        ).length;
+
+        const belumHadir = allParticipants.filter(
+          (participant) =>
+            participant.kelompok === selectedKelompok && !participant.isPresent,
+        ).length;
+
+        btn.classList.remove("empty");
+        text.textContent = selectedKelompok;
+        hint.textContent = `${belumHadir} dari ${totalPeserta} peserta masih bisa absen.`;
+      }
+
+      async function openKelompokPicker() {
+        if (!kelompokList || kelompokList.length === 0) {
+          popupInfo("Belum ada kelompok yang tersedia.", "Kelompok Kosong");
+          return;
+        }
+
+        const html = `
+    <div class="kelompok-modal-list">
+      ${kelompokList
+        .map((kelompok, index) => {
+          const totalPeserta = allParticipants.filter(
+            (participant) => participant.kelompok === kelompok,
+          ).length;
+
+          const belumHadir = allParticipants.filter(
+            (participant) =>
+              participant.kelompok === kelompok && !participant.isPresent,
+          ).length;
+
+          return `
+            <button
+              type="button"
+              class="swal-kelompok-item"
+              data-kelompok="${escapeHtml(kelompok)}"
+            >
+              <span class="swal-kelompok-icon">${index + 1}</span>
+              <span class="swal-kelompok-name">${escapeHtml(kelompok)}</span>
+              <span class="swal-kelompok-count">${belumHadir}/${totalPeserta}</span>
+            </button>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+
+        await Swal.fire({
+          title: "Pilih Kelompok",
+          html,
+          showConfirmButton: false,
+          showCloseButton: true,
+          width: 430,
+          customClass: {
+            popup: "kelompok-popup",
+          },
+          didOpen: () => {
+            const popup = Swal.getPopup();
+
+            popup.querySelectorAll(".swal-kelompok-item").forEach((button) => {
+              button.addEventListener("click", () => {
+                const kelompok = button.getAttribute("data-kelompok");
+
+                selectedKelompok = kelompok;
+                selectedParticipantId = "";
+                selectedParticipantName = "";
+
+                updateKelompokPicker();
+                filterParticipantsByKelompok();
+                Swal.close();
+              });
+            });
+          },
+        });
+      }
+
+      function renderParticipants(participants) {
+        filteredParticipants = participants;
+
+        const availableParticipants = filteredParticipants.filter(
+          (participant) => !participant.isPresent,
+        );
+
+        const stillExists = availableParticipants.some(
+          (participant) =>
+            String(participant.id) === String(selectedParticipantId),
+        );
+
+        if (!stillExists) {
+          selectedParticipantId = "";
+          selectedParticipantName = "";
+        }
+
+        updateParticipantPicker();
+      }
+
+      function updateParticipantPicker() {
+        const btn = document.getElementById("participantPickerBtn");
+        const text = document.getElementById("participantPickerText");
+        const hint = document.getElementById("participantHint");
+
+        if (!selectedKelompok) {
+          btn.classList.add("empty");
+          text.textContent = "Pilih nama peserta";
+          hint.textContent = "Pilih kelompok terlebih dahulu.";
+          return;
+        }
+
+        const availableCount = filteredParticipants.filter(
+          (participant) => !participant.isPresent,
+        ).length;
+
+        if (!selectedParticipantId) {
+          btn.classList.add("empty");
+          text.textContent = "Pilih nama peserta";
+          hint.textContent =
+            availableCount > 0
+              ? `${availableCount} peserta tersedia di kelompok ${selectedKelompok}.`
+              : `Semua peserta di kelompok ${selectedKelompok} sudah tercatat hadir.`;
+          return;
+        }
+
+        btn.classList.remove("empty");
+        text.textContent = selectedParticipantName;
+        hint.textContent = `Kelompok ${selectedKelompok} dipilih.`;
+      }
+
+      async function openParticipantPicker() {
+        if (!selectedKelompok) {
+          popupInfo(
+            "Silakan pilih kelompok terlebih dahulu.",
+            "Pilih Kelompok",
+          );
+          return;
+        }
+
+        const availableParticipants = filteredParticipants.filter(
+          (participant) => !participant.isPresent,
+        );
+
+        if (availableParticipants.length === 0) {
+          popupInfo(
+            `Semua peserta di kelompok ${selectedKelompok} sudah tercatat hadir.`,
+            "Peserta Tidak Tersedia",
+          );
+          return;
+        }
+
+        const html = `
+    <div class="participant-modal-list">
+      ${availableParticipants
+        .map((participant, index) => {
+          const namaPeserta = escapeHtml(
+            participant.nama || participant.name || "-",
+          );
+          return `
+            <button
+              type="button"
+              class="swal-participant-item"
+              data-id="${participant.id}"
+            >
+              <span class="swal-participant-number">${index + 1}</span>
+              <span class="swal-participant-name">${namaPeserta}</span>
+            </button>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+
+        await Swal.fire({
+          title: "Pilih Nama Peserta",
+          html,
+          showConfirmButton: false,
+          showCloseButton: true,
+          width: 430,
+          customClass: {
+            popup: "participant-popup",
+          },
+          didOpen: () => {
+            const popup = Swal.getPopup();
+
+            popup
+              .querySelectorAll(".swal-participant-item")
+              .forEach((button) => {
+                button.addEventListener("click", () => {
+                  const id = button.getAttribute("data-id");
+
+                  const selected = availableParticipants.find(
+                    (participant) => String(participant.id) === String(id),
+                  );
+
+                  if (!selected) return;
+
+                  selectedParticipantId = selected.id;
+                  selectedParticipantName =
+                    selected.nama || selected.name || "-";
+
+                  updateParticipantPicker();
+                  Swal.close();
+                });
+              });
+          },
+        });
+      }
+
+      function filterParticipantsByKelompok() {
+        if (!selectedKelompok) {
+          renderParticipants([]);
+          return;
+        }
+
+        const filtered = allParticipants.filter((participant) => {
+          const kelompokPeserta = participant.kelompok || "";
+          return kelompokPeserta === selectedKelompok;
+        });
+
+        renderParticipants(filtered);
+      }
+
+      async function readJsonResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (!contentType.includes("application/json")) {
+          const text = await response.text();
+
+          throw new Error(
+            "Server sedang bermasalah. Silakan coba beberapa saat lagi.",
+          );
+        }
+
+        return await response.json();
+      }
+
+      async function submitAttendance() {
+        const submitBtn = document.getElementById("submitBtn");
+
+        if (!sessionId || !token) {
+          popupError("Link absensi tidak valid. Silakan scan QR terbaru.");
+          return;
+        }
+
+        if (!selectedKelompok) {
+          popupInfo(
+            "Silakan pilih kelompok terlebih dahulu.",
+            "Pilih Kelompok",
+          );
+          return;
+        }
+
+        if (!selectedParticipantId) {
+          popupInfo(
+            "Silakan pilih nama peserta terlebih dahulu.",
+            "Pilih Peserta",
+          );
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Menyimpan...";
+
+        try {
+          const localDeviceId = getLocalDeviceId();
+
+          showLoadingPopup(
+            "Menyimpan Absensi",
+            "Sedang mengambil lokasi dan memproses kehadiran...",
+          );
+
+          const userLocation = await getUserLocation();
+
+          const response = await fetch("/api/attendance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionId,
+              token,
+              participantId: selectedParticipantId,
+              localDeviceId,
+              userLatitude: userLocation.latitude,
+              userLongitude: userLocation.longitude,
+            }),
+          });
+
+          const result = await readJsonResponse(response);
+
+          Swal.close();
+
+          if (!result.success) {
+            const message = result.message || "Gagal menyimpan absensi.";
+            const code = result.code || "";
+            const lowerMessage = message.toLowerCase();
+
+            if (
+              code === "DEVICE_ALREADY_USED" ||
+              code === "PARTICIPANT_ALREADY_PRESENT" ||
+              lowerMessage.includes("sudah") ||
+              lowerMessage.includes("perangkat")
+            ) {
+              await Swal.fire({
+                icon: "warning",
+                title: "Absensi Sudah Tercatat",
+                text: message,
+                confirmButtonText: "Oke, Saya Mengerti",
+                confirmButtonColor: "#f59e0b",
+              });
+            } else if (
+              lowerMessage.includes("luar radius") ||
+              lowerMessage.includes("jarak")
+            ) {
+              await Swal.fire({
+                icon: "warning",
+                title: "Lokasi di Luar Area Absensi",
+                html: `
+        <div style="text-align:center; line-height:1.6;">
+          <p>${escapeHtml(message)}</p>
+          <p style="margin-top:10px; color:#64748b; font-size:14px;">
+            Silakan mendekat ke titik lokasi absensi yang sudah ditentukan, lalu coba lagi.
+          </p>
+        </div>
+      `,
+                confirmButtonText: "Saya Mengerti",
+                confirmButtonColor: "#f59e0b",
+              });
+            } else {
+              popupError(message);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Hadir";
+            return;
+          }
+
+          const gender = (result.data.gender || "").toLowerCase();
+
+          let ucapanTerimaKasih = "Alhamdulillah Jazakumullahu Khoiroh";
+
+          if (gender.includes("laki")) {
+            ucapanTerimaKasih = "Alhamdulillah Jazakallahu Khoiroh";
+          } else if (gender.includes("perempuan")) {
+            ucapanTerimaKasih = "Alhamdulillah Jazakillahu Khoiroh";
+          }
+
+          await popupSuccess(
+            `${result.message} ${ucapanTerimaKasih}, ${result.data.name} 😊`,
+            "Absensi Berhasil",
+          );
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sudah Absen";
+
+          await loadParticipants();
+        } catch (error) {
+          Swal.close();
+
+          const message =
+            error.message || "Terjadi kesalahan saat menyimpan absensi.";
+
+          if (
+            message.toLowerCase().includes("lokasi") ||
+            message.toLowerCase().includes("geolocation")
+          ) {
+            await Swal.fire({
+              icon: "warning",
+              title: "Lokasi Belum Aktif",
+              text: message,
+              confirmButtonText: "Oke, Saya Aktifkan",
+              confirmButtonColor: "#f59e0b",
+            });
+          } else if (
+            message.toLowerCase().includes("failed to fetch") ||
+            message.toLowerCase().includes("server sedang bermasalah")
+          ) {
+            await Swal.fire({
+              icon: "error",
+              title: "Gagal Menghubungi Server",
+              text: "Absensi belum bisa diproses karena server/API tidak merespons dengan benar. Silakan coba beberapa saat lagi.",
+              confirmButtonText: "Oke",
+              confirmButtonColor: "#ef4444",
+            });
+          } else {
+            popupError(message);
+          }
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Hadir";
+        }
+      }
+
+      loadParticipants();
+      getLocalDeviceId();
+    </script>
+  </body>
+</html>
