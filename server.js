@@ -8,6 +8,9 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = 3000;
 
+
+// abakbakba
+
 /**
  * Pengganti __dirname karena di ES Module tidak tersedia langsung.
  */
