@@ -8,6 +8,7 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 - Menambahkan migration `participants.is_active` dengan default `true`.
 - Menambahkan indikator, filter, dan aksi aktif/nonaktif pada halaman Kelola Peserta.
+- Memisahkan statistik peserta nonaktif dari total aktif serta hitungan laki-laki dan perempuan aktif.
 - Mengeluarkan peserta nonaktif dari pilihan absensi QR/manual, Pengumuman WA, finalisasi Alfa, dan daftar WhatsApp Alfa.
 - Menambahkan penolakan server-side untuk pencatatan peserta nonaktif tanpa menghapus riwayat attendance lama.
 - Menambahkan regression check berbasis `node:test` untuk kontrak status peserta.

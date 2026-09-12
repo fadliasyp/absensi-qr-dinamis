@@ -171,7 +171,7 @@
 
       .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 14px;
         margin-bottom: 18px;
       }
@@ -726,9 +726,15 @@
 
       <section class="stats-grid">
         <div class="stat-card">
-          <p class="stat-label">Total Peserta</p>
+          <p class="stat-label">Peserta Aktif</p>
           <p class="stat-value" id="totalPeserta">0</p>
-          <span class="stat-chip">Semua data</span>
+          <span class="stat-chip">Masuk absensi</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Peserta Nonaktif</p>
+          <p class="stat-value" id="totalNonaktif">0</p>
+          <span class="stat-chip">Tidak masuk absensi</span>
         </div>
 
         <div class="stat-card">
@@ -987,24 +993,29 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
       }
 
       function updateStats() {
-        const total = allParticipants.length;
+        const activeParticipants = allParticipants.filter(
+          (item) => item.is_active !== false,
+        );
+        const totalNonaktif = allParticipants.length - activeParticipants.length;
 
-        const laki = allParticipants.filter(
+        const laki = activeParticipants.filter(
           (item) => item.gender === "Laki-laki",
         ).length;
 
-        const perempuan = allParticipants.filter(
+        const perempuan = activeParticipants.filter(
           (item) => item.gender === "Perempuan",
         ).length;
 
         const kelompok = new Set(
-          allParticipants
+          activeParticipants
             .map((item) => item.kelompok)
             .filter(Boolean)
             .map((item) => item.toLowerCase()),
         ).size;
 
-        document.getElementById("totalPeserta").textContent = total;
+        document.getElementById("totalPeserta").textContent =
+          activeParticipants.length;
+        document.getElementById("totalNonaktif").textContent = totalNonaktif;
         document.getElementById("totalLaki").textContent = laki;
         document.getElementById("totalPerempuan").textContent = perempuan;
         document.getElementById("totalKelompok").textContent = kelompok;

@@ -19,4 +19,8 @@ test("inactive participants are excluded from attendance and WhatsApp flows", as
   assert.match(api, /\.eq\("participants\.is_active", true\)/);
   assert.match(page, /id="statusFilter"/);
   assert.match(page, /toggleParticipantStatus/);
+  assert.match(page, /id="totalNonaktif"/);
+  assert.match(page, /const activeParticipants = allParticipants\.filter/);
+  assert.match(page, /const laki = activeParticipants\.filter/);
+  assert.match(page, /const perempuan = activeParticipants\.filter/);
 });
