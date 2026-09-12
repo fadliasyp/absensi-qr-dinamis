@@ -116,3 +116,4 @@ Saat task selesai, kosongkan task aktif menjadi `Belum ada task aktif`, simpan t
 - Jangan mendokumentasikan file backup sebagai fitur aktif.
 - Status japri gratis berarti tautan WhatsApp telah dibuka, bukan konfirmasi pesan terkirim; jangan mengubah label menjadi klaim delivery tanpa API resmi.
 - Status japri `announcement` dan `alfa` harus tetap terpisah dan saat ini hanya persisten pada browser admin yang sama.
+- Hanya peserta dengan `participants.is_active = true` yang boleh muncul pada pilihan absensi/manual/pengumuman, diterima endpoint absensi, atau ikut finalisasi dan daftar WhatsApp Alfa. Nonaktif tidak menghapus riwayat attendance lama.

@@ -41,8 +41,9 @@ Field yang digunakan:
 - `gender`
 - `kelompok`
 - `no_wa`
+- `is_active`
 
-`nama` dan `kelompok` diwajibkan oleh API. Nomor WhatsApp dan gender dapat null menurut payload aplikasi.
+`nama` dan `kelompok` diwajibkan oleh API. Nomor WhatsApp dan gender dapat null menurut payload aplikasi. Migration `20260912000000_add_participant_is_active.sql` menambahkan `is_active boolean not null default true`; migration belum dijalankan atau diverifikasi terhadap Supabase dari sesi ini.
 
 ### `attendance`
 
@@ -116,7 +117,7 @@ Daftar ini adalah kebutuhan audit, bukan klaim bahwa constraint tersebut ada.
 
 ## Migrations and Seed
 
-Tidak ditemukan migration atau seed resmi. `note.sql` berisi query operasional/manual:
+Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql`, tetapi belum memiliki schema awal atau seed lengkap. `note.sql` berisi query operasional/manual:
 
 - melihat rekap
 - membuat sesi contoh dua jam
@@ -138,4 +139,3 @@ Belum diketahui / perlu dikonfirmasi. Ini kritis karena halaman browser memakai 
 - Jangan mengekspos `SUPABASE_SERVICE_ROLE_KEY` ke browser.
 - Gunakan database non-produksi untuk test finalisasi karena proses membuat banyak row Alfa.
 - Sebelum perubahan schema, ekspor schema aktual dan buat migration yang dapat direview.
-

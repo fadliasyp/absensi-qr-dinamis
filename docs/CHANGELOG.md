@@ -4,6 +4,14 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-12
 
+### Added — Status Peserta Aktif/Nonaktif
+
+- Menambahkan migration `participants.is_active` dengan default `true`.
+- Menambahkan indikator, filter, dan aksi aktif/nonaktif pada halaman Kelola Peserta.
+- Mengeluarkan peserta nonaktif dari pilihan absensi QR/manual, Pengumuman WA, finalisasi Alfa, dan daftar WhatsApp Alfa.
+- Menambahkan penolakan server-side untuk pencatatan peserta nonaktif tanpa menghapus riwayat attendance lama.
+- Menambahkan regression check berbasis `node:test` untuk kontrak status peserta.
+
 ### Added — Japri WhatsApp
 
 - Menambahkan halaman pengumuman sesi yang membuat pesan personal dari data sesi dan peserta.

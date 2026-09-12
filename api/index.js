@@ -208,6 +208,7 @@ app.get("/api/participants", async (req, res) => {
     const { data: participants, error: participantError } = await supabase
       .from("participants")
       .select("*")
+      .eq("is_active", true)
       .order("kelompok", { ascending: true })
       .order("nama", { ascending: true });
 
@@ -381,6 +382,13 @@ app.post("/api/attendance", async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Peserta tidak ditemukan.",
+      });
+    }
+
+    if (participant.is_active === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Peserta sedang nonaktif dan tidak dapat melakukan absensi.",
       });
     }
 
@@ -590,6 +598,13 @@ app.post("/api/manual-attendance", async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Peserta tidak ditemukan.",
+      });
+    }
+
+    if (participant.is_active === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Peserta sedang nonaktif dan tidak dapat dicatat pada sesi.",
       });
     }
 
@@ -840,13 +855,15 @@ app.get("/api/attendance/:sessionId/alfa", async (req, res) => {
         kelompok,
         keterangan,
         waktu_hadir,
-        participants (
-          no_wa
+        participants!inner (
+          no_wa,
+          is_active
         )
       `,
       )
       .eq("session_id", sessionId)
       .eq("keterangan", "Alfa")
+      .eq("participants.is_active", true)
       .order("kelompok", { ascending: true })
       .order("nama", { ascending: true });
 
@@ -965,6 +982,7 @@ app.post("/api/participants", async (req, res) => {
         gender: item.gender?.trim() || null,
         kelompok: item.kelompok?.trim(),
         no_wa: item.no_wa?.trim() || null,
+        is_active: true,
       }))
       .filter((item) => item.nama && item.kelompok);
 
@@ -1037,7 +1055,7 @@ app.get("/api/all-participants", async (req, res) => {
 app.put("/api/participants/:participantId", async (req, res) => {
   try {
     const { participantId } = req.params;
-    const { nama, gender, kelompok, no_wa } = req.body;
+    const { nama, gender, kelompok, no_wa, is_active } = req.body;
 
     if (!participantId) {
       return res.status(400).json({
@@ -1053,14 +1071,25 @@ app.put("/api/participants/:participantId", async (req, res) => {
       });
     }
 
+    if (is_active !== undefined && typeof is_active !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Status aktif peserta tidak valid.",
+      });
+    }
+
+    const updates = {
+      nama: nama.trim(),
+      gender: gender?.trim() || null,
+      kelompok: kelompok.trim(),
+      no_wa: no_wa?.trim() || null,
+    };
+
+    if (is_active !== undefined) updates.is_active = is_active;
+
     const { data, error } = await supabase
       .from("participants")
-      .update({
-        nama: nama.trim(),
-        gender: gender?.trim() || null,
-        kelompok: kelompok.trim(),
-        no_wa: no_wa?.trim() || null,
-      })
+      .update(updates)
       .eq("id", participantId)
       .select()
       .single();
@@ -1150,7 +1179,7 @@ app.delete("/api/participants/:participantId", async (req, res) => {
 
 // ========================
 // Endpoint finalisasi sesi
-// Peserta yang belum memiliki data absensi otomatis menjadi Alfa
+// Peserta aktif yang belum memiliki data absensi otomatis menjadi Alfa
 // ========================
 app.post("/api/sessions/:sessionId/finalize", async (req, res) => {
   try {
@@ -1203,10 +1232,11 @@ app.post("/api/sessions/:sessionId/finalize", async (req, res) => {
       });
     }
 
-    // 4. Ambil semua peserta
+    // 4. Ambil semua peserta aktif
     const { data: participants, error: participantError } = await supabase
       .from("participants")
       .select("id, nama, gender, kelompok")
+      .eq("is_active", true)
       .order("kelompok", { ascending: true })
       .order("nama", { ascending: true });
 
@@ -1221,7 +1251,7 @@ app.post("/api/sessions/:sessionId/finalize", async (req, res) => {
     if (!participants || participants.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Belum ada data peserta yang tersedia.",
+        message: "Belum ada peserta aktif yang tersedia.",
       });
     }
 
@@ -1270,7 +1300,7 @@ app.post("/api/sessions/:sessionId/finalize", async (req, res) => {
       return res.json({
         success: true,
         message:
-          "Semua peserta sudah memiliki data absensi. Sesi berhasil difinalisasi.",
+          "Semua peserta aktif sudah memiliki data absensi. Sesi berhasil difinalisasi.",
         insertedCount: 0,
       });
     }

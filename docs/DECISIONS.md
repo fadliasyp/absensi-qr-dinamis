@@ -1,5 +1,27 @@
 # Decision Log
 
+## 2026-09-12 — Nonaktif Mempertahankan Riwayat Absensi
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Status peserta disimpan sebagai `participants.is_active`. Peserta nonaktif dikeluarkan dari seluruh kandidat absensi dan tindak lanjut baru, tetapi row peserta serta attendance yang sudah tercatat tidak dihapus.
+
+### Context
+
+Pengguna memerlukan cara mengeluarkan peserta dari absensi, pengumuman, dan Alfa tanpa harus menghapus data peserta.
+
+### Reason
+
+Soft-disable memungkinkan peserta diaktifkan kembali dan menjaga keutuhan laporan sesi lama.
+
+### Consequences
+
+Daftar pengelolaan tetap memuat seluruh peserta. Endpoint peserta untuk sesi, finalisasi, dan WhatsApp hanya memakai peserta aktif; endpoint pencatatan melakukan validasi tambahan terhadap status tersebut.
+
 ## 2026-09-12 — Repository Menjadi Sumber Memory Project
 
 ### Status
@@ -77,4 +99,3 @@ Menganggap source yang tampak lengkap sebagai stable. Ditolak karena tidak membu
 ### Consequences
 
 Baseline mencatat kandidat perilaku yang harus dijaga, dan promosi ke `STABLE` menunggu verifikasi.
-

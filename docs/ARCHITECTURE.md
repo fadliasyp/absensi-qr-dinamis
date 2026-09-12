@@ -27,7 +27,7 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `login.html`, `register.html`: authentication admin.
 - `admin-session.html`: lokasi dan sesi.
 - `admin.html`: QR, rekap, finalisasi, tautan export.
-- `peserta.html`: CRUD peserta.
+- `peserta.html`: CRUD serta aktivasi/nonaktivasi peserta.
 - `manual.html`: status manual.
 - `alfa-wa.html`: tindak lanjut Alfa.
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
@@ -119,13 +119,17 @@ Admin membuat sesi + lokasi
 
 ```text
 Sesi berakhir -> admin menekan Finalisasi
-  -> ambil semua participants
+  -> ambil participants aktif
   -> ambil participant_id yang sudah tercatat
   -> insert Alfa untuk selisihnya
   -> tandai sessions.is_finalized
 ```
 
 Operasi insert Alfa dan update sesi tidak berada dalam satu transaction; kegagalan langkah kedua dapat meninggalkan data Alfa dengan sesi belum ditandai final.
+
+### Status Peserta
+
+`participants.is_active` menjadi filter backend untuk pilihan absensi QR/manual, pengumuman WhatsApp, finalisasi, dan daftar WhatsApp Alfa. Endpoint absensi juga menolak ID peserta nonaktif agar status tidak dapat dilewati lewat request langsung. Menonaktifkan peserta tidak menghapus row peserta maupun riwayat `attendance` yang sudah tercatat.
 
 ## Architectural Rules
 

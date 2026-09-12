@@ -23,7 +23,8 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Registrasi dan login admin melalui Supabase Auth (email/password dan login Google).
 - Approval status admin serta pembatasan halaman super admin.
 - Timeout sesi admin: idle 30 menit dan umur sesi maksimum 8 jam pada browser.
-- CRUD peserta: tambah tunggal/bulk, daftar/filter, edit, hapus, dan nomor WhatsApp.
+- CRUD peserta: tambah tunggal/bulk, daftar/filter, edit, hapus, nomor WhatsApp, dan status aktif/nonaktif.
+- Peserta nonaktif dikeluarkan dari pilihan absensi QR/manual, pengumuman, finalisasi Alfa, dan daftar WhatsApp Alfa serta ditolak oleh endpoint pencatatan.
 - Pembuatan, daftar/filter, dan penghapusan sesi.
 - Penyimpanan dan pemakaian ulang titik lokasi beserta radius.
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
@@ -60,6 +61,7 @@ Belum diprioritaskan oleh pengguna:
 - Input manual dapat membuat record atau mengganti status record yang sudah ada menjadi `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi hanya boleh setelah waktu sesi selesai dan hanya satu kali menurut flag `is_finalized`.
 - Semua peserta tanpa record saat finalisasi dibuat sebagai `Alfa`.
+- Hanya peserta aktif yang menjadi kandidat absensi dan finalisasi. Menonaktifkan peserta mempertahankan riwayat attendance yang sudah ada.
 - Sesi yang dibuat UI saat ini menggunakan `kelompok: "Semua"`; daftar peserta tidak dibatasi berdasarkan kelompok sesi.
 - Format tanggal/waktu laporan menggunakan locale Indonesia dan zona `Asia/Jakarta`.
 - Status japri dicatat saat admin membuka tautan WhatsApp. Status ini bukan bukti delivery dan disimpan terpisah per sesi/jenis pesan di localStorage browser admin.
@@ -76,7 +78,7 @@ Belum diprioritaskan oleh pengguna:
 
 ## Constraints
 
-- Schema, migration, seed, constraint, index, RLS policy, dan konfigurasi Supabase Auth tidak tersimpan lengkap di repository.
+- Schema awal, seed, constraint, index, RLS policy, dan konfigurasi Supabase Auth tidak tersimpan lengkap di repository; baru ada migration tambahan status peserta.
 - Banyak halaman dan handler berada dalam file besar, sehingga perubahan harus sangat terarah.
 - Geolocation browser biasanya memerlukan secure context (HTTPS, selain pengecualian localhost).
 - Data nyata dan deployment tidak boleh digunakan untuk discovery tanpa izin.
@@ -127,6 +129,7 @@ Belum diprioritaskan oleh pengguna:
 - Zona waktu laporan WIB.
 - Pemisahan anon key browser dan service-role key backend.
 - Pemisahan status japri pengumuman dan Alfa untuk setiap sesi.
+- Filter dan penolakan server-side untuk peserta nonaktif tanpa menghapus riwayat attendance lama.
 
 ## Hal yang Belum Diketahui / Perlu Dikonfirmasi
 

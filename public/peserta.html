@@ -418,7 +418,7 @@
 
       .toolbar {
         display: grid;
-        grid-template-columns: 1.3fr 0.7fr auto;
+        grid-template-columns: 1.3fr 0.7fr 0.7fr auto;
         gap: 12px;
         align-items: center;
         margin: 18px 0;
@@ -519,6 +519,20 @@
         color: #6d28d9;
       }
 
+      .badge-active {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .badge-inactive {
+        background: #e2e8f0;
+        color: #475569;
+      }
+
+      .inactive-row {
+        opacity: 0.68;
+      }
+
       .wa-link {
         color: #15803d;
         font-weight: 900;
@@ -557,6 +571,15 @@
       .delete-btn {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
+      }
+
+      .status-btn {
+        background: linear-gradient(135deg, #64748b, #475569);
+        color: white;
+      }
+
+      .activate-btn {
+        background: linear-gradient(135deg, #15803d, #22c55e);
       }
 
       .empty-state {
@@ -851,8 +874,8 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
               <p class="section-kicker">Database Peserta</p>
               <h2>Daftar Peserta</h2>
               <p class="subtitle">
-                Cari berdasarkan nama/WA, filter berdasarkan kelompok, lalu edit
-                atau hapus data peserta.
+                Peserta nonaktif tetap tersimpan, tetapi tidak ikut absensi,
+                pengumuman WhatsApp, atau Alfa.
               </p>
             </div>
           </div>
@@ -869,6 +892,12 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
               <option value="">Semua kelompok</option>
             </select>
 
+            <select id="statusFilter" onchange="renderParticipants()">
+              <option value="">Semua status</option>
+              <option value="active">Aktif</option>
+              <option value="inactive">Nonaktif</option>
+            </select>
+
             <button class="mini-btn" type="button" onclick="resetFilter()">
               Reset Filter
             </button>
@@ -883,12 +912,13 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
                   <th>Gender</th>
                   <th>Kelompok</th>
                   <th>No WA</th>
+                  <th>Status</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="participantTable">
                 <tr>
-                  <td colspan="6" class="empty-state">
+                  <td colspan="7" class="empty-state">
                     Memuat data peserta<span class="loading-dot">...</span>
                   </td>
                 </tr>
@@ -1008,6 +1038,7 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
       function resetFilter() {
         document.getElementById("searchInput").value = "";
         document.getElementById("kelompokFilter").value = "";
+        document.getElementById("statusFilter").value = "";
         renderParticipants();
       }
 
@@ -1250,6 +1281,61 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
         }
       }
 
+      async function toggleParticipantStatus(participant) {
+        const isActive = participant.is_active !== false;
+        const nextStatus = !isActive;
+        const confirmation = await Swal.fire({
+          icon: "question",
+          title: nextStatus ? "Aktifkan peserta?" : "Nonaktifkan peserta?",
+          html: nextStatus
+            ? `<strong>${safeText(participant.nama)}</strong> akan kembali muncul pada daftar absensi dan pengumuman.`
+            : `<strong>${safeText(participant.nama)}</strong> tidak akan muncul pada absensi, pengumuman, dan Alfa. Riwayat absensi lama tetap tersimpan.`,
+          showCancelButton: true,
+          confirmButtonText: nextStatus ? "Ya, aktifkan" : "Ya, nonaktifkan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: nextStatus ? "#16a34a" : "#64748b",
+        });
+
+        if (!confirmation.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/api/participants/${participant.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nama: participant.nama,
+              gender: participant.gender,
+              kelompok: participant.kelompok,
+              no_wa: participant.no_wa,
+              is_active: nextStatus,
+            }),
+          });
+          const result = await response.json();
+
+          if (!result.success) {
+            return Swal.fire({
+              icon: "error",
+              title: "Gagal",
+              text: result.message || "Status peserta gagal diubah.",
+            });
+          }
+
+          await loadParticipants();
+          Swal.fire({
+            icon: "success",
+            title: nextStatus ? "Peserta diaktifkan" : "Peserta dinonaktifkan",
+            timer: 1300,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Terjadi kesalahan",
+            text: "Status peserta gagal diubah: " + error.message,
+          });
+        }
+      }
+
       async function addBulkParticipants() {
         const rawText = document.getElementById("bulkInput").value.trim();
 
@@ -1313,7 +1399,7 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
 
         table.innerHTML = `
           <tr>
-            <td colspan="6" class="empty-state">
+            <td colspan="7" class="empty-state">
               Memuat data peserta<span class="loading-dot">...</span>
             </td>
           </tr>
@@ -1326,7 +1412,7 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
           if (!result.success) {
             table.innerHTML = `
               <tr>
-                <td colspan="6" class="empty-state">
+                <td colspan="7" class="empty-state">
                   ${safeText(result.message || "Gagal memuat peserta.")}
                 </td>
               </tr>
@@ -1342,7 +1428,7 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
         } catch (error) {
           table.innerHTML = `
             <tr>
-              <td colspan="6" class="empty-state">
+              <td colspan="7" class="empty-state">
                 Gagal memuat peserta: ${safeText(error.message)}
               </td>
             </tr>
@@ -1359,12 +1445,21 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
 
         const selectedKelompok =
           document.getElementById("kelompokFilter").value;
+        const selectedStatus = document.getElementById("statusFilter").value;
 
         let filtered = allParticipants;
 
         if (selectedKelompok) {
           filtered = filtered.filter(
             (participant) => participant.kelompok === selectedKelompok,
+          );
+        }
+
+        if (selectedStatus) {
+          filtered = filtered.filter((participant) =>
+            selectedStatus === "active"
+              ? participant.is_active !== false
+              : participant.is_active === false,
           );
         }
 
@@ -1388,7 +1483,7 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
         if (!filtered.length) {
           table.innerHTML = `
             <tr>
-              <td colspan="6" class="empty-state">
+              <td colspan="7" class="empty-state">
                 Tidak ada peserta yang sesuai dengan pencarian/filter.
               </td>
             </tr>
@@ -1398,6 +1493,8 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
 
         filtered.forEach((participant, index) => {
           const row = document.createElement("tr");
+          const isActive = participant.is_active !== false;
+          if (!isActive) row.className = "inactive-row";
 
           const waValue = participant.no_wa
             ? `<a class="wa-link" href="https://wa.me/${safeText(
@@ -1415,9 +1512,11 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
               participant.kelompok || "-",
             )}</span></td>
             <td>${waValue}</td>
+            <td><span class="badge ${isActive ? "badge-active" : "badge-inactive"}">${isActive ? "Aktif" : "Nonaktif"}</span></td>
             <td>
               <div class="action-wrap">
                 <button class="action-btn edit-btn" type="button">Edit</button>
+                <button class="action-btn status-btn ${isActive ? "" : "activate-btn"}" type="button">${isActive ? "Nonaktifkan" : "Aktifkan"}</button>
                 <button class="action-btn delete-btn" type="button">Hapus</button>
               </div>
             </td>
@@ -1426,10 +1525,15 @@ Budi Santoso | Laki-laki | Sangiang | 6281111111111"
           table.appendChild(row);
 
           const editBtn = row.querySelector(".edit-btn");
+          const statusBtn = row.querySelector(".status-btn");
           const deleteBtn = row.querySelector(".delete-btn");
 
           editBtn.addEventListener("click", function () {
             editParticipant(participant);
+          });
+
+          statusBtn.addEventListener("click", function () {
+            toggleParticipantStatus(participant);
           });
 
           deleteBtn.addEventListener("click", function () {

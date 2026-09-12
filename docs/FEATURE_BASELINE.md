@@ -13,7 +13,8 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Guard halaman dan timeout admin | WORKING | `admin-auth.js`: status approved, idle 30 menit, maksimum 8 jam. Hanya melindungi UI. |
 | Approval status admin | PARTIAL | UI super admin membaca/mengubah `admin_users` langsung; efektivitas bergantung pada RLS yang belum diketahui. |
 | Hapus admin | WORKING | Client service-role sudah diimpor dan authorization super admin tetap dipertahankan; belum diuji terhadap Supabase. |
-| CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, dan nomor WA tersedia. Integritas delete bergantung FK aktual. |
+| CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, nomor WA, serta status aktif/nonaktif tersedia. Integritas delete bergantung FK aktual. |
+| Peserta nonaktif | PARTIAL | Filter dan penolakan backend serta kontrol UI diimplementasikan dan diuji statis; migration kolom belum dijalankan atau diuji end-to-end pada Supabase. |
 | CRUD lokasi tersimpan | WORKING | Daftar, tambah, pakai ulang, hapus, dan ambil geolocation admin tersedia. |
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, dan hapus tersedia. Klaim cascade saat delete belum terverifikasi. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
@@ -100,6 +101,21 @@ Perilaku yang harus dipertahankan:
 File penting: `public/pengumuman-wa.html`, `public/alfa-wa.html`, `public/wa-contact-status.js`.
 
 Cara verifikasi: buka dua tab untuk sesi yang sama, klik `Kirim WA` pada satu tab, pastikan kedua tab berubah, refresh, lalu uji `Tandai Belum` dan pastikan status pengumuman tidak mengubah status Alfa.
+
+### Peserta Aktif/Nonaktif
+
+Status: `PARTIAL` / kandidat baseline setelah migration
+
+Perilaku yang harus dipertahankan:
+
+- Peserta baru dan peserta lama bernilai aktif secara default.
+- Peserta nonaktif tetap terlihat pada Kelola Peserta dan dapat diaktifkan kembali.
+- Peserta nonaktif tidak muncul pada pilihan absensi QR/manual atau Pengumuman WA.
+- Endpoint absensi QR/manual menolak peserta nonaktif meskipun ID dikirim langsung.
+- Peserta nonaktif tidak ikut finalisasi Alfa dan Alfa lamanya tidak muncul pada daftar WhatsApp Alfa.
+- Riwayat attendance lama tidak dihapus saat peserta dinonaktifkan.
+
+File penting: `api/index.js`, `public/peserta.html`, dan migration `supabase/migrations/20260912000000_add_participant_is_active.sql`.
 
 ## Promosi Menjadi STABLE
 

@@ -1,6 +1,6 @@
 # Absensi QR Dinamis
 
-Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta, kehadiran, pengumuman WhatsApp, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, lokasi, dan identitas perangkat.
+Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta aktif/nonaktif, kehadiran, pengumuman WhatsApp, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, lokasi, dan identitas perangkat.
 
 ## Stack
 
@@ -32,7 +32,15 @@ SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
-Jangan menyimpan nilainya dalam dokumentasi atau commit. Belum tersedia `.env.example` dan schema/migration yang dapat membangun database dari nol.
+Jangan menyimpan nilainya dalam dokumentasi atau commit. Belum tersedia `.env.example` dan schema lengkap yang dapat membangun database dari nol.
+
+Sebelum memakai status peserta aktif/nonaktif, jalankan migration berikut melalui SQL Editor Supabase:
+
+```text
+supabase/migrations/20260912000000_add_participant_is_active.sql
+```
+
+Migration tersebut menambahkan `participants.is_active` dengan default `true`, sehingga peserta lama tetap aktif.
 
 ## Menjalankan
 

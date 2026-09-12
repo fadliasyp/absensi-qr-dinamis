@@ -6,29 +6,29 @@ Belum ada task aktif.
 
 ## Status
 
-Fitur japri pengumuman sesi dan status kontak selesai pada 2026-09-12.
+Implementasi source fitur peserta aktif/nonaktif selesai pada 2026-09-12; penerapan migration dan uji Supabase masih perlu dilakukan pengguna.
 
 ## Completed
 
-- Menambahkan aksi Pengumuman WA pada setiap sesi.
-- Menambahkan halaman japri satu per satu dengan pesan yang dihasilkan dari data sesi dan dapat diedit.
-- Menambahkan warna, statistik, dan filter status sudah/belum dijapri.
-- Menerapkan status yang sama pada fitur WhatsApp peserta Alfa.
-- Menyimpan status per sesi/jenis pesan di browser admin dan menyinkronkannya antar-tab.
-- Menambahkan test status, sintaks JavaScript inline, dan penyajian halaman lokal.
+- Menambahkan migration `participants.is_active` dengan default peserta lama tetap aktif.
+- Menambahkan tombol aktif/nonaktif, indikator, dan filter pada Kelola Peserta.
+- Memfilter peserta nonaktif dari absensi QR/manual, pengumuman, finalisasi, dan WhatsApp Alfa.
+- Menolak peserta nonaktif pada endpoint absensi QR/manual.
+- Mempertahankan riwayat attendance lama.
+- Menambahkan pemeriksaan otomatis untuk kontrak fitur dan sintaks halaman.
 
 ## Files Being Modified
 
-Tidak ada source code aplikasi yang sedang dimodifikasi.
+Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Menunggu prioritas task berikutnya dari pengguna.
+Jalankan migration status peserta pada Supabase, deploy source terbaru, lalu uji satu peserta aktif dan satu peserta nonaktif secara end-to-end.
 
 ## Blockers
 
-Status tidak dapat memastikan pesan benar-benar dikirim karena tautan gratis WhatsApp tidak memberikan callback delivery. Sistem secara jujur mencatat bahwa tombol WhatsApp telah dibuka.
+Migration belum dijalankan dari sesi ini karena perubahan database memerlukan persetujuan dan akses lingkungan pengguna.
 
 ## Notes for Next Session
 
-Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Jika status harus terlihat lintas HP/admin, pindahkan penyimpanan dari localStorage ke tabel Supabase dengan authorization yang benar.
+Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Verifikasi kolom `participants.is_active` serta RLS Supabase sebelum menyatakan fitur stabil.
