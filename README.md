@@ -36,23 +36,31 @@ Jangan menyimpan nilainya dalam dokumentasi atau commit. Belum tersedia `.env.ex
 
 ## Menjalankan
 
-Lingkungan yang paling mendekati routing produksi adalah:
-
-```bash
-npx vercel dev
-```
-
-Script berikut tercantum di `package.json`, tetapi `api/index.js` tidak memanggil `listen()`. Proses akan selesai tanpa membuka server dan juga tidak menyajikan folder `public/`:
+Untuk development lokal, atur environment variable Supabase lalu jalankan:
 
 ```bash
 npm start
+```
+
+Server tersedia di `http://localhost:3000` dan halaman awal diarahkan ke login. Port dapat diganti melalui environment variable `PORT`.
+
+Untuk mensimulasikan routing Vercel, gunakan:
+
+```bash
+npx vercel dev
 ```
 
 `server.js` adalah prototipe lokal lama berbasis data in-memory, bukan backend Supabase yang dipakai konfigurasi Vercel.
 
 ## Testing
 
-Belum ada test otomatis. `npm test` masih merupakan placeholder dan sengaja keluar dengan status gagal. Pemeriksaan sintaks yang tersedia:
+Smoke test lokal menggunakan test runner bawaan Node:
+
+```bash
+npm test
+```
+
+Pemeriksaan sintaks tambahan:
 
 ```bash
 node --check api/index.js

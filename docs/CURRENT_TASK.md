@@ -6,14 +6,15 @@ Belum ada task aktif.
 
 ## Status
 
-Bootstrap memory dan dokumentasi project selesai pada 2026-09-12.
+Perbaikan kerusakan terverifikasi selesai pada 2026-09-12.
 
 ## Completed
 
-- Struktur, dependency, konfigurasi, source, query SQL, dan Git history telah diinventarisasi.
-- Fitur dan status implementasinya telah dicatat.
-- Risiko/ketidakpastian dipisahkan dari fakta yang dapat dibuktikan.
-- README, aturan agent, arsitektur, database, baseline, keputusan, dan changelog dibuat.
+- Memperbaiki client service-role endpoint hapus admin.
+- Menghapus deklarasi route Alfa dan lokasi yang terduplikasi tanpa mengubah handler aktif.
+- Membuat `npm start` menyajikan aplikasi lokal melalui handler produksi yang sama.
+- Menambahkan smoke test berbasis test runner bawaan Node.
+- Memperbarui dependency runtime kompatibel hingga audit runtime bersih.
 
 ## Files Being Modified
 
@@ -25,9 +26,8 @@ Menunggu prioritas task berikutnya dari pengguna.
 
 ## Blockers
 
-Tidak ada blocker untuk dokumentasi. Verifikasi runtime penuh memerlukan project Supabase/deployment atau lingkungan non-produksi yang sesuai.
+Verifikasi endpoint database/auth penuh memerlukan project Supabase non-produksi atau deployment yang sesuai.
 
 ## Notes for Next Session
 
-Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Jangan menganggap status `WORKING` sebagai `STABLE` sebelum pengujian end-to-end.
-
+Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Authorization API selain endpoint hapus admin masih menjadi prioritas security, tetapi penerapannya harus sekaligus memperbarui seluruh caller browser agar tidak merusak alur.

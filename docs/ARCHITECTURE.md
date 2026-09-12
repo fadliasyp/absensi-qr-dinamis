@@ -51,13 +51,13 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | POST | `/api/sessions/:sessionId/finalize` | Isi Alfa otomatis dan finalisasi. |
 | GET | `/api/sessions/:sessionId/export-pdf` | Export rekap PDF. |
 | GET | `/api/sessions/:sessionId/qr-pdf` | Export QR PDF. |
-| GET | `/api/attendance/:sessionId/alfa` | Data Alfa dan nomor WA. Route terduplikasi. |
+| GET | `/api/attendance/:sessionId/alfa` | Data Alfa dan nomor WA. |
 | POST | `/api/participants` | Tambah peserta tunggal/bulk. |
 | GET | `/api/all-participants` | Daftar seluruh peserta. |
 | PUT, DELETE | `/api/participants/:participantId` | Edit/hapus peserta. |
 | GET, POST | `/api/locations` | Daftar/tambah lokasi. |
-| DELETE | `/api/locations/:locationId` | Hapus lokasi. Route terduplikasi. |
-| DELETE | `/api/admin-users/:adminId` | Hapus admin; saat ini broken karena client admin tidak tersedia. |
+| DELETE | `/api/locations/:locationId` | Hapus lokasi. |
+| DELETE | `/api/admin-users/:adminId` | Hapus admin dengan verifikasi bearer token dan role super admin. |
 
 Format error/sukses umumnya JSON dengan `success` dan `message`.
 
@@ -71,7 +71,7 @@ Data diakses dengan `@supabase/supabase-js`; tidak ada ORM. Tabel yang terlihat:
 - Browser membaca `admin_users` untuk status `pending`, `approved`, atau `rejected`.
 - Role `super_admin` diperlukan oleh UI approval.
 - Browser logout setelah idle 30 menit atau maksimum sesi 8 jam.
-- Authorization API belum diterapkan secara konsisten. Satu endpoint mencoba bearer-token authorization, tetapi implementasinya broken.
+- Authorization API belum diterapkan secara konsisten. Endpoint hapus admin sudah memverifikasi bearer token dan role super admin.
 
 ## Storage
 
@@ -92,6 +92,8 @@ Tidak ditemukan queue, cron, worker, atau background job. Finalisasi dilakukan s
 ## Deployment
 
 `vercel.json` me-rewrite semua `/api/*` ke `api/index.js`. Static pages diharapkan dilayani dari `public/`. Tidak ditemukan CI/CD, Docker, atau workflow GitHub Actions.
+
+Saat `api/index.js` dijalankan langsung melalui `npm start`, handler yang sama menyajikan `public/` dan membuka listener lokal. Ketika diimpor oleh Vercel, listener lokal tidak dibuat.
 
 ## Data Flows
 
@@ -134,7 +136,6 @@ Operasi insert Alfa dan update sesi tidak berada dalam satu transaction; kegagal
 - API sensitif tanpa authorization server-side.
 - Ketergantungan pada RLS/trigger/FK yang tidak terdokumentasi.
 - Handler monolitik dan halaman inline besar meningkatkan risiko regression.
-- Duplikasi route dan kode backup dapat membingungkan sumber kebenaran.
+- Kode backup dapat membingungkan sumber kebenaran.
 - Finalisasi multi-langkah tidak atomik.
-- Proses development lokal tidak seragam.
-- `npm start` tidak membuka listener karena entrypoint-nya adalah handler Vercel.
+- Dependency development Vercel memerlukan upgrade mayor untuk menutup seluruh advisory audit; dependency runtime sudah bersih.

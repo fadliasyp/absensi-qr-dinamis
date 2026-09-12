@@ -16,7 +16,7 @@ Target pengguna:
 
 Status keseluruhan: **WORKING berdasarkan implementasi statis, belum terverifikasi end-to-end**.
 
-Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Tidak ada test otomatis dan koneksi database/deployment tidak diuji dalam discovery ini. Karena itu belum ada fitur yang layak diklaim `STABLE`.
+Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test server lokal juga lulus, tetapi koneksi database/deployment belum diuji end-to-end. Karena itu belum ada fitur bisnis yang layak diklaim `STABLE`.
 
 ## Completed Features (berdasarkan source code)
 
@@ -37,7 +37,7 @@ Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Bootstrap dokumentasi selesai pada 2026-09-12.
+Belum ada task pengembangan aktif. Bootstrap dokumentasi dan perbaikan kerusakan terverifikasi selesai pada 2026-09-12.
 
 ## Pending Work
 
@@ -46,9 +46,7 @@ Belum diprioritaskan oleh pengguna:
 - Menyediakan schema/migration database yang reproducible.
 - Menambahkan test otomatis dan lingkungan pengujian non-produksi.
 - Memindahkan authorization operasi admin ke server-side untuk seluruh endpoint sensitif.
-- Memperbaiki endpoint penghapusan admin yang memakai identifier client yang tidak tersedia di `api/index.js`.
-- Menghapus duplikasi route setelah ada regression test.
-- Menentukan jalur development lokal tunggal (`vercel dev` vs server Express khusus).
+- Memverifikasi endpoint penghapusan admin terhadap project Supabase non-produksi.
 
 ## Business Logic
 
@@ -66,6 +64,7 @@ Belum diprioritaskan oleh pengguna:
 ## Technical Facts
 
 - Handler produksi: `api/index.js`.
+- Handler yang sama membuka server lokal dan menyajikan `public/` ketika dijalankan langsung melalui `npm start`.
 - `server.js` adalah prototipe lama dengan array in-memory, satu sesi contoh, dan token 20 detik.
 - Frontend tidak memiliki proses build.
 - CDN browser: Supabase JS dan SweetAlert2.
@@ -82,16 +81,13 @@ Belum diprioritaskan oleh pengguna:
 ## Known Issues and Risks
 
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
-- **BROKEN:** `DELETE /api/admin-users/:adminId` memakai `supabaseAdmin`, tetapi `api/index.js` hanya mengimpor `supabase`; request akan gagal sebelum operasi admin dilakukan.
+- Penghapusan admin sudah menggunakan client service-role yang benar, tetapi belum diuji terhadap Supabase non-produksi.
 - **Security:** kode undangan registrasi berada di JavaScript browser sehingga tidak dapat dianggap rahasia.
 - **Security/configuration:** URL dan anon key Supabase berada di `public/auth-config.js`. Anon key memang dipakai browser, tetapi keamanan tetap bergantung pada RLS yang belum dapat diverifikasi.
-- Route Alfa dan delete lokasi dideklarasikan dua kali. Pada Express, handler pertama yang mengirim respons membuat handler duplikat berikutnya praktis tidak terjangkau untuk request normal.
 - Pesan UI penghapusan sesi menyatakan attendance dan token ikut terhapus, tetapi handler hanya menghapus row `sessions`; perilaku cascade belum dapat dibuktikan karena schema tidak tersedia.
 - Hapus peserta juga bergantung pada aturan foreign key yang belum diketahui bila peserta memiliki attendance.
-- Logging QR mencetak URL Supabase dan session ID ke log backend; bukan credential, tetapi tidak diperlukan dalam produksi.
-- Import `SUPABASE_SERVICE_ROLE_KEY` dibuat di `api/supabase.js`, namun endpoint yang memerlukannya tidak mengimpor client admin dengan benar.
-- Script `npm start` menunjuk ke handler Vercel yang tidak memanggil `listen()`, sehingga belum menjadi server development lokal yang berfungsi.
-- Tidak ada rate limiting, CSRF protection eksplisit, atau test otomatis.
+- Tidak ada rate limiting atau CSRF protection eksplisit.
+- Audit dependency runtime bersih, tetapi tool development Vercel lama masih memiliki advisory yang perbaikannya memerlukan upgrade mayor.
 
 ## Important Files
 

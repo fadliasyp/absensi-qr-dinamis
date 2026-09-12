@@ -71,7 +71,7 @@ Jangan menambah framework, dependency, atau abstraction tanpa kebutuhan nyata.
 - Jangan menyatakan fitur `STABLE` tanpa bukti runtime/test/penggunaan yang dapat diverifikasi.
 - Jalankan minimal `node --check` pada JavaScript yang diubah.
 - Untuk perubahan alur utama, uji manual dengan Supabase non-produksi: login, sesi, QR, absensi, finalisasi, dan export yang relevan.
-- `npm test` saat ini placeholder; jangan melaporkannya lulus.
+- Jalankan `npm test`; smoke test memastikan entrypoint lokal menyajikan halaman login.
 
 ## Documentation Rules
 
@@ -113,4 +113,3 @@ Saat task selesai, kosongkan task aktif menjadi `Belum ada task aktif`, simpan t
 - Sesi baru saat ini berlaku untuk semua kelompok (`kelompok: "Semua"`).
 - Token QR dibuat satu kali per sesi dan mengikuti `end_time` sesi; jangan menyebutnya QR berotasi tanpa mengubah implementasi.
 - Jangan mendokumentasikan file backup sebagai fitur aktif.
-

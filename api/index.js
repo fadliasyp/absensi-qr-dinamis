@@ -2,7 +2,8 @@ import express from "express";
 import QRCode from "qrcode";
 import cookieParser from "cookie-parser";
 import crypto from "crypto";
-import { supabase } from "./supabase.js";
+import { fileURLToPath } from "url";
+import { supabase, supabaseAdmin } from "./supabase.js";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
@@ -10,17 +11,6 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-
-// const supabaseAdmin = createClient(
-//   process.env.SUPABASE_URL,
-//   process.env.SUPABASE_SERVICE_ROLE_KEY,
-//   {
-//     auth: {
-//       autoRefreshToken: false,
-//       persistSession: false,
-//     },
-//   },
-// );
 
 function generateToken() {
   return crypto.randomBytes(16).toString("hex");
@@ -114,9 +104,6 @@ function formatTanggalSesiIndonesia(dateString) {
 app.get("/api/qr/:sessionId", async (req, res) => {
   try {
     const { sessionId } = req.params;
-    console.log("SESSION ID DARI ADMIN:", sessionId);
-    console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
-
     const { data: session, error: sessionError } = await supabase
       .from("sessions")
       .select("*")
@@ -1156,81 +1143,6 @@ app.delete("/api/participants/:participantId", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Terjadi kesalahan saat menghapus peserta.",
-      error: error.message,
-    });
-  }
-});
-
-// ========================
-// Masukan tanggal Sesi ngaji ke Pesan WA ALFA
-// ========================
-app.get("/api/attendance/:sessionId/alfa", async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-
-    const { data: session, error: sessionError } = await supabase
-      .from("sessions")
-      .select("id, judul, start_time, end_time")
-      .eq("id", sessionId)
-      .maybeSingle();
-
-    if (sessionError || !session) {
-      return res.status(404).json({
-        success: false,
-        message: "Sesi tidak ditemukan.",
-      });
-    }
-
-    const { data, error } = await supabase
-      .from("attendance")
-      .select(
-        `
-        id,
-        session_id,
-        participant_id,
-        nama,
-        gender,
-        kelompok,
-        keterangan,
-        waktu_hadir,
-        participants (
-          no_wa
-        )
-      `,
-      )
-      .eq("session_id", sessionId)
-      .eq("keterangan", "Alfa")
-      .order("kelompok", { ascending: true })
-      .order("nama", { ascending: true });
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Gagal mengambil data peserta Alfa.",
-        error: error.message,
-      });
-    }
-
-    const result = data.map((item) => ({
-      id: item.id,
-      participant_id: item.participant_id,
-      nama: item.nama,
-      gender: item.gender,
-      kelompok: item.kelompok,
-      keterangan: item.keterangan,
-      waktu_hadir: item.waktu_hadir,
-      no_wa: item.participants?.no_wa || null,
-    }));
-
-    res.json({
-      success: true,
-      session,
-      alfa: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat mengambil peserta Alfa.",
       error: error.message,
     });
   }
@@ -2895,43 +2807,6 @@ app.delete("/api/locations/:locationId", async (req, res) => {
   }
 });
 
-app.delete("/api/locations/:locationId", async (req, res) => {
-  try {
-    const { locationId } = req.params;
-
-    if (!locationId) {
-      return res.status(400).json({
-        success: false,
-        message: "Location ID wajib dikirim.",
-      });
-    }
-
-    const { error } = await supabase
-      .from("locations")
-      .delete()
-      .eq("id", locationId);
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Gagal menghapus lokasi.",
-        error: error.message,
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Lokasi utama berhasil dihapus.",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat menghapus lokasi.",
-      error: error.message,
-    });
-  }
-});
-
 app.delete("/api/admin-users/:adminId", async (req, res) => {
   try {
     const { adminId } = req.params;
@@ -3044,5 +2919,22 @@ app.delete("/api/admin-users/:adminId", async (req, res) => {
     });
   }
 });
+
+const isDirectRun =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) ===
+    path.resolve(fileURLToPath(import.meta.url));
+
+if (isDirectRun) {
+  const port = Number(process.env.PORT) || 3000;
+  const publicDirectory = path.join(process.cwd(), "public");
+
+  app.use(express.static(publicDirectory));
+  app.get("/", (_req, res) => res.redirect("/login.html"));
+
+  const server = app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${server.address().port}`);
+  });
+}
 
 export default app;

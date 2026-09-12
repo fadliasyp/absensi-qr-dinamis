@@ -4,7 +4,7 @@ Terakhir diperbarui: 2026-09-12
 
 ## Ringkasan Status
 
-Belum ada fitur berstatus `STABLE`. Repository tidak memiliki test otomatis, bukti penggunaan nyata, atau hasil verifikasi end-to-end. Status `WORKING` di bawah berarti implementasinya lengkap secara statis dan source utama lolos pemeriksaan sintaks; status tersebut belum menjadi jaminan runtime.
+Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test server lokal, tetapi belum ada bukti penggunaan nyata atau hasil verifikasi Supabase end-to-end. Status `WORKING` berarti implementasinya lengkap secara statis dan pemeriksaan yang relevan lulus; status tersebut belum menjamin integrasi produksi.
 
 | Fitur | Status | Bukti / catatan |
 |---|---|---|
@@ -12,9 +12,9 @@ Belum ada fitur berstatus `STABLE`. Repository tidak memiliki test otomatis, buk
 | Registrasi admin | PARTIAL | `signUp` tersedia, tetapi pembuatan row `admin_users` bergantung pada konfigurasi/trigger Supabase yang tidak ada di repo; invite code terlihat di browser. |
 | Guard halaman dan timeout admin | WORKING | `admin-auth.js`: status approved, idle 30 menit, maksimum 8 jam. Hanya melindungi UI. |
 | Approval status admin | PARTIAL | UI super admin membaca/mengubah `admin_users` langsung; efektivitas bergantung pada RLS yang belum diketahui. |
-| Hapus admin | BROKEN | Endpoint mereferensikan `supabaseAdmin` yang tidak diimpor. |
+| Hapus admin | WORKING | Client service-role sudah diimpor dan authorization super admin tetap dipertahankan; belum diuji terhadap Supabase. |
 | CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, dan nomor WA tersedia. Integritas delete bergantung FK aktual. |
-| CRUD lokasi tersimpan | WORKING | Daftar, tambah, pakai ulang, hapus, dan ambil geolocation admin tersedia; route delete terduplikasi. |
+| CRUD lokasi tersimpan | WORKING | Daftar, tambah, pakai ulang, hapus, dan ambil geolocation admin tersedia. |
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, dan hapus tersedia. Klaim cascade saat delete belum terverifikasi. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
@@ -25,6 +25,7 @@ Belum ada fitur berstatus `STABLE`. Repository tidak memiliki test otomatis, buk
 | Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel tersedia. |
 | Tindak lanjut WhatsApp Alfa | WORKING | Daftar/filter, preview/salin pesan, dan tautan `wa.me`; pengguna tetap menekan Kirim. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
+| Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
 | Prototipe `server.js` | DEPRECATED | Backend in-memory terpisah dari implementasi Supabase/Vercel dan tidak menyajikan fitur terbaru. |
 | File backup HTML | DEPRECATED | Tidak dirujuk oleh navigasi aktif; disimpan sebagai backup. |
 
@@ -84,4 +85,3 @@ Cara verifikasi: buka dashboard sesi dengan data campuran, periksa ringkasan/fil
 ## Promosi Menjadi STABLE
 
 Ubah status hanya setelah ada hasil pengujian yang dicatat (atau konfirmasi penggunaan produksi dari pengguna), dependency/database telah diverifikasi, dan tidak ada regression yang diketahui.
-
