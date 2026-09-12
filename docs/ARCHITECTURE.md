@@ -30,6 +30,8 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `peserta.html`: CRUD peserta.
 - `manual.html`: status manual.
 - `alfa-wa.html`: tindak lanjut Alfa.
+- `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
+- `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.
 - `admin-approval.html`: status akun admin.
 - `absen.html`: UI publik peserta.
 
@@ -76,6 +78,8 @@ Data diakses dengan `@supabase/supabase-js`; tidak ada ORM. Tabel yang terlihat:
 ## Storage
 
 Tidak ditemukan Supabase Storage atau filesystem persistence untuk data. `assets/header-qr.png` dibaca oleh generator PDF saat runtime, dengan fallback gambar berbasis shape/text.
+
+Status japri WhatsApp disimpan dalam `localStorage` browser admin dengan key terpisah untuk jenis `announcement` dan `alfa` serta session ID. Custom event memperbarui tab aktif dan browser `storage` event menyinkronkan tab lain pada origin yang sama. Status ini tidak tersedia lintas HP/browser.
 
 ## External Services
 

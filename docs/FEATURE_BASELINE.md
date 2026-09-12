@@ -24,6 +24,9 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
 | Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel tersedia. |
 | Tindak lanjut WhatsApp Alfa | WORKING | Daftar/filter, preview/salin pesan, dan tautan `wa.me`; pengguna tetap menekan Kirim. |
+| Status japri WhatsApp Alfa | WORKING | Warna/statistik/filter berubah saat tautan dibuka, persisten dan realtime pada browser admin yang sama. |
+| Pengumuman WhatsApp sesi | WORKING | Pesan sesi dapat diedit dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
+| Status japri pengumuman | WORKING | Dipisahkan per session ID dan dari status Alfa; dapat dikembalikan menjadi belum dijapri. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
 | Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
 | Prototipe `server.js` | DEPRECATED | Backend in-memory terpisah dari implementasi Supabase/Vercel dan tidak menyajikan fitur terbaru. |
@@ -81,6 +84,22 @@ Perilaku yang harus dipertahankan:
 File penting: `api/index.js`, `public/admin.html`, `public/admin-session.html`, `assets/header-qr.png`.
 
 Cara verifikasi: buka dashboard sesi dengan data campuran, periksa ringkasan/filter, unduh kedua PDF, dan buka hasilnya.
+
+### Japri WhatsApp
+
+Status: `WORKING` / kandidat baseline
+
+Perilaku yang harus dipertahankan:
+
+- Pengumuman dan Alfa mempunyai status japri yang terpisah per sesi.
+- Membuka tombol `Kirim WA` langsung mengubah kartu menjadi hijau dan memperbarui statistik/filter.
+- Refresh halaman mempertahankan status pada browser yang sama; perubahan antar-tab tersinkron.
+- Admin dapat mengembalikan status menjadi belum dijapri.
+- Label UI menjelaskan bahwa status berarti tautan WhatsApp dibuka, bukan konfirmasi delivery.
+
+File penting: `public/pengumuman-wa.html`, `public/alfa-wa.html`, `public/wa-contact-status.js`.
+
+Cara verifikasi: buka dua tab untuk sesi yang sama, klik `Kirim WA` pada satu tab, pastikan kedua tab berubah, refresh, lalu uji `Tandai Belum` dan pastikan status pengumuman tidak mengubah status Alfa.
 
 ## Promosi Menjadi STABLE
 

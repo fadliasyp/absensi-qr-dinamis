@@ -37,6 +37,11 @@ test("npm start entrypoint serves the public application", async (t) => {
   assert.equal(response.status, 200);
   assert.match(html, /<title>Login Admin Absensi<\/title>/);
 
+  const announcementPage = await fetch(
+    `http://127.0.0.1:${port}/pengumuman-wa.html?session=test-session`,
+  );
+  assert.equal(announcementPage.status, 200);
+
   const unauthorizedDelete = await fetch(
     `http://127.0.0.1:${port}/api/admin-users/test-admin`,
     { method: "DELETE" },

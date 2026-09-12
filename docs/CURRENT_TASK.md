@@ -6,15 +6,16 @@ Belum ada task aktif.
 
 ## Status
 
-Perbaikan kerusakan terverifikasi selesai pada 2026-09-12.
+Fitur japri pengumuman sesi dan status kontak selesai pada 2026-09-12.
 
 ## Completed
 
-- Memperbaiki client service-role endpoint hapus admin.
-- Menghapus deklarasi route Alfa dan lokasi yang terduplikasi tanpa mengubah handler aktif.
-- Membuat `npm start` menyajikan aplikasi lokal melalui handler produksi yang sama.
-- Menambahkan smoke test berbasis test runner bawaan Node.
-- Memperbarui dependency runtime kompatibel hingga audit runtime bersih.
+- Menambahkan aksi Pengumuman WA pada setiap sesi.
+- Menambahkan halaman japri satu per satu dengan pesan yang dihasilkan dari data sesi dan dapat diedit.
+- Menambahkan warna, statistik, dan filter status sudah/belum dijapri.
+- Menerapkan status yang sama pada fitur WhatsApp peserta Alfa.
+- Menyimpan status per sesi/jenis pesan di browser admin dan menyinkronkannya antar-tab.
+- Menambahkan test status, sintaks JavaScript inline, dan penyajian halaman lokal.
 
 ## Files Being Modified
 
@@ -26,8 +27,8 @@ Menunggu prioritas task berikutnya dari pengguna.
 
 ## Blockers
 
-Verifikasi endpoint database/auth penuh memerlukan project Supabase non-produksi atau deployment yang sesuai.
+Status tidak dapat memastikan pesan benar-benar dikirim karena tautan gratis WhatsApp tidak memberikan callback delivery. Sistem secara jujur mencatat bahwa tombol WhatsApp telah dibuka.
 
 ## Notes for Next Session
 
-Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Authorization API selain endpoint hapus admin masih menjadi prioritas security, tetapi penerapannya harus sekaligus memperbarui seluruh caller browser agar tidak merusak alur.
+Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Jika status harus terlihat lintas HP/admin, pindahkan penyimpanan dari localStorage ke tabel Supabase dengan authorization yang benar.

@@ -31,6 +31,7 @@ Jangan menambah framework, dependency, atau abstraction tanpa kebutuhan nyata.
 - `api/index.js`: API Express/Supabase dan generator PDF/QR
 - `api/supabase.js`: client Supabase anon dan service-role
 - `public/`: halaman browser dan auth guard admin
+- `public/wa-contact-status.js`: status japri WhatsApp lokal per sesi/jenis pesan
 - `assets/`: gambar/header dan file backup
 - `server.js`: prototipe lokal in-memory; bukan implementasi produksi
 - `note.sql`: query operasional manual, bukan migration lengkap
@@ -113,3 +114,5 @@ Saat task selesai, kosongkan task aktif menjadi `Belum ada task aktif`, simpan t
 - Sesi baru saat ini berlaku untuk semua kelompok (`kelompok: "Semua"`).
 - Token QR dibuat satu kali per sesi dan mengikuti `end_time` sesi; jangan menyebutnya QR berotasi tanpa mengubah implementasi.
 - Jangan mendokumentasikan file backup sebagai fitur aktif.
+- Status japri gratis berarti tautan WhatsApp telah dibuka, bukan konfirmasi pesan terkirim; jangan mengubah label menjadi klaim delivery tanpa API resmi.
+- Status japri `announcement` dan `alfa` harus tetap terpisah dan saat ini hanya persisten pada browser admin yang sama.

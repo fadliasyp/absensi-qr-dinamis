@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pengumuman WhatsApp Sesi</title>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --green: #16a34a;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --card: rgba(255, 255, 255, 0.94);
+        --shadow: 0 22px 55px rgba(15, 23, 42, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 22px 12px 40px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: var(--dark);
+        background:
+          radial-gradient(circle at top left, #dbeafe 0, transparent 34%),
+          radial-gradient(circle at top right, #dcfce7 0, transparent 30%),
+          #f8fafc;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      .page {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+      }
+
+      .top-actions,
+      .toolbar,
+      .card-actions,
+      .meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .top-actions {
+        margin-bottom: 14px;
+      }
+
+      .btn,
+      .wa-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 14px;
+        color: #fff;
+        background: var(--primary);
+        font-weight: 850;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .btn.secondary {
+        color: #334155;
+        background: #e2e8f0;
+      }
+
+      .hero {
+        padding: 28px;
+        border-radius: 30px;
+        color: #fff;
+        background: linear-gradient(135deg, #16a34a, #2563eb);
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        margin: 5px 0 10px;
+        font-size: clamp(28px, 5vw, 45px);
+      }
+
+      .hero p {
+        max-width: 760px;
+        margin: 0;
+        line-height: 1.65;
+        font-weight: 650;
+      }
+
+      .session-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 16px 0;
+      }
+
+      .info-box,
+      .stat,
+      .panel,
+      .participant-card {
+        border: 1px solid #e2e8f0;
+        background: var(--card);
+        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.07);
+      }
+
+      .info-box,
+      .stat {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .label {
+        margin: 0 0 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .value {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 900;
+        line-height: 1.45;
+      }
+
+      .panel {
+        margin-top: 16px;
+        padding: 22px;
+        border-radius: 26px;
+      }
+
+      .panel h2 {
+        margin: 0 0 8px;
+      }
+
+      .description,
+      .note {
+        color: var(--muted);
+        line-height: 1.6;
+        font-weight: 650;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        margin-top: 12px;
+        padding: 15px;
+        resize: vertical;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 17px;
+        color: var(--dark);
+        background: #f8fafc;
+        line-height: 1.6;
+      }
+
+      textarea:focus,
+      input:focus,
+      select:focus {
+        outline: 0;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 27px;
+      }
+
+      .toolbar {
+        margin: 16px 0;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        min-height: 46px;
+        padding: 10px 13px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 14px;
+        background: #fff;
+        color: var(--dark);
+        font-weight: 700;
+      }
+
+      .toolbar input {
+        flex: 1 1 260px;
+      }
+
+      .toolbar select {
+        flex: 1 1 170px;
+      }
+
+      #participantBox {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 13px;
+      }
+
+      .participant-card {
+        position: relative;
+        overflow: hidden;
+        padding: 17px;
+        border-radius: 22px;
+        border-color: #fed7aa;
+        background: linear-gradient(180deg, #fff, #fffaf3);
+      }
+
+      .participant-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 5px;
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+      }
+
+      .participant-card.contacted {
+        border-color: #86efac;
+        background: linear-gradient(180deg, #fff, #f0fdf4);
+      }
+
+      .participant-card.contacted::before {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
+      }
+
+      .participant-name {
+        margin: 3px 0 7px;
+        font-size: 19px;
+        font-weight: 900;
+      }
+
+      .participant-meta {
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .meta-row {
+        margin-top: 10px;
+      }
+
+      .pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #ede9fe;
+        color: #6d28d9;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .pill.pending {
+        background: #ffedd5;
+        color: #c2410c;
+      }
+
+      .pill.sent {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .pill.missing {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+
+      .card-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: 14px;
+      }
+
+      .wa-link {
+        background: #16a34a;
+      }
+
+      .copy-btn {
+        background: #2563eb;
+      }
+
+      .preview-btn {
+        background: #7c3aed;
+      }
+
+      .undo-btn {
+        background: #64748b;
+      }
+
+      .missing,
+      .empty,
+      .note {
+        margin-top: 13px;
+        padding: 13px;
+        border-radius: 15px;
+        background: #f8fafc;
+      }
+
+      .missing {
+        color: #be123c;
+        background: #fff1f2;
+      }
+
+      .empty {
+        grid-column: 1 / -1;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 760px) {
+        .session-info,
+        .stats,
+        #participantBox {
+          grid-template-columns: 1fr;
+        }
+
+        .hero,
+        .panel {
+          padding: 19px;
+          border-radius: 23px;
+        }
+
+        .top-actions .btn {
+          flex: 1 1 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="top-actions">
+        <a class="btn secondary" href="/admin-session.html">← Daftar Sesi</a>
+        <a id="recapLink" class="btn" href="#">Buka Rekap Sesi</a>
+        <button id="refreshBtn" class="btn" type="button">Refresh</button>
+      </nav>
+
+      <section class="hero">
+        <p>📣 WhatsApp Pengumuman Sesi</p>
+        <h1>Japri Peserta Satu per Satu</h1>
+        <p>
+          Pesan dibuat dari data sesi dan dipersonalisasi untuk setiap peserta.
+          Kartu langsung berubah hijau setelah tombol WhatsApp dibuka.
+        </p>
+      </section>
+
+      <section class="session-info">
+        <div class="info-box">
+          <p class="label">Nama sesi</p>
+          <p id="sessionTitle" class="value">Memuat...</p>
+        </div>
+        <div class="info-box">
+          <p class="label">Waktu</p>
+          <p id="sessionTime" class="value">-</p>
+        </div>
+        <div class="info-box">
+          <p class="label">Lokasi</p>
+          <p id="sessionLocation" class="value">-</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Isi Pengumuman</h2>
+        <p class="description">
+          Sapaan dan nama peserta ditambahkan otomatis. Isi pesan di bawah dapat
+          diedit sebelum dikirim.
+        </p>
+        <textarea id="messageInput" aria-label="Isi pengumuman"></textarea>
+      </section>
+
+      <section class="stats">
+        <div class="stat"><span>Total peserta</span><strong id="totalCount">0</strong></div>
+        <div class="stat"><span>Nomor WA ada</span><strong id="waCount">0</strong></div>
+        <div class="stat"><span>Sudah dijapri</span><strong id="sentCount">0</strong></div>
+        <div class="stat"><span>Belum dijapri</span><strong id="pendingCount">0</strong></div>
+      </section>
+
+      <section class="panel">
+        <h2>Daftar Peserta</h2>
+        <div class="toolbar">
+          <input id="searchInput" type="search" placeholder="Cari nama, kelompok, atau nomor WA" />
+          <select id="groupFilter"><option value="">Semua kelompok</option></select>
+          <select id="statusFilter">
+            <option value="">Semua status japri</option>
+            <option value="pending">Belum dijapri</option>
+            <option value="sent">Sudah dijapri</option>
+            <option value="missing">Nomor WA kosong</option>
+          </select>
+          <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+        </div>
+
+        <div id="participantBox"><div class="empty">Memuat peserta...</div></div>
+
+        <div class="note">
+          <strong>Catatan:</strong> “Sudah dijapri” berarti tombol WhatsApp sudah
+          dibuka dari halaman ini, bukan konfirmasi delivery dari WhatsApp.
+          Status tersimpan hanya pada HP/browser admin ini.
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+    <script src="/wa-contact-status.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      protectAdminPage();
+
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
+      let currentSession = null;
+      let participants = [];
+
+      const participantBox = document.getElementById("participantBox");
+      const messageInput = document.getElementById("messageInput");
+
+      function escapeHtml(value = "") {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function normalizeWaNumber(value) {
+        if (!value) return "";
+        let number = String(value).replace(/\D/g, "");
+        if (number.startsWith("0")) number = `62${number.slice(1)}`;
+        return number;
+      }
+
+      function getGreeting(gender) {
+        const value = String(gender || "").toLowerCase();
+        if (value.includes("laki") || value === "l" || value === "pria") return "Mas";
+        if (value.includes("perempuan") || value === "p" || value === "wanita") return "Mba";
+        return "Kak";
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleDateString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
+
+      function formatTime(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleTimeString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      }
+
+      function formatContactTime(value) {
+        if (!value) return "";
+        return new Date(value).toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      }
+
+      function defaultAnnouncement(session) {
+        return `Kami dari pengurus muda/i Desa Periuk Jaya mengundang untuk mengikuti:
+
+*${session.judul || "Pengajian"}*
+Hari/Tanggal: ${formatDate(session.start_time)}
+Waktu: ${formatTime(session.start_time)}–${formatTime(session.end_time)} WIB
+Lokasi: ${session.location_name || "Akan diinformasikan"}
+
+Mohon kehadirannya. Semoga Allah memberikan kelancaran dan kebarokahan. Aamiin.`;
+      }
+
+      function participantMessage(participant) {
+        const greeting = getGreeting(participant.gender);
+        const group = participant.kelompok ? ` kelompok ${participant.kelompok}` : "";
+        return `Assalamu’alaikum, ${greeting} *${participant.nama || participant.name || ""}*${group}.
+
+${messageInput.value.trim()}`;
+      }
+
+      function updateStats() {
+        const withWa = participants.filter((item) => normalizeWaNumber(item.no_wa));
+        const contacted = withWa.filter((item) =>
+          WaContactStatus.get("announcement", sessionId, item.id),
+        ).length;
+
+        document.getElementById("totalCount").textContent = participants.length;
+        document.getElementById("waCount").textContent = withWa.length;
+        document.getElementById("sentCount").textContent = contacted;
+        document.getElementById("pendingCount").textContent = withWa.length - contacted;
+      }
+
+      function updateGroupFilter() {
+        const select = document.getElementById("groupFilter");
+        const groups = [...new Set(participants.map((item) => item.kelompok).filter(Boolean))].sort();
+        select.innerHTML = '<option value="">Semua kelompok</option>';
+
+        groups.forEach((group) => {
+          const option = document.createElement("option");
+          option.value = group;
+          option.textContent = group;
+          select.appendChild(option);
+        });
+      }
+
+      function renderParticipants() {
+        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+        const group = document.getElementById("groupFilter").value;
+        const status = document.getElementById("statusFilter").value;
+
+        const filtered = participants.filter((item) => {
+          const hasWa = Boolean(normalizeWaNumber(item.no_wa));
+          const contacted = Boolean(WaContactStatus.get("announcement", sessionId, item.id));
+          const matchesStatus =
+            !status ||
+            (status === "missing"
+              ? !hasWa
+              : status === "sent"
+                ? hasWa && contacted
+                : hasWa && !contacted);
+          const matchesGroup = !group || item.kelompok === group;
+          const searchable = [item.nama, item.name, item.kelompok, item.no_wa].join(" ").toLowerCase();
+          return matchesStatus && matchesGroup && (!keyword || searchable.includes(keyword));
+        });
+
+        participantBox.innerHTML = "";
+        if (!filtered.length) {
+          participantBox.innerHTML = '<div class="empty">Tidak ada peserta yang sesuai dengan filter.</div>';
+          return;
+        }
+
+        filtered.forEach((participant) => {
+          const number = normalizeWaNumber(participant.no_wa);
+          const name = participant.nama || participant.name || "-";
+          const contactedAt = WaContactStatus.get("announcement", sessionId, participant.id);
+          const message = participantMessage(participant);
+          const card = document.createElement("article");
+          card.className = `participant-card${contactedAt ? " contacted" : ""}`;
+
+          card.innerHTML = `
+            <h3 class="participant-name">${escapeHtml(name)}</h3>
+            <div class="participant-meta">No WA: ${escapeHtml(participant.no_wa || "Belum tersedia")}</div>
+            <div class="meta-row">
+              <span class="pill">${escapeHtml(participant.kelompok || "Tanpa kelompok")}</span>
+              <span class="pill ${!number ? "missing" : contactedAt ? "sent" : "pending"}">
+                ${!number ? "Nomor WA kosong" : contactedAt ? `Sudah dijapri · ${formatContactTime(contactedAt)}` : "Belum dijapri"}
+              </span>
+            </div>
+            ${
+              number
+                ? `<div class="card-actions">
+                    <a class="wa-link" href="https://wa.me/${number}?text=${encodeURIComponent(message)}" target="_blank" rel="noopener">Kirim WA</a>
+                    <button class="btn copy-btn" type="button">Salin Pesan</button>
+                    <button class="btn preview-btn" type="button">Preview</button>
+                    ${contactedAt ? '<button class="btn undo-btn" type="button">Tandai Belum</button>' : ""}
+                  </div>`
+                : `<div class="missing">Nomor WA belum tersedia. Lengkapi dari halaman Kelola Peserta.</div>
+                  ${contactedAt ? '<div class="card-actions"><button class="btn undo-btn" type="button">Tandai Belum</button></div>' : ""}`
+            }
+          `;
+
+          participantBox.appendChild(card);
+
+          card.querySelector(".wa-link")?.addEventListener("click", () => {
+            WaContactStatus.mark("announcement", sessionId, participant.id);
+          });
+          card.querySelector(".copy-btn")?.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(message);
+              Swal.fire({ icon: "success", title: "Pesan disalin", timer: 1200, showConfirmButton: false });
+            } catch (error) {
+              Swal.fire({ icon: "error", title: "Gagal menyalin", text: error.message });
+            }
+          });
+          card.querySelector(".preview-btn")?.addEventListener("click", () => {
+            Swal.fire({ title: `Pesan untuk ${name}`, html: `<div style="text-align:left;white-space:pre-line">${escapeHtml(message)}</div>`, width: 560 });
+          });
+          card.querySelector(".undo-btn")?.addEventListener("click", () => {
+            WaContactStatus.clear("announcement", sessionId, participant.id);
+          });
+        });
+      }
+
+      async function loadData(showNotice = false) {
+        participantBox.innerHTML = '<div class="empty">Memuat peserta...</div>';
+
+        try {
+          const [participantResponse, sessionResponse] = await Promise.all([
+            fetch(`/api/participants?session=${sessionId}`),
+            fetch("/api/sessions"),
+          ]);
+          const participantResult = await participantResponse.json();
+          const sessionResult = await sessionResponse.json();
+
+          if (!participantResult.success || !sessionResult.success) {
+            throw new Error(participantResult.message || sessionResult.message || "Gagal memuat data.");
+          }
+
+          currentSession = (sessionResult.sessions || []).find(
+            (item) => String(item.id) === String(sessionId),
+          );
+          if (!currentSession) throw new Error("Sesi tidak ditemukan.");
+
+          participants = (participantResult.participants || []).sort((a, b) =>
+            `${a.kelompok || ""} ${a.nama || a.name || ""}`.localeCompare(
+              `${b.kelompok || ""} ${b.nama || b.name || ""}`,
+            ),
+          );
+
+          document.getElementById("sessionTitle").textContent = currentSession.judul || "-";
+          document.getElementById("sessionTime").textContent = `${formatDate(currentSession.start_time)}, ${formatTime(currentSession.start_time)}–${formatTime(currentSession.end_time)} WIB`;
+          document.getElementById("sessionLocation").textContent = currentSession.location_name || "-";
+          if (!messageInput.value.trim()) messageInput.value = defaultAnnouncement(currentSession);
+
+          updateGroupFilter();
+          updateStats();
+          renderParticipants();
+
+          if (showNotice) {
+            Swal.fire({ icon: "success", title: "Data diperbarui", timer: 1200, showConfirmButton: false });
+          }
+        } catch (error) {
+          participantBox.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+        }
+      }
+
+      if (!sessionId) {
+        Swal.fire({ icon: "error", title: "Session ID tidak ditemukan" }).then(
+          () => (window.location.href = "/admin-session.html"),
+        );
+      } else {
+        document.getElementById("recapLink").href = `/admin.html?session=${sessionId}`;
+        WaContactStatus.subscribe("announcement", sessionId, () => {
+          updateStats();
+          renderParticipants();
+        });
+        loadData();
+      }
+
+      document.getElementById("refreshBtn").addEventListener("click", () => loadData(true));
+      document.getElementById("searchInput").addEventListener("input", renderParticipants);
+      document.getElementById("groupFilter").addEventListener("change", renderParticipants);
+      document.getElementById("statusFilter").addEventListener("change", renderParticipants);
+      messageInput.addEventListener("input", renderParticipants);
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("groupFilter").value = "";
+        document.getElementById("statusFilter").value = "";
+        renderParticipants();
+      });
+    </script>
+  </body>
+</html>

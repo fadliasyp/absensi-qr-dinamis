@@ -4,6 +4,15 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-12
 
+### Added — Japri WhatsApp
+
+- Menambahkan halaman pengumuman sesi yang membuat pesan personal dari data sesi dan peserta.
+- Menambahkan tombol Pengumuman WA pada setiap baris sesi.
+- Menambahkan status sudah/belum dijapri, warna kartu, statistik, filter, waktu klik, dan aksi reset.
+- Menerapkan status japri yang sama pada halaman peserta Alfa.
+- Menambahkan penyimpanan localStorage terpisah per sesi/jenis pesan dan sinkronisasi realtime antar-tab.
+- Menambahkan test helper status, JavaScript inline kedua halaman, dan akses halaman melalui server lokal.
+
 ### Fixed
 
 - Memperbaiki endpoint hapus admin dengan memakai export `supabaseAdmin` yang sudah tersedia.

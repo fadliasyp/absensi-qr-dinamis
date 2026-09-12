@@ -1,6 +1,6 @@
 # Absensi QR Dinamis
 
-Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta, kehadiran, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, lokasi, dan identitas perangkat.
+Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta, kehadiran, pengumuman WhatsApp, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, lokasi, dan identitas perangkat.
 
 ## Stack
 

@@ -659,6 +659,10 @@
         background: var(--orange);
       }
 
+      .announcement {
+        background: var(--green);
+      }
+
       .delete {
         background: var(--red);
       }
@@ -995,8 +999,8 @@
             <div class="badge-top">📋 Daftar Sesi</div>
             <h2>Sesi Tersimpan</h2>
             <p class="subtitle">
-              Buka QR, input manual, export PDF, atau hapus sesi yang sudah
-              tidak digunakan.
+              Buka QR, kirim pengumuman WA, input manual, export PDF, atau
+              hapus sesi yang sudah tidak digunakan.
             </p>
           </div>
 
@@ -1626,6 +1630,10 @@
 
                 <a class="action-link manual" href="/manual.html?session=${session.id}">
                   Izin/Alfa
+                </a>
+
+                <a class="action-link announcement" href="/pengumuman-wa.html?session=${session.id}">
+                  Pengumuman WA
                 </a>
 
                 <a

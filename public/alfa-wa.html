@@ -313,7 +313,7 @@
 
       .toolbar {
         display: grid;
-        grid-template-columns: 1fr 0.75fr auto;
+        grid-template-columns: 1fr 0.75fr 0.65fr auto;
         gap: 10px;
         margin: 18px 0;
       }
@@ -379,6 +379,15 @@
         inset: 0 0 auto 0;
         height: 5px;
         background: linear-gradient(90deg, #f59e0b, #ef4444);
+      }
+
+      .alfa-card.contacted {
+        background: linear-gradient(180deg, #ffffff, #f0fdf4);
+        border-color: #86efac;
+      }
+
+      .alfa-card.contacted::before {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
       }
 
       .alfa-top {
@@ -454,6 +463,30 @@
         color: #475569;
       }
 
+      .contact-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .contact-status.pending {
+        background: #ffedd5;
+        color: #c2410c;
+      }
+
+      .contact-status.sent {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .contact-status.missing {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+
       .card-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -463,7 +496,8 @@
 
       .wa-link,
       .copy-btn,
-      .preview-btn {
+      .preview-btn,
+      .undo-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -495,6 +529,11 @@
       .preview-btn {
         background: linear-gradient(135deg, #7c3aed, #a855f7);
         box-shadow: 0 12px 24px rgba(124, 58, 237, 0.18);
+        grid-column: 1 / -1;
+      }
+
+      .undo-btn {
+        background: #64748b;
         grid-column: 1 / -1;
       }
 
@@ -664,9 +703,15 @@
         </div>
 
         <div class="stat-card">
-          <p class="stat-label">Nomor WA Kosong</p>
-          <p class="stat-value" id="totalWaKosong">0</p>
-          <span class="stat-chip">Perlu dilengkapi</span>
+          <p class="stat-label">Sudah Dijapri</p>
+          <p class="stat-value" id="totalSudahDijapri">0</p>
+          <span class="stat-chip">Tombol WA dibuka</span>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Belum Dijapri</p>
+          <p class="stat-value" id="totalBelumDijapri">0</p>
+          <span class="stat-chip">Nomor WA tersedia</span>
         </div>
 
         <div class="stat-card">
@@ -702,6 +747,13 @@
             <option value="">Semua kelompok</option>
           </select>
 
+          <select id="contactStatusFilter" onchange="renderAlfaList()">
+            <option value="">Semua status japri</option>
+            <option value="pending">Belum dijapri</option>
+            <option value="sent">Sudah dijapri</option>
+            <option value="missing">Nomor WA kosong</option>
+          </select>
+
           <button class="reset-btn" type="button" onclick="resetFilter()">
             Reset
           </button>
@@ -714,7 +766,9 @@
         <div class="note">
           <strong>Catatan:</strong> fitur ini menggunakan WhatsApp link gratis,
           sehingga pesan tidak terkirim otomatis. Admin tetap perlu menekan
-          tombol <strong>Send/Kirim</strong> di WhatsApp.
+          tombol <strong>Send/Kirim</strong> di WhatsApp. Status berubah saat
+          tombol <strong>Kirim WA</strong> dibuka dan tersimpan pada HP/browser
+          admin ini.
         </div>
       </section>
     </div>
@@ -722,6 +776,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/auth-config.js"></script>
     <script src="/admin-auth.js"></script>
+    <script src="/wa-contact-status.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -841,13 +896,35 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
         const waAda = alfaData.filter((item) =>
           normalizeWaNumber(item.no_wa),
         ).length;
-        const waKosong = total - waAda;
+        const sudahDijapri = alfaData.filter(
+          (item) =>
+            normalizeWaNumber(item.no_wa) &&
+            WaContactStatus.get("alfa", sessionId, item.participant_id),
+        ).length;
 
         document.getElementById("totalAlfa").textContent = total;
         document.getElementById("totalWaAda").textContent = waAda;
-        document.getElementById("totalWaKosong").textContent = waKosong;
+        document.getElementById("totalSudahDijapri").textContent =
+          sudahDijapri;
+        document.getElementById("totalBelumDijapri").textContent = Math.max(
+          0,
+          waAda - sudahDijapri,
+        );
         document.getElementById("tanggalSesiStat").textContent =
           currentTanggalSesi || "-";
+      }
+
+      function formatContactTime(dateString) {
+        if (!dateString) return "";
+
+        return new Date(dateString).toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
       }
 
       function updateKelompokFilter() {
@@ -878,6 +955,7 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
       function resetFilter() {
         document.getElementById("searchInput").value = "";
         document.getElementById("kelompokFilter").value = "";
+        document.getElementById("contactStatusFilter").value = "";
         renderAlfaList();
       }
 
@@ -965,6 +1043,9 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
 
         const selectedKelompok =
           document.getElementById("kelompokFilter").value;
+        const selectedContactStatus = document.getElementById(
+          "contactStatusFilter",
+        ).value;
 
         let filtered = alfaData;
 
@@ -972,6 +1053,20 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
           filtered = filtered.filter(
             (item) => item.kelompok === selectedKelompok,
           );
+        }
+
+        if (selectedContactStatus) {
+          filtered = filtered.filter((item) => {
+            const hasWa = Boolean(normalizeWaNumber(item.no_wa));
+            const contacted = Boolean(
+              WaContactStatus.get("alfa", sessionId, item.participant_id),
+            );
+
+            if (selectedContactStatus === "missing") return !hasWa;
+            return selectedContactStatus === "sent"
+              ? hasWa && contacted
+              : hasWa && !contacted;
+          });
         }
 
         if (keyword) {
@@ -1004,6 +1099,11 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
           const noWa = normalizeWaNumber(item.no_wa);
           const nama = item.nama || "-";
           const kelompok = item.kelompok || "-";
+          const contactedAt = WaContactStatus.get(
+            "alfa",
+            sessionId,
+            item.participant_id,
+          );
           const message = createWaMessage(
             nama,
             item.gender,
@@ -1016,7 +1116,7 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
             : "";
 
           const card = document.createElement("div");
-          card.className = "alfa-card";
+          card.className = `alfa-card${contactedAt ? " contacted" : ""}`;
 
           card.innerHTML = `
             <div class="alfa-top">
@@ -1031,6 +1131,15 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
             <div class="meta-row">
               <span class="badge badge-group">${escapeHtml(kelompok)}</span>
               ${getGenderBadge(item.gender)}
+              <span class="contact-status ${!noWa ? "missing" : contactedAt ? "sent" : "pending"}">
+                ${
+                  !noWa
+                    ? "Nomor WA kosong"
+                    : contactedAt
+                    ? `Sudah dijapri · ${formatContactTime(contactedAt)}`
+                    : "Belum dijapri"
+                }
+              </span>
             </div>
 
             ${
@@ -1048,6 +1157,12 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
                     <button class="preview-btn" type="button">
                       Preview Pesan
                     </button>
+
+                    ${
+                      contactedAt
+                        ? `<button class="undo-btn" type="button">Tandai Belum Dijapri</button>`
+                        : ""
+                    }
                   </div>
                 `
                 : `
@@ -1063,6 +1178,12 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
                     <button class="preview-btn" type="button">
                       Preview Pesan
                     </button>
+
+                    ${
+                      contactedAt
+                        ? `<button class="undo-btn" type="button">Tandai Belum Dijapri</button>`
+                        : ""
+                    }
                   </div>
                 `
             }
@@ -1072,6 +1193,28 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
 
           const copyBtn = card.querySelector(".copy-btn");
           const previewBtn = card.querySelector(".preview-btn");
+          const waLink = card.querySelector(".wa-link");
+          const undoBtn = card.querySelector(".undo-btn");
+
+          if (waLink) {
+            waLink.addEventListener("click", function () {
+              WaContactStatus.mark(
+                "alfa",
+                sessionId,
+                item.participant_id,
+              );
+            });
+          }
+
+          if (undoBtn) {
+            undoBtn.addEventListener("click", function () {
+              WaContactStatus.clear(
+                "alfa",
+                sessionId,
+                item.participant_id,
+              );
+            });
+          }
 
           copyBtn.addEventListener("click", function () {
             copyMessage(message, nama);
@@ -1082,6 +1225,11 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
           });
         });
       }
+
+      WaContactStatus.subscribe("alfa", sessionId, function () {
+        updateStats();
+        renderAlfaList();
+      });
 
       loadAlfaList();
     </script>

@@ -32,6 +32,8 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
 - Daftar peserta Alfa serta penyusunan tautan/pesan WhatsApp; pengiriman tetap dilakukan manual oleh pengguna.
+- Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
+- Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
@@ -60,6 +62,7 @@ Belum diprioritaskan oleh pengguna:
 - Semua peserta tanpa record saat finalisasi dibuat sebagai `Alfa`.
 - Sesi yang dibuat UI saat ini menggunakan `kelompok: "Semua"`; daftar peserta tidak dibatasi berdasarkan kelompok sesi.
 - Format tanggal/waktu laporan menggunakan locale Indonesia dan zona `Asia/Jakarta`.
+- Status japri dicatat saat admin membuka tautan WhatsApp. Status ini bukan bukti delivery dan disimpan terpisah per sesi/jenis pesan di localStorage browser admin.
 
 ## Technical Facts
 
@@ -99,6 +102,8 @@ Belum diprioritaskan oleh pengguna:
 - `public/manual.html`: input status manual
 - `public/peserta.html`: manajemen peserta
 - `public/alfa-wa.html`: tindak lanjut WhatsApp
+- `public/pengumuman-wa.html`: generator pengumuman dan daftar japri peserta
+- `public/wa-contact-status.js`: status japri lokal dan sinkronisasi antar-tab
 - `public/admin-auth.js`: guard halaman dan timeout login
 - `public/login.html`, `public/register.html`, `public/admin-approval.html`: alur admin
 - `vercel.json`: routing deployment
@@ -121,6 +126,7 @@ Belum diprioritaskan oleh pengguna:
 - Query parameter `session` dan `token` pada URL absensi.
 - Zona waktu laporan WIB.
 - Pemisahan anon key browser dan service-role key backend.
+- Pemisahan status japri pengumuman dan Alfa untuk setiap sesi.
 
 ## Hal yang Belum Diketahui / Perlu Dikonfirmasi
 
