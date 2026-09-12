@@ -15,9 +15,11 @@ for (const file of ["public/alfa-wa.html", "public/pengumuman-wa.html"]) {
 test("announcement uses the agreed fixed template", async () => {
   const html = await readFile("public/pengumuman-wa.html", "utf8");
 
-  assert.match(html, /Pengajian Muda Mudi Desa/);
+  assert.match(html, /\*Pengajian Muda Mudi Desa\*/);
   assert.match(html, /Hari\/Tanggal: \$\{formatDate\(session\.start_time\)\}/);
   assert.match(html, /Waktu: 09\.00–11\.00 WIB/);
   assert.match(html, /Lokasi: SB kelompok PJ 2/);
-  assert.match(html, /Materi : Al-Qur'an &amp; K\. Adillah|Materi : Al-Qur'an & K\. Adillah/);
+  assert.match(html, /\*Materi : Al-Qur'an &amp; K\. Adillah\*|\*Materi : Al-Qur'an & K\. Adillah\*/);
+  assert.match(html, /\*\$\{participant\.nama \|\| participant\.name \|\| ""\}\*/);
+  assert.match(html, /kelompok \*\$\{participant\.kelompok\}\*/);
 });
