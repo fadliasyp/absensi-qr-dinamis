@@ -487,10 +487,14 @@
       function defaultAnnouncement(session) {
         return `Kami dari pengurus muda/i Desa Periuk Jaya mengundang untuk mengikuti:
 
-*${session.judul || "Pengajian"}*
+Pengajian Muda Mudi Desa
 Hari/Tanggal: ${formatDate(session.start_time)}
-Waktu: ${formatTime(session.start_time)}–${formatTime(session.end_time)} WIB
-Lokasi: ${session.location_name || "Akan diinformasikan"}
+Waktu: 09.00–11.00 WIB
+Lokasi: SB kelompok PJ 2
+
+Materi : Al-Qur'an & K. Adillah
+
+Bagi yang berhalangan izin maka supaya nitip izin ke temanya yang mengaji, agar bisa di catat.
 
 Mohon kehadirannya. Semoga Allah memberikan kelancaran dan kebarokahan. Aamiin.`;
       }
@@ -498,7 +502,7 @@ Mohon kehadirannya. Semoga Allah memberikan kelancaran dan kebarokahan. Aamiin.`
       function participantMessage(participant) {
         const greeting = getGreeting(participant.gender);
         const group = participant.kelompok ? ` kelompok ${participant.kelompok}` : "";
-        return `Assalamu’alaikum, ${greeting} *${participant.nama || participant.name || ""}*${group}.
+        return `Assalamu’alaikum, ${greeting} ${participant.nama || participant.name || ""}${group}.
 
 ${messageInput.value.trim()}`;
       }
