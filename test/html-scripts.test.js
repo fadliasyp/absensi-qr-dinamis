@@ -29,6 +29,8 @@ test("WA lists restore the last contacted participant when returning", async () 
     const html = await readFile(file, "utf8");
     assert.match(html, /dataset\.participantId/);
     assert.match(html, /scrollIntoView/);
+    assert.match(html, /sessionStorage\.setItem\(lastContactedKey/);
+    assert.match(html, /sessionStorage\.getItem\(lastContactedKey\)/);
     assert.match(html, /visibilitychange/);
   }
 });

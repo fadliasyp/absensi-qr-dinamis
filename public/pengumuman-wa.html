@@ -424,7 +424,8 @@
       const sessionId = params.get("session");
       let currentSession = null;
       let participants = [];
-      let lastContactedId = "";
+      const lastContactedKey = `wa-last-contacted:announcement:${sessionId}`;
+      let lastContactedId = sessionStorage.getItem(lastContactedKey) || "";
 
       const participantBox = document.getElementById("participantBox");
       const messageInput = document.getElementById("messageInput");
@@ -434,7 +435,9 @@
         const card = [...participantBox.children].find(
           (item) => item.dataset.participantId === lastContactedId,
         );
-        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        sessionStorage.removeItem(lastContactedKey);
         lastContactedId = "";
       }
 
@@ -603,6 +606,7 @@ ${messageInput.value.trim()}`;
 
           card.querySelector(".wa-link")?.addEventListener("click", () => {
             lastContactedId = String(participant.id);
+            sessionStorage.setItem(lastContactedKey, lastContactedId);
             WaContactStatus.mark("announcement", sessionId, participant.id);
           });
           card.querySelector(".copy-btn")?.addEventListener("click", async () => {
@@ -656,6 +660,7 @@ ${messageInput.value.trim()}`;
           updateGroupFilter();
           updateStats();
           renderParticipants();
+          requestAnimationFrame(restoreLastContacted);
 
           if (showNotice) {
             Swal.fire({ icon: "success", title: "Data diperbarui", timer: 1200, showConfirmButton: false });
