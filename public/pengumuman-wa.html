@@ -424,9 +424,19 @@
       const sessionId = params.get("session");
       let currentSession = null;
       let participants = [];
+      let lastContactedId = "";
 
       const participantBox = document.getElementById("participantBox");
       const messageInput = document.getElementById("messageInput");
+
+      function restoreLastContacted() {
+        if (document.hidden || !lastContactedId) return;
+        const card = [...participantBox.children].find(
+          (item) => item.dataset.participantId === lastContactedId,
+        );
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        lastContactedId = "";
+      }
 
       function escapeHtml(value = "") {
         return String(value)
@@ -565,6 +575,7 @@ ${messageInput.value.trim()}`;
           const message = participantMessage(participant);
           const card = document.createElement("article");
           card.className = `participant-card${contactedAt ? " contacted" : ""}`;
+          card.dataset.participantId = String(participant.id);
 
           card.innerHTML = `
             <h3 class="participant-name">${escapeHtml(name)}</h3>
@@ -591,6 +602,7 @@ ${messageInput.value.trim()}`;
           participantBox.appendChild(card);
 
           card.querySelector(".wa-link")?.addEventListener("click", () => {
+            lastContactedId = String(participant.id);
             WaContactStatus.mark("announcement", sessionId, participant.id);
           });
           card.querySelector(".copy-btn")?.addEventListener("click", async () => {
@@ -670,6 +682,8 @@ ${messageInput.value.trim()}`;
       document.getElementById("searchInput").addEventListener("input", renderParticipants);
       document.getElementById("groupFilter").addEventListener("change", renderParticipants);
       document.getElementById("statusFilter").addEventListener("change", renderParticipants);
+      window.addEventListener("focus", restoreLastContacted);
+      document.addEventListener("visibilitychange", restoreLastContacted);
       messageInput.addEventListener("input", renderParticipants);
       document.getElementById("resetBtn").addEventListener("click", () => {
         document.getElementById("searchInput").value = "";

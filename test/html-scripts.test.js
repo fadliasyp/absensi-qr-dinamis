@@ -23,3 +23,12 @@ test("announcement uses the agreed fixed template", async () => {
   assert.match(html, /\*\$\{participant\.nama \|\| participant\.name \|\| ""\}\*/);
   assert.match(html, /kelompok \*\$\{participant\.kelompok\}\*/);
 });
+
+test("WA lists restore the last contacted participant when returning", async () => {
+  for (const file of ["public/alfa-wa.html", "public/pengumuman-wa.html"]) {
+    const html = await readFile(file, "utf8");
+    assert.match(html, /dataset\.participantId/);
+    assert.match(html, /scrollIntoView/);
+    assert.match(html, /visibilitychange/);
+  }
+});

@@ -789,6 +789,16 @@
 
       let alfaData = [];
       let currentTanggalSesi = "hari ini";
+      let lastContactedId = "";
+
+      function restoreLastContacted() {
+        if (document.hidden || !lastContactedId) return;
+        const card = [...document.getElementById("alfaBox").children].find(
+          (item) => item.dataset.participantId === lastContactedId,
+        );
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        lastContactedId = "";
+      }
 
       if (!sessionId) {
         Swal.fire({
@@ -1117,6 +1127,7 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
 
           const card = document.createElement("div");
           card.className = `alfa-card${contactedAt ? " contacted" : ""}`;
+          card.dataset.participantId = String(item.participant_id);
 
           card.innerHTML = `
             <div class="alfa-top">
@@ -1198,6 +1209,7 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
 
           if (waLink) {
             waLink.addEventListener("click", function () {
+              lastContactedId = String(item.participant_id);
               WaContactStatus.mark(
                 "alfa",
                 sessionId,
@@ -1230,6 +1242,9 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
         updateStats();
         renderAlfaList();
       });
+
+      window.addEventListener("focus", restoreLastContacted);
+      document.addEventListener("visibilitychange", restoreLastContacted);
 
       loadAlfaList();
     </script>
