@@ -6,17 +6,17 @@ Belum ada task aktif.
 
 ## Status
 
-Pemilih Kelompok dan Nama Peserta pada halaman absensi selesai dipercantik pada 2026-09-13 tanpa mengembalikan dependency CDN.
+Penyaringan nama peserta yang sudah hadir selesai diperkuat pada 2026-09-13. Daftar diperbarui dari server setiap kali pemilih Nama Peserta dibuka.
 
 ## Completed
 
-- Mengganti `<select>` native yang memunculkan dialog bawaan perangkat dengan modal pilihan lokal bergaya biru Absenku.
-- Menggunakan satu komponen modal untuk Kelompok dan Nama Peserta.
-- Menambahkan pencarian, jumlah peserta yang masih bisa absen, indikator pilihan, scrolling, backdrop/close, dan tombol Escape.
-- Mempertahankan filter peserta hadir/nonaktif, validasi pilihan, dan alur submit yang sudah ada.
-- Mempertahankan halaman absensi tanpa dependency CDN agar tetap tahan terhadap kegagalan resource pihak ketiga.
-- Memperbarui regression test agar melindungi custom picker lokal.
-- Seluruh 17 test lokal lulus.
+- Mempertahankan filter `isPresent` yang mengeluarkan peserta hadir dari custom picker.
+- Mengambil ulang daftar peserta/status kehadiran sebelum pemilih Nama Peserta ditampilkan.
+- Menampilkan status memuat dan menolak menampilkan daftar lama bila refresh gagal.
+- Menghapus pilihan yang menjadi tidak tersedia dan memperbarui jumlah peserta belum hadir.
+- Menandai peserta hadir secara lokal setelah submit sukses atau respons `PARTICIPANT_ALREADY_PRESENT`.
+- Tidak menambahkan polling terus-menerus atau dependency realtime.
+- Menambahkan regression test untuk refresh serta penghilangan peserta hadir; seluruh 18 test lokal lulus.
 
 ## Files Being Modified
 
@@ -24,7 +24,7 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Setelah deploy, periksa tampilan modal dan pencarian pada Android Chrome, iPhone Safari, serta Huawei Browser/WebView, lalu lakukan satu submit sukses dan satu percobaan duplikat.
+Setelah deploy, buka QR yang sama di dua perangkat. Absenkan satu nama pada perangkat pertama, lalu buka pilihan Nama Peserta di perangkat kedua dan pastikan nama tersebut sudah hilang.
 
 ## Blockers
 

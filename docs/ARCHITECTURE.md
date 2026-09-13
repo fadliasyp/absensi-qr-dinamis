@@ -109,6 +109,7 @@ Admin membuat sesi
   -> API mengambil/membuat qr_tokens
   -> Peserta membuka /absen.html?session=...&token=...
   -> Browser mengambil peserta + device ID
+  -> Saat pemilih nama dibuka, browser menyegarkan status dan menyisakan peserta belum hadir
   -> POST /api/attendance
   -> API paralel validasi sesi/token/peserta
   -> API paralel memeriksa duplikasi peserta/perangkat

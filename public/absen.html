@@ -778,7 +778,7 @@
         }
       }
 
-      function openPicker(type) {
+      async function openPicker(type) {
         const trigger = document.getElementById(
           type === "kelompok" ? "kelompokSelect" : "participantSelect",
         );
@@ -796,8 +796,94 @@
         document.getElementById("pickerOverlay").hidden = false;
         document.body.classList.add("picker-open");
 
-        renderPickerOptions();
         document.getElementById("pickerSheet").focus();
+
+        if (type === "participant") {
+          const container = document.getElementById("pickerOptions");
+          const loading = document.createElement("div");
+
+          container.textContent = "";
+          loading.className = "picker-empty";
+          loading.textContent = "Memperbarui daftar peserta...";
+          container.appendChild(loading);
+
+          try {
+            await refreshParticipantsForPicker();
+          } catch (error) {
+            if (activePickerType !== "participant") return;
+
+            const canRetry = error.code !== "SESSION_NOT_FOUND";
+            closePicker();
+            showMessage(
+              "error",
+              error.message ||
+                "Daftar peserta terbaru belum dapat dimuat. Silakan coba lagi.",
+              "Daftar Belum Diperbarui",
+              canRetry
+                ? function () {
+                    openPicker("participant");
+                  }
+                : null,
+            );
+            return;
+          }
+
+          if (activePickerType !== "participant") return;
+        }
+
+        renderPickerOptions();
+      }
+
+      async function refreshParticipantsForPicker() {
+        const response = await fetchWithTimeout(
+          `/api/participants?session=${sessionId}`,
+        );
+        const result = await readJsonResponse(response);
+
+        if (!result.success) {
+          const error = new Error(
+            result.message || "Daftar peserta terbaru belum dapat dimuat.",
+          );
+          error.code = result.code || "PARTICIPANTS_LOAD_FAILED";
+          throw error;
+        }
+
+        allParticipants = result.participants || [];
+        filteredParticipants = allParticipants.filter(function (participant) {
+          return participant.kelompok === selectedKelompok;
+        });
+
+        const selectedParticipant = filteredParticipants.find(
+          function (participant) {
+            return (
+              participant.id === selectedParticipantId &&
+              !participant.isPresent
+            );
+          },
+        );
+        const availableCount = filteredParticipants.filter(
+          function (participant) {
+            return !participant.isPresent;
+          },
+        ).length;
+        const participantTrigger = document.getElementById("participantSelect");
+
+        if (!selectedParticipant) {
+          selectedParticipantId = "";
+          setPickerTrigger(
+            "participantSelect",
+            "participantSelectText",
+            "",
+            availableCount
+              ? "Pilih nama peserta"
+              : "Semua peserta sudah tercatat",
+          );
+        }
+
+        participantTrigger.disabled = availableCount === 0;
+        document.getElementById("participantHint").textContent = availableCount
+          ? `${availableCount} peserta belum hadir di kelompok ${selectedKelompok}.`
+          : `Semua peserta di kelompok ${selectedKelompok} sudah tercatat hadir.`;
       }
 
       function closePicker() {
@@ -873,7 +959,9 @@
           empty.className = "picker-empty";
           empty.textContent = query
             ? "Pilihan tidak ditemukan. Coba kata pencarian lain."
-            : "Belum ada pilihan yang tersedia.";
+            : activePickerType === "participant"
+              ? `Semua peserta di kelompok ${selectedKelompok} sudah tercatat hadir.`
+              : "Belum ada pilihan yang tersedia.";
           container.appendChild(empty);
           return;
         }
@@ -1219,6 +1307,15 @@
               lowerMessage.includes("perangkat")
             ) {
               await popupInfo(message, "Absensi Sudah Tercatat");
+
+              if (code === "PARTICIPANT_ALREADY_PRESENT") {
+                const participant = allParticipants.find(function (item) {
+                  return item.id === selectedParticipantId;
+                });
+
+                if (participant) participant.isPresent = true;
+                filterParticipantsByKelompok();
+              }
             } else if (
               [
                 "SESSION_CHECK_FAILED",
@@ -1253,6 +1350,13 @@
           } else if (gender.includes("perempuan")) {
             ucapanTerimaKasih = "Alhamdulillah Jazakillahu Khoiroh";
           }
+
+          const attendedParticipant = allParticipants.find(function (item) {
+            return item.id === selectedParticipantId;
+          });
+
+          if (attendedParticipant) attendedParticipant.isPresent = true;
+          filterParticipantsByKelompok();
 
           await popupSuccess(
             `${result.message} ${ucapanTerimaKasih}, ${result.data.name} 😊`,

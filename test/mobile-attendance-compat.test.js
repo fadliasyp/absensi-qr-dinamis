@@ -108,3 +108,19 @@ test("attendance form explains failures and offers a safe retry", async () => {
   assert.doesNotMatch(participantEndpoint, /error:\s*\w+\.message/);
   assert.doesNotMatch(attendanceEndpoint, /error:\s*\w+\.message/);
 });
+
+test("participant picker refreshes and hides names already present", async () => {
+  const html = await readFile("public/absen.html", "utf8");
+  const openPickerSource = html.slice(
+    html.indexOf("async function openPicker"),
+    html.indexOf("function closePicker"),
+  );
+
+  assert.match(
+    openPickerSource,
+    /type === "participant"[\s\S]*await refreshParticipantsForPicker\(\)/,
+  );
+  assert.match(html, /return !participant\.isPresent/);
+  assert.match(html, /attendedParticipant\.isPresent = true/);
+  assert.match(html, /participant\.isPresent = true/);
+});

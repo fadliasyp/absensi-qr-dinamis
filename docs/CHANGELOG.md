@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Peserta Hadir Hilang dari Pilihan
+
+- Menyegarkan daftar/status attendance dari server setiap kali pemilih Nama Peserta dibuka.
+- Hanya menampilkan peserta aktif yang belum hadir dan memperbarui jumlah peserta tersedia.
+- Menandai serta mengeluarkan nama secara lokal setelah submit sukses atau respons bahwa peserta sudah tercatat.
+- Menambahkan regression test perilaku refresh/filter; seluruh 18 test lokal lulus.
+
 ### Changed — Custom Picker Absensi
 
 - Mengganti pilihan native Kelompok dan Nama Peserta dengan modal pilihan lokal bergaya biru Absenku.

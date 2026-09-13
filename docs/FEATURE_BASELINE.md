@@ -19,7 +19,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, edit waktu mulai/selesai termasuk saat berjalan, dan hapus tersedia. Sesi final tidak dapat diubah; cascade attendance terverifikasi, sedangkan cascade QR token belum. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
-| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, custom picker lokal bergaya biru tanpa CDN, query paralel/kolom minimum, timeout, pesan spesifik, dan retry aman tersedia. Unique constraint peserta serta kedua unique index perangkat per sesi terverifikasi tanpa duplikasi. |
+| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, custom picker lokal tanpa CDN, refresh status sebelum memilih nama, timeout, pesan spesifik, dan retry aman tersedia. Peserta hadir tidak ditampilkan; constraint peserta/perangkat per sesi terverifikasi. |
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
@@ -52,6 +52,7 @@ Perilaku yang harus dipertahankan:
 - Menyimpan snapshot nama, gender, kelompok, waktu, device, user agent, dan IP sesuai implementasi.
 - Tidak meminta geolocation dan tidak memvalidasi jarak.
 - Form publik memakai custom picker lokal untuk kelompok/nama serta tetap memuat kontrol dan pesan tanpa CDN pihak ketiga.
+- Pemilih Nama Peserta mengambil data terbaru saat dibuka dan tidak menampilkan peserta dengan `isPresent: true`.
 - Query independen berjalan paralel, tetapi insert baru dilakukan setelah seluruh validasi lolos.
 - Peserta menerima pesan berbeda untuk QR/sesi/peserta/duplikat/koneksi/server, bukan detail error database.
 - Request yang melewati 20 detik berhenti menunggu pada UI dan menyediakan tombol `Coba Lagi`; pesan submit mengingatkan peserta menunggu sebelum mencoba nama yang sama.
