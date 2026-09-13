@@ -4,6 +4,14 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Fixed — Kompatibilitas Absensi Mobile Tahap 1
+
+- Mengganti `crypto.randomUUID()` dengan generator device ID yang memakai Web Crypto lebih luas dan fallback sederhana.
+- Menangani localStorage yang ditolak browser tanpa menggagalkan request absensi; cookie backend tetap menjadi pemeriksaan perangkat kedua bila tersedia.
+- Mengganti `String.replaceAll()` pada halaman absensi agar pemilih kelompok lebih kompatibel dengan browser lama.
+- Menambahkan test untuk kondisi penyimpanan dan Web Crypto yang tidak tersedia.
+- Mencatat konfirmasi pengguna bahwa migration geolocation sudah dijalankan.
+
 ### Added — Edit Masa Aktif Sesi
 
 - Menambahkan tombol edit waktu mulai dan selesai pada daftar sesi, termasuk untuk sesi yang sudah mulai atau sedang berjalan.

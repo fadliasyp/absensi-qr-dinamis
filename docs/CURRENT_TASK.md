@@ -6,15 +6,15 @@ Belum ada task aktif.
 
 ## Status
 
-Edit masa aktif sesi selesai diimplementasikan pada 2026-09-13; uji end-to-end Supabase/deployment masih perlu dilakukan pengguna.
+Tahap pertama perbaikan kompatibilitas absensi mobile selesai pada 2026-09-13. Migration geolocation dikonfirmasi sudah dijalankan pengguna; pengujian perangkat nyata belum dilakukan.
 
 ## Completed
 
-- Menambahkan tombol `Edit Waktu` pada setiap sesi.
-- Mengizinkan perubahan waktu mulai/selesai untuk sesi yang sudah mulai atau sedang berjalan.
-- Memvalidasi urutan waktu dan menolak perubahan sesi yang sudah difinalisasi.
-- Menyesuaikan kedaluwarsa token QR tanpa mengganti token atau data attendance.
-- Menambahkan regression test edit masa aktif; seluruh test lokal lulus.
+- Mengganti `crypto.randomUUID()` dengan generator berbasis `crypto.getRandomValues()` dan fallback sederhana.
+- Menangani kegagalan baca/tulis localStorage tanpa membatalkan request absensi.
+- Mempertahankan ID yang sama selama halaman aktif dan cookie backend sebagai pemeriksaan perangkat kedua.
+- Mengganti `String.replaceAll()` pada halaman peserta dengan regex yang lebih kompatibel.
+- Menambahkan regression test browser lama/storage terblokir; seluruh 13 test lokal lulus.
 
 ## Files Being Modified
 
@@ -22,12 +22,12 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Deploy source terbaru, lalu uji memperpanjang sesi berjalan dan pastikan QR lama tetap menerima absensi sampai waktu selesai baru. Migration `20260913000000_remove_geolocation_requirements.sql` dari task sebelumnya juga masih perlu dijalankan.
+Tahap berikutnya: hilangkan titik gagal CDN pada halaman absensi publik, lalu optimalkan query Supabase secara terpisah. Setelah deploy, uji Android Chrome, iPhone Safari, serta Huawei Browser/WebView.
 
 ## Blockers
 
-Integrasi Supabase aktual belum diuji. Migration pelepasan `NOT NULL` dari task geolocation sebelumnya juga belum dijalankan.
+Log Vercel/Supabase, URL/HTTPS produksi, versi browser client, dan pengujian perangkat nyata belum tersedia.
 
 ## Notes for Next Session
 
-Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Verifikasi edit waktu sesi berjalan, masa berlaku QR, absensi tanpa permission lokasi, dan penolakan perangkat ganda sebelum menyatakan fitur stabil.
+Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Lanjutkan bertahap dari ketergantungan CDN publik, kemudian performa API, tanpa melemahkan pembatasan perangkat.

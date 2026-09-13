@@ -111,7 +111,7 @@ Daftar ini adalah kebutuhan audit, bukan klaim bahwa constraint tersebut ada.
 
 ## Migrations and Seed
 
-Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql` dan pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, tetapi belum memiliki schema awal atau seed lengkap. Migration geolocation mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`. `note.sql` berisi query operasional/manual:
+Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql` dan pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, tetapi belum memiliki schema awal atau seed lengkap. Migration geolocation—dikonfirmasi pengguna sudah dijalankan pada 2026-09-13—mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`; hasil schema belum diverifikasi langsung. `note.sql` berisi query operasional/manual:
 
 - melihat rekap
 - membuat sesi contoh dua jam

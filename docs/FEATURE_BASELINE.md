@@ -15,11 +15,11 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Hapus admin | WORKING | Client service-role sudah diimpor dan authorization super admin tetap dipertahankan; belum diuji terhadap Supabase. |
 | CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, nomor WA, serta status aktif/nonaktif tersedia. Integritas delete bergantung FK aktual. |
 | Peserta nonaktif | PARTIAL | Filter dan penolakan backend serta kontrol UI diimplementasikan dan diuji statis; migration kolom belum dijalankan atau diuji end-to-end pada Supabase. |
-| Lokasi/geolocation | REMOVED | GPS, koordinat, radius, validasi jarak, lokasi tersimpan, dan endpoint lokasi dihapus dari alur aktif atas permintaan pengguna. Nama tempat opsional tetap tersedia; migration pelepasan `NOT NULL` belum diuji di Supabase. |
+| Lokasi/geolocation | REMOVED | GPS, koordinat, radius, validasi jarak, lokasi tersimpan, dan endpoint lokasi dihapus dari alur aktif. Migration pelepasan `NOT NULL` dikonfirmasi sudah dijalankan pengguna; belum diuji end-to-end. |
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, edit waktu mulai/selesai termasuk saat berjalan, dan hapus tersedia. Sesi final tidak dapat diubah; klaim cascade saat delete belum terverifikasi. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
-| Absensi peserta | WORKING | Validasi token, waktu, identitas peserta, peserta aktif, dan duplikasi peserta/perangkat tersedia tanpa geolocation. |
+| Absensi peserta | WORKING | Validasi token, waktu, identitas peserta, peserta aktif, dan duplikasi peserta/perangkat tersedia tanpa geolocation; fallback ID perangkat mobile sudah ditambahkan. |
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |

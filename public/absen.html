@@ -458,14 +458,15 @@
       let filteredParticipants = [];
       let selectedParticipantId = "";
       let selectedParticipantName = "";
+      let memoryDeviceId = "";
 
       function escapeHtml(text = "") {
         return String(text)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
       }
 
       function popupSuccess(message, title = "Berhasil") {
@@ -517,15 +518,55 @@
        * Membuat local device ID.
        * Ini disimpan di browser peserta.
        */
-      function getLocalDeviceId() {
-        let deviceId = localStorage.getItem("attendance_local_device_id");
+      function createDeviceId() {
+        const cryptoApi = window.crypto || window.msCrypto;
 
-        if (!deviceId) {
-          deviceId = crypto.randomUUID();
-          localStorage.setItem("attendance_local_device_id", deviceId);
+        try {
+          if (cryptoApi && typeof cryptoApi.getRandomValues === "function") {
+            const values = new Uint32Array(4);
+            cryptoApi.getRandomValues(values);
+
+            return Array.prototype.map
+              .call(values, (value) =>
+                ("00000000" + value.toString(16)).slice(-8),
+              )
+              .join("-");
+          }
+        } catch (error) {
+          // Gunakan fallback sederhana jika Web Crypto tidak dapat dipakai.
         }
 
-        return deviceId;
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function getLocalDeviceId() {
+        if (memoryDeviceId) return memoryDeviceId;
+
+        try {
+          const storedDeviceId = window.localStorage.getItem(
+            "attendance_local_device_id",
+          );
+
+          if (storedDeviceId) {
+            memoryDeviceId = storedDeviceId;
+            return memoryDeviceId;
+          }
+        } catch (error) {
+          // Cookie backend menjadi pembatas cadangan jika browser mengizinkannya.
+        }
+
+        memoryDeviceId = createDeviceId();
+
+        try {
+          window.localStorage.setItem(
+            "attendance_local_device_id",
+            memoryDeviceId,
+          );
+        } catch (error) {
+          // ID memori cukup untuk request ini; cookie backend tetap dicoba.
+        }
+
+        return memoryDeviceId;
       }
 
       async function loadParticipants() {
@@ -947,7 +988,6 @@
       }
 
       loadParticipants();
-      getLocalDeviceId();
     </script>
   </body>
 </html>

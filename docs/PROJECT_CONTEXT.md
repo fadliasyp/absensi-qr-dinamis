@@ -28,6 +28,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pembuatan, daftar/filter, edit masa aktif, dan penghapusan sesi. Waktu sesi dapat diubah saat sesi sudah mulai atau sedang berjalan selama belum difinalisasi.
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
 - Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
+- Halaman absensi memiliki fallback device ID untuk browser lama serta tetap dapat mengirim request ketika akses localStorage ditolak.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
@@ -84,6 +85,9 @@ Belum diprioritaskan oleh pengguna:
 
 ## Known Issues and Risks
 
+- **Ketergantungan frontend publik:** halaman absensi menunggu SweetAlert2 dari jsDelivr sebelum menjalankan pengambilan peserta. CDN lambat/terblokir dapat membuat data terlambat atau kontrol halaman tidak berfungsi; Google Fonts juga menambah request eksternal.
+- **Performa:** endpoint daftar peserta melakukan query sesi, seluruh peserta aktif, lalu attendance secara berurutan dan memakai `select("*")`. Endpoint submit melakukan hingga tujuh operasi Supabase berurutan sebelum berhasil.
+- Error Supabase yang sudah ditangani tidak dicatat secara terstruktur; UI sering hanya menampilkan pesan umum sehingga penyebab produksi sulit dibedakan.
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
 - Penghapusan admin sudah menggunakan client service-role yang benar, tetapi belum diuji terhadap Supabase non-produksi.
 - **Security:** kode undangan registrasi berada di JavaScript browser sehingga tidak dapat dianggap rahasia.
@@ -136,6 +140,7 @@ Belum diprioritaskan oleh pengguna:
 - Apakah trigger membuat row `admin_users` sesudah `auth.signUp`.
 - Node.js version produksi dan domain deployment aktif.
 - Apakah semua fitur pernah diuji end-to-end atau digunakan nyata.
+- Migration geolocation dikonfirmasi sudah dijalankan pengguna pada 2026-09-13, tetapi schema hasilnya belum diverifikasi langsung dari repository.
 - Apakah `assets/backup-absen.html` dan `public/backup-admin.html` masih perlu disimpan.
 - Apakah `server.js` masih digunakan untuk workflow tertentu.
 
