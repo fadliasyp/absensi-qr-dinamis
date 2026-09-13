@@ -29,6 +29,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
 - Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
 - Halaman absensi memiliki fallback device ID untuk browser lama serta tetap dapat mengirim request ketika akses localStorage ditolak.
+- Halaman absensi publik memakai select dan pesan status native tanpa dependency CDN/font eksternal.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
@@ -73,7 +74,7 @@ Belum diprioritaskan oleh pengguna:
 - Handler yang sama membuka server lokal dan menyajikan `public/` ketika dijalankan langsung melalui `npm start`.
 - `server.js` adalah prototipe lama dengan array in-memory, satu sesi contoh, dan token 20 detik.
 - Frontend tidak memiliki proses build.
-- CDN browser: Supabase JS dan SweetAlert2.
+- Halaman admin masih memakai CDN Supabase JS dan SweetAlert2; halaman absensi publik tidak lagi bergantung pada CDN.
 - Vercel me-rewrite `/api/(.*)` ke `api/index.js`.
 - Git history yang tersedia hanya dua commit dan tidak cukup untuk membuktikan kestabilan fitur.
 
@@ -85,7 +86,6 @@ Belum diprioritaskan oleh pengguna:
 
 ## Known Issues and Risks
 
-- **Ketergantungan frontend publik:** halaman absensi menunggu SweetAlert2 dari jsDelivr sebelum menjalankan pengambilan peserta. CDN lambat/terblokir dapat membuat data terlambat atau kontrol halaman tidak berfungsi; Google Fonts juga menambah request eksternal.
 - **Performa:** endpoint daftar peserta melakukan query sesi, seluruh peserta aktif, lalu attendance secara berurutan dan memakai `select("*")`. Endpoint submit melakukan hingga tujuh operasi Supabase berurutan sebelum berhasil.
 - Error Supabase yang sudah ditangani tidak dicatat secara terstruktur; UI sering hanya menampilkan pesan umum sehingga penyebab produksi sulit dibedakan.
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
@@ -119,8 +119,8 @@ Belum diprioritaskan oleh pengguna:
 - Supabase Database: penyimpanan sesi, peserta, attendance, token, lokasi, admin.
 - Supabase Auth: email/password dan OAuth Google.
 - WhatsApp `wa.me`: membuka pesan terisi; tidak mengirim otomatis.
-- jsDelivr: Supabase JS browser.
-- SweetAlert2 CDN: dialog UI.
+- jsDelivr: Supabase JS pada halaman admin.
+- SweetAlert2 CDN: dialog UI halaman admin.
 - Vercel: hosting/routing yang dikonfigurasi.
 
 ## Things We Must Not Break

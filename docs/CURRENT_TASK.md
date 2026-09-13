@@ -6,15 +6,15 @@ Belum ada task aktif.
 
 ## Status
 
-Tahap pertama perbaikan kompatibilitas absensi mobile selesai pada 2026-09-13. Migration geolocation dikonfirmasi sudah dijalankan pengguna; pengujian perangkat nyata belum dilakukan.
+Tahap kedua perbaikan absensi mobile selesai pada 2026-09-13: halaman publik tidak lagi bergantung pada CDN. Pengujian perangkat nyata belum dilakukan.
 
 ## Completed
 
-- Mengganti `crypto.randomUUID()` dengan generator berbasis `crypto.getRandomValues()` dan fallback sederhana.
-- Menangani kegagalan baca/tulis localStorage tanpa membatalkan request absensi.
-- Mempertahankan ID yang sama selama halaman aktif dan cookie backend sebagai pemeriksaan perangkat kedua.
-- Mengganti `String.replaceAll()` pada halaman peserta dengan regex yang lebih kompatibel.
-- Menambahkan regression test browser lama/storage terblokir; seluruh 13 test lokal lulus.
+- Menghapus SweetAlert2 CDN dan Google Fonts dari halaman absensi publik.
+- Mengganti pemilih popup dengan select native untuk kelompok dan nama peserta.
+- Mengganti popup sukses/gagal/loading dengan status lokal yang dapat diumumkan screen reader.
+- Menghapus reload daftar peserta yang tidak diperlukan setelah absensi berhasil.
+- Menambahkan regression test tanpa dependency pihak ketiga; seluruh 14 test lokal lulus.
 
 ## Files Being Modified
 
@@ -22,7 +22,7 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Tahap berikutnya: hilangkan titik gagal CDN pada halaman absensi publik, lalu optimalkan query Supabase secara terpisah. Setelah deploy, uji Android Chrome, iPhone Safari, serta Huawei Browser/WebView.
+Tahap berikutnya: optimalkan query Supabase untuk pemuatan peserta dan submit absensi. Setelah deploy, uji Android Chrome, iPhone Safari, serta Huawei Browser/WebView.
 
 ## Blockers
 
@@ -30,4 +30,4 @@ Log Vercel/Supabase, URL/HTTPS produksi, versi browser client, dan pengujian per
 
 ## Notes for Next Session
 
-Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Lanjutkan bertahap dari ketergantungan CDN publik, kemudian performa API, tanpa melemahkan pembatasan perangkat.
+Baca `AGENTS.md`, `PROJECT_CONTEXT.md`, dan `FEATURE_BASELINE.md`. Lanjutkan ke performa API dengan query paralel/kolom minimum tanpa melemahkan validasi waktu, token, peserta, dan perangkat.

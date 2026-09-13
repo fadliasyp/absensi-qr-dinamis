@@ -4,6 +4,14 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Fixed — Ketergantungan CDN Absensi Mobile Tahap 2
+
+- Menghapus SweetAlert2 CDN dan Google Fonts dari halaman absensi publik.
+- Mengganti popup pemilih kelompok/nama dengan select native browser.
+- Menampilkan status loading, sukses, dan gagal langsung di halaman dengan `aria-live`.
+- Menghapus pengambilan ulang seluruh daftar peserta setelah absensi berhasil.
+- Menambahkan regression test yang memastikan halaman publik tidak memiliki dependency UI pihak ketiga.
+
 ### Fixed — Kompatibilitas Absensi Mobile Tahap 1
 
 - Mengganti `crypto.randomUUID()` dengan generator device ID yang memakai Web Crypto lebih luas dan fallback sederhana.
