@@ -44,7 +44,7 @@ Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Pemberitahuan absensi sudah dipindahkan dari elemen inline ke popup lokal dan seluruh test lokal lulus.
+Belum ada task pengembangan aktif. Regresi edit waktu akibat pemilihan kolom tabel yang keliru sudah diperbaiki; alur sesi dan token QR telah diaudit statis serta seluruh test lokal lulus.
 
 ## Pending Work
 

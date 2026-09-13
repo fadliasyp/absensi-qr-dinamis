@@ -6,15 +6,15 @@ Belum ada task aktif.
 
 ## Status
 
-Pemberitahuan halaman absensi selesai dipindahkan dari elemen inline menjadi popup lokal pada 2026-09-13.
+Regresi edit masa aktif sesi selesai diperbaiki dan seluruh lintasan waktunya diaudit pada 2026-09-13.
 
 ## Completed
 
-- Menampilkan loading, informasi, sukses, absensi sudah tercatat, serta kegagalan sebagai popup di tengah layar.
-- Menyediakan tombol tutup yang sesuai dan tetap mempertahankan aksi `Coba Lagi` pada kegagalan yang aman diulang.
-- Mencegah popup loading ditutup sebelum request selesai serta mengunci scroll halaman saat popup tampil.
-- Mempertahankan custom picker, refresh status peserta, filter peserta hadir, dan seluruh aturan absensi yang sudah ada.
-- Memperbarui regression test popup; seluruh 18 test lokal lulus.
+- Menemukan regresi query hasil update `sessions` yang meminta kolom milik `attendance` sejak optimasi query sebelumnya.
+- Mengembalikan pilihan kolom hasil update ke `id`, `start_time`, dan `end_time` yang benar.
+- Memverifikasi alur UI datetime-local ke ISO, validasi waktu, larangan edit sesi final, update waktu sesi, penyesuaian `qr_tokens.expired_at`, rollback, dan refresh daftar.
+- Menambahkan log server serta respons error aman untuk endpoint edit sesi.
+- Memperluas regression test edit waktu; seluruh 18 test lokal lulus dan `node --check api/index.js` berhasil.
 
 ## Files Being Modified
 
@@ -22,11 +22,11 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Setelah deploy, periksa popup loading/hasil dan custom picker pada Android Chrome/in-app browser, iPhone Safari, serta Huawei Browser/WebView.
+Setelah deploy, ubah waktu sesi belum mulai, sedang berjalan, dan sudah berakhir tetapi belum difinalisasi; pastikan daftar sesi, QR, serta batas waktu absensi mengikuti nilai baru.
 
 ## Blockers
 
-URL/HTTPS deployment, log Vercel/Supabase, dan pengujian Android/iPhone/Huawei nyata belum tersedia.
+Mutation terhadap Supabase/deployment produksi tidak dijalankan dari sesi audit ini, sehingga verifikasi akhir tetap perlu dilakukan setelah deploy.
 
 ## Notes for Next Session
 

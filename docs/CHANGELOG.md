@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Fixed — Edit Masa Aktif Sesi
+
+- Memperbaiki query hasil update tabel `sessions` yang keliru meminta kolom milik `attendance` sehingga perubahan waktu selalu ditolak Supabase.
+- Memastikan hasil update hanya meminta `id`, `start_time`, dan `end_time`, sementara nilai token QR tetap dipertahankan dan hanya `expired_at` yang disesuaikan.
+- Menambahkan log server dan kode error aman pada kegagalan cek/update/token/rollback tanpa membocorkan detail database ke browser.
+- Memperluas regression test untuk validasi waktu, sesi final, kolom hasil update, penyesuaian token, larangan insert/delete, konversi waktu UI, dan refresh daftar; seluruh 18 test lokal lulus.
+
 ### Changed — Popup Pemberitahuan Absensi
 
 - Memindahkan seluruh pemberitahuan halaman absensi dari elemen inline menjadi popup lokal di tengah layar.

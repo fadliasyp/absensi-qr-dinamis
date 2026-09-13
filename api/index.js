@@ -842,10 +842,12 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
       .maybeSingle();
 
     if (findError) {
+      logDatabaseError("SESSION UPDATE LOOKUP ERROR:", findError);
+
       return res.status(500).json({
         success: false,
+        code: "SESSION_LOOKUP_FAILED",
         message: "Gagal mengecek sesi.",
-        error: findError.message,
       });
     }
 
@@ -871,14 +873,16 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
       .from("sessions")
       .update(updatedTimes)
       .eq("id", sessionId)
-      .select("nama, gender, kelompok, keterangan, waktu_hadir")
+      .select("id, start_time, end_time")
       .single();
 
     if (updateError) {
+      logDatabaseError("SESSION UPDATE ERROR:", updateError);
+
       return res.status(500).json({
         success: false,
+        code: "SESSION_UPDATE_FAILED",
         message: "Gagal mengubah masa aktif sesi.",
-        error: updateError.message,
       });
     }
 
@@ -888,7 +892,9 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
       .eq("session_id", sessionId);
 
     if (tokenError) {
-      await supabase
+      logDatabaseError("SESSION QR TOKEN UPDATE ERROR:", tokenError);
+
+      const { error: rollbackError } = await supabase
         .from("sessions")
         .update({
           start_time: session.start_time,
@@ -896,10 +902,16 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
         })
         .eq("id", sessionId);
 
+      if (rollbackError) {
+        logDatabaseError("SESSION UPDATE ROLLBACK ERROR:", rollbackError);
+      }
+
       return res.status(500).json({
         success: false,
+        code: rollbackError
+          ? "SESSION_UPDATE_ROLLBACK_FAILED"
+          : "QR_TOKEN_UPDATE_FAILED",
         message: "Gagal menyesuaikan masa aktif token QR.",
-        error: tokenError.message,
       });
     }
 
@@ -909,10 +921,12 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
       session: data,
     });
   } catch (error) {
+    logDatabaseError("SESSION UPDATE SERVER ERROR:", error);
+
     res.status(500).json({
       success: false,
+      code: "SESSION_UPDATE_SERVER_ERROR",
       message: "Terjadi kesalahan saat mengubah masa aktif sesi.",
-      error: error.message,
     });
   }
 });
