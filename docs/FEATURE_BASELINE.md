@@ -13,13 +13,13 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Guard halaman dan timeout admin | WORKING | `admin-auth.js`: status approved, idle 30 menit, maksimum 8 jam. Hanya melindungi UI. |
 | Approval status admin | PARTIAL | UI super admin membaca/mengubah `admin_users` langsung; efektivitas bergantung pada RLS yang belum diketahui. |
 | Hapus admin | WORKING | Client service-role sudah diimpor dan authorization super admin tetap dipertahankan; belum diuji terhadap Supabase. |
-| CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, nomor WA, serta status aktif/nonaktif tersedia. Integritas delete bergantung FK aktual. |
+| CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, nomor WA, serta status aktif/nonaktif tersedia. Hapus peserta melakukan cascade ke attendance; UI memperingatkan agar memakai Nonaktifkan bila riwayat harus dipertahankan. |
 | Peserta nonaktif | PARTIAL | Filter dan penolakan backend serta kontrol UI diimplementasikan dan diuji statis; migration kolom belum dijalankan atau diuji end-to-end pada Supabase. |
 | Lokasi/geolocation | REMOVED | GPS, koordinat, radius, validasi jarak, lokasi tersimpan, dan endpoint lokasi dihapus dari alur aktif. Migration pelepasan `NOT NULL` dikonfirmasi sudah dijalankan pengguna; belum diuji end-to-end. |
-| Pengelolaan sesi | WORKING | Buat, daftar/filter status, edit waktu mulai/selesai termasuk saat berjalan, dan hapus tersedia. Sesi final tidak dapat diubah; klaim cascade saat delete belum terverifikasi. |
+| Pengelolaan sesi | WORKING | Buat, daftar/filter status, edit waktu mulai/selesai termasuk saat berjalan, dan hapus tersedia. Sesi final tidak dapat diubah; cascade attendance terverifikasi, sedangkan cascade QR token belum. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
-| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, UI native tanpa CDN, query Supabase paralel/kolom minimum, timeout, pesan spesifik, dan retry aman sudah ditambahkan. |
+| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, UI native tanpa CDN, query paralel/kolom minimum, timeout, pesan spesifik, dan retry aman tersedia. Unique constraint peserta serta kedua unique index perangkat per sesi terverifikasi tanpa duplikasi. |
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
@@ -48,6 +48,7 @@ Perilaku yang harus dipertahankan:
 - Menolak sesi yang tidak ditemukan/tidak aktif/belum mulai/sudah selesai.
 - Menolak token yang tidak cocok atau kedaluwarsa.
 - Menolak peserta yang sudah tercatat serta perangkat yang sudah dipakai pada sesi sama.
+- Database menegakkan keunikan peserta, local device ID, dan cookie device ID per sesi selain pemeriksaan aplikasi.
 - Menyimpan snapshot nama, gender, kelompok, waktu, device, user agent, dan IP sesuai implementasi.
 - Tidak meminta geolocation dan tidak memvalidasi jarak.
 - Form publik tetap dapat memuat kontrol serta pesan tanpa CDN pihak ketiga.

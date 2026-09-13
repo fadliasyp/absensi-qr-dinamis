@@ -43,7 +43,7 @@ Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Bootstrap dokumentasi dan perbaikan kerusakan terverifikasi selesai pada 2026-09-12.
+Belum ada task pengembangan aktif. Audit unique constraint attendance selesai tanpa migration baru karena seluruh constraint/index yang dibutuhkan sudah tersedia.
 
 ## Pending Work
 
@@ -82,20 +82,21 @@ Belum diprioritaskan oleh pengguna:
 
 ## Constraints
 
-- Schema awal, seed, constraint, index, RLS policy, dan konfigurasi Supabase Auth tidak tersimpan lengkap di repository; baru ada migration tambahan status peserta.
+- Schema awal, seed, mayoritas constraint/index, RLS policy, dan konfigurasi Supabase Auth tidak tersimpan lengkap di repository. Constraint/index utama attendance sudah diverifikasi lewat audit Supabase 2026-09-13.
 - Banyak halaman dan handler berada dalam file besar, sehingga perubahan harus sangat terarah.
 - Data nyata dan deployment tidak boleh digunakan untuk discovery tanpa izin.
 
 ## Known Issues and Risks
 
 - **Performa deployment:** cold start Vercel, jarak region Vercel–Supabase, jumlah peserta, dan index database belum diukur pada lingkungan nyata.
+- Keunikan peserta/local device/cookie per sesi dilindungi oleh pemeriksaan aplikasi dan constraint/index database; audit menemukan nol duplikasi.
 - Endpoint publik peserta/absensi sudah mencatat konteks dan kode error Supabase di log server serta mengirim kode/pesan aman ke UI; observability endpoint admin lainnya masih belum seragam.
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
 - Penghapusan admin sudah menggunakan client service-role yang benar, tetapi belum diuji terhadap Supabase non-produksi.
 - **Security:** kode undangan registrasi berada di JavaScript browser sehingga tidak dapat dianggap rahasia.
 - **Security/configuration:** URL dan anon key Supabase berada di `public/auth-config.js`. Anon key memang dipakai browser, tetapi keamanan tetap bergantung pada RLS yang belum dapat diverifikasi.
-- Pesan UI penghapusan sesi menyatakan attendance dan token ikut terhapus, tetapi handler hanya menghapus row `sessions`; perilaku cascade belum dapat dibuktikan karena schema tidak tersedia.
-- Hapus peserta juga bergantung pada aturan foreign key yang belum diketahui bila peserta memiliki attendance.
+- Penghapusan sesi terbukti menghapus attendance melalui cascade, tetapi klaim bahwa QR token ikut terhapus belum terverifikasi.
+- Penghapusan peserta menghapus attendance terkait melalui cascade; UI memperingatkan admin untuk memakai status Nonaktif bila riwayat harus dipertahankan.
 - Tidak ada rate limiting atau CSRF protection eksplisit.
 - Audit dependency runtime bersih, tetapi tool development Vercel lama masih memiliki advisory yang perbaikannya memerlukan upgrade mayor.
 
@@ -138,7 +139,7 @@ Belum diprioritaskan oleh pengguna:
 
 ## Hal yang Belum Diketahui / Perlu Dikonfirmasi
 
-- Struktur SQL aktual, tipe field, foreign key, cascade, unique constraint, index, trigger, dan RLS policy.
+- Struktur SQL selain bagian attendance yang telah diaudit, termasuk constraint/index tabel lain, trigger, dan RLS policy.
 - Apakah trigger membuat row `admin_users` sesudah `auth.signUp`.
 - Node.js version produksi dan domain deployment aktif.
 - Apakah semua fitur pernah diuji end-to-end atau digunakan nyata.

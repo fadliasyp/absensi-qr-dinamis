@@ -60,14 +60,14 @@ Field yang digunakan:
 
 Kolom lama `user_latitude`, `user_longitude`, dan `distance_meters` mungkin masih ada, tetapi alur absensi aktif tidak lagi menulisnya.
 
-Relasi logis:
+Relasi yang terverifikasi dari hasil audit Supabase 2026-09-13:
 
-- `attendance.session_id` → `sessions.id`
-- `attendance.participant_id` → `participants.id`
+- `attendance.session_id` → `sessions.id` dengan `ON DELETE CASCADE`
+- `attendance.participant_id` → `participants.id` dengan `ON DELETE CASCADE`
 
-Nested select `participants(no_wa)` membuktikan Supabase mengenali sebuah relasi attendance–participants, tetapi nama/aturan foreign key belum tersedia.
+Menghapus sesi atau peserta akan menghapus row attendance terkait. Menonaktifkan peserta tetap menjadi pilihan untuk mempertahankan riwayat.
 
-Aplikasi memeriksa keunikan peserta per sesi serta masing-masing device ID per sesi sebelum insert. Error PostgreSQL `23505` juga ditangani, yang mengindikasikan ada unique constraint, tetapi kolom constraint yang sebenarnya belum dapat dibuktikan.
+Aplikasi memeriksa keunikan sebelum insert dan database juga menegakkannya melalui constraint/index yang dijelaskan di bawah. Error PostgreSQL `23505` tetap ditangani sebagai perlindungan terhadap request bersamaan.
 
 ### `locations` (legacy)
 
@@ -99,19 +99,28 @@ Tanda `?` berarti cardinality/constraint aktual belum diketahui.
 
 ## Indexes and Constraints
 
-Belum diketahui / perlu dikonfirmasi. Secara bisnis, kandidat yang harus diperiksa:
+Hasil audit Supabase yang dijalankan pengguna pada 2026-09-13 memverifikasi:
 
-- uniqueness `(session_id, participant_id)` pada attendance
-- uniqueness device per sesi, dengan perlakuan null yang sesuai
-- uniqueness token dan/atau satu token per sesi
-- foreign key dan cascade untuk session/participant deletion
-- check constraint nilai `keterangan` dan `status`
+- primary key `attendance_pkey` pada `id`
+- unique constraint `attendance_session_id_participant_id_key` pada `(session_id, participant_id)`
+- partial unique index `unique_local_device_per_session` pada `(session_id, local_device_id)` ketika `local_device_id is not null`
+- partial unique index `unique_cookie_device_per_session` pada `(session_id, cookie_device_id)` ketika `cookie_device_id is not null`
+- foreign key attendance ke sessions dan participants, keduanya `ON DELETE CASCADE`
+- tidak ada kelompok/baris duplikat pada ketiga aturan keunikan saat audit dijalankan
 
-Daftar ini adalah kebutuhan audit, bukan klaim bahwa constraint tersebut ada.
+Keempat kolom tersebut memiliki tipe `session_id uuid`, `participant_id uuid`, `local_device_id text`, dan `cookie_device_id text`; semuanya nullable pada database aktual. Keunikan token/satu token per sesi, constraint nilai `keterangan`, dan schema tabel lain masih belum dikonfirmasi.
+
+Audit baca-saja tersedia di `supabase/checks/20260913_attendance_uniqueness_audit.sql`. Query tersebut menampilkan tipe/nullability kolom, constraint, index, dan jumlah kelompok/baris duplikat untuk:
+
+- `(session_id, participant_id)`
+- `(session_id, local_device_id)` ketika device ID tidak null
+- `(session_id, cookie_device_id)` ketika device ID tidak null
+
+Hasil audit menunjukkan unique index yang dibutuhkan sudah ada, sehingga tidak dibuat migration tambahan yang redundant.
 
 ## Migrations and Seed
 
-Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql` dan pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, tetapi belum memiliki schema awal atau seed lengkap. Migration geolocation—dikonfirmasi pengguna sudah dijalankan pada 2026-09-13—mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`; hasil schema belum diverifikasi langsung. `note.sql` berisi query operasional/manual:
+Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql`, pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, serta folder `supabase/checks/` untuk query audit baca-saja. Repository belum memiliki schema awal atau seed lengkap. Migration geolocation—dikonfirmasi pengguna sudah dijalankan pada 2026-09-13—mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`; hasil schema belum diverifikasi langsung. `note.sql` berisi query operasional/manual:
 
 - melihat rekap
 - membuat sesi contoh dua jam

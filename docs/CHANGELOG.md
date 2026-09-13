@@ -4,6 +4,19 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Verified — Constraint Attendance
+
+- Memverifikasi unique constraint peserta per sesi serta partial unique index local/cookie device per sesi pada Supabase aktual.
+- Memverifikasi tidak ada duplikasi pada ketiga aturan tersebut; migration baru tidak diperlukan.
+- Memverifikasi foreign key sesi dan peserta memakai `ON DELETE CASCADE` terhadap attendance.
+- Memperjelas peringatan UI bahwa menghapus peserta akan menghapus riwayat attendance dan bahwa Nonaktifkan harus dipakai untuk mempertahankannya.
+
+### Added — Preflight Unique Constraint Attendance
+
+- Menambahkan query audit Supabase baca-saja untuk tipe kolom, constraint, index, dan duplikasi peserta/perangkat per sesi.
+- Menunda pembuatan unique index sampai schema aktual diketahui dan data lama dipastikan tidak memiliki duplikasi.
+- Menambahkan regression test yang memastikan query audit tidak memutasi data/schema dan mencakup tiga aturan duplikasi; seluruh 17 test lokal lulus.
+
 ### Changed — Pesan Absensi Mobile Tahap 4
 
 - Menambahkan batas tunggu 20 detik pada pemuatan peserta dan submit absensi.

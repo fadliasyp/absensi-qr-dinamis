@@ -1,5 +1,23 @@
 # Decision Log
 
+## 2026-09-13 — Tidak Menambah Constraint Attendance yang Redundant
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Pertahankan unique constraint/index attendance yang sudah ada dan jangan membuat migration keunikan baru.
+
+### Context
+
+Audit Supabase memverifikasi keunikan `(session_id, participant_id)`, `(session_id, local_device_id)` untuk nilai non-null, dan `(session_id, cookie_device_id)` untuk nilai non-null. Ketiganya tidak memiliki data duplikat.
+
+### Consequences
+
+Pemeriksaan aplikasi tetap memberi pesan yang ramah, sedangkan database melindungi race condition. Tidak ada downtime atau risiko migration redundant. Nullable kolom dan constraint tabel lain tidak diubah.
+
 ## 2026-09-13 — Masa Aktif Sesi Dapat Diubah Sebelum Finalisasi
 
 ### Status
