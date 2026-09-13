@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Popup Pemberitahuan Absensi
+
+- Memindahkan seluruh pemberitahuan halaman absensi dari elemen inline menjadi popup lokal di tengah layar.
+- Memberi tampilan berbeda untuk loading, informasi, sukses, dan gagal termasuk kasus absensi sudah tercatat.
+- Mempertahankan tombol `Coba Lagi` untuk kegagalan yang aman diulang serta mencegah popup loading ditutup selama request berlangsung.
+- Mempertahankan halaman tanpa dependency CDN dan memperbarui regression test; seluruh 18 test lokal lulus.
+
 ### Fixed — Tata Letak Custom Picker Mobile
 
 - Menghapus pencarian dari pemilih Kelompok dan Nama Peserta.

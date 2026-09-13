@@ -6,17 +6,15 @@ Belum ada task aktif.
 
 ## Status
 
-Tata letak custom picker Kelompok dan Nama Peserta selesai dirapikan pada 2026-09-13 berdasarkan hasil penggunaan mobile.
+Pemberitahuan halaman absensi selesai dipindahkan dari elemen inline menjadi popup lokal pada 2026-09-13.
 
 ## Completed
 
-- Menghapus kolom pencarian dari pemilih Kelompok maupun Nama Peserta.
-- Mengubah bottom sheet yang menempel ke bawah menjadi modal mengambang di tengah dengan jarak aman atas/bawah.
-- Membulatkan seluruh sudut modal dan membatasi tingginya terhadap dynamic viewport mobile.
-- Membuat daftar scroll di dalam modal serta selalu kembali ke posisi paling atas saat dibuka.
-- Menghilangkan keterangan kelompok yang berulang pada setiap kartu nama peserta.
-- Mempertahankan refresh status dan filter peserta yang sudah hadir.
-- Memperbarui regression test tata letak; seluruh 18 test lokal lulus.
+- Menampilkan loading, informasi, sukses, absensi sudah tercatat, serta kegagalan sebagai popup di tengah layar.
+- Menyediakan tombol tutup yang sesuai dan tetap mempertahankan aksi `Coba Lagi` pada kegagalan yang aman diulang.
+- Mencegah popup loading ditutup sebelum request selesai serta mengunci scroll halaman saat popup tampil.
+- Mempertahankan custom picker, refresh status peserta, filter peserta hadir, dan seluruh aturan absensi yang sudah ada.
+- Memperbarui regression test popup; seluruh 18 test lokal lulus.
 
 ## Files Being Modified
 
@@ -24,7 +22,7 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Setelah deploy, periksa posisi dan scrolling modal pada Android Chrome/in-app browser, iPhone Safari, serta Huawei Browser/WebView.
+Setelah deploy, periksa popup loading/hasil dan custom picker pada Android Chrome/in-app browser, iPhone Safari, serta Huawei Browser/WebView.
 
 ## Blockers
 

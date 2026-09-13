@@ -74,7 +74,9 @@ test("public attendance form has a local styled picker without CDN", async () =>
   assert.match(html, /container\.scrollTop = 0/);
   assert.match(html, /function openPicker\(type\)/);
   assert.match(html, /function selectPickerItem\(item\)/);
-  assert.match(html, /id="messageBox"[\s\S]*?aria-live="polite"/);
+  assert.match(html, /id="messageOverlay"[\s\S]*?class="message-overlay"/);
+  assert.match(html, /id="messageDialog"[\s\S]*?role="alertdialog"/);
+  assert.doesNotMatch(html, /id="messageBox"/);
 });
 
 test("attendance form explains failures and offers a safe retry", async () => {
@@ -100,6 +102,8 @@ test("attendance form explains failures and offers a safe retry", async () => {
   });
 
   assert.match(html, /id="messageRetryBtn"[\s\S]*?Coba Lagi/);
+  assert.match(html, /overlay\.className = `message-overlay \$\{type\}`/);
+  assert.match(html, /const isLoading = type === "loading"/);
   assert.match(html, /QR Tidak Valid/);
   assert.match(html, /Waktu Tunggu Habis/);
   assert.match(html, /Koneksi Bermasalah/);

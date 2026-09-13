@@ -33,7 +33,7 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
 - `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.
 - `admin-approval.html`: status akun admin.
-- `absen.html`: UI publik peserta dengan kontrol native dan tanpa dependency CDN.
+- `absen.html`: UI publik peserta dengan custom picker serta popup pemberitahuan lokal tanpa dependency CDN.
 
 Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi Supabase serta row `admin_users`, lalu menerapkan timeout lokal.
 
