@@ -16,6 +16,13 @@ function generateToken() {
   return crypto.randomBytes(16).toString("hex");
 }
 
+function logDatabaseError(context, error) {
+  console.error(context, {
+    code: error?.code || "UNKNOWN",
+    message: error?.message || "Kesalahan database tidak diketahui.",
+  });
+}
+
 function getBaseUrl(req) {
   const protocol = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers.host;
@@ -160,7 +167,8 @@ app.get("/api/participants", async (req, res) => {
     if (!sessionId) {
       return res.status(400).json({
         success: false,
-        message: "Session ID wajib dikirim.",
+        code: "SESSION_ID_REQUIRED",
+        message: "Link absensi tidak lengkap. Silakan scan ulang QR dari admin.",
       });
     }
 
@@ -186,26 +194,42 @@ app.get("/api/participants", async (req, res) => {
         .eq("session_id", sessionId),
     ]);
 
-    if (sessionError || !session) {
+    if (sessionError) {
+      logDatabaseError("PARTICIPANT LIST SESSION ERROR:", sessionError);
+
+      return res.status(500).json({
+        success: false,
+        code: "SESSION_LOOKUP_FAILED",
+        message: "Sesi belum dapat diperiksa. Silakan tekan Coba Lagi.",
+      });
+    }
+
+    if (!session) {
       return res.status(404).json({
         success: false,
-        message: "Sesi tidak ditemukan.",
+        code: "SESSION_NOT_FOUND",
+        message:
+          "Sesi absensi tidak ditemukan. Silakan scan QR terbaru atau hubungi admin.",
       });
     }
 
     if (participantError) {
+      logDatabaseError("PARTICIPANT LIST ERROR:", participantError);
+
       return res.status(500).json({
         success: false,
-        message: "Gagal mengambil daftar peserta.",
-        error: participantError.message,
+        code: "PARTICIPANTS_LOAD_FAILED",
+        message: "Daftar peserta belum dapat dimuat. Silakan tekan Coba Lagi.",
       });
     }
 
     if (hadirError) {
+      logDatabaseError("PARTICIPANT ATTENDANCE LIST ERROR:", hadirError);
+
       return res.status(500).json({
         success: false,
-        message: "Gagal mengambil data kehadiran.",
-        error: hadirError.message,
+        code: "ATTENDANCE_LOAD_FAILED",
+        message: "Status kehadiran belum dapat dimuat. Silakan tekan Coba Lagi.",
       });
     }
 
@@ -226,10 +250,12 @@ app.get("/api/participants", async (req, res) => {
       participants: result,
     });
   } catch (error) {
+    logDatabaseError("PARTICIPANT LIST SERVER ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan saat mengambil peserta.",
-      error: error.message,
+      code: "PARTICIPANTS_SERVER_ERROR",
+      message: "Data peserta belum dapat dimuat. Silakan tekan Coba Lagi.",
     });
   }
 });
@@ -241,7 +267,9 @@ app.post("/api/attendance", async (req, res) => {
     if (!sessionId || !token || !participantId || !localDeviceId) {
       return res.status(400).json({
         success: false,
-        message: "Data absensi belum lengkap.",
+        code: "DATA_INCOMPLETE",
+        message:
+          "Data absensi belum lengkap. Muat ulang halaman dan pilih nama kembali.",
       });
     }
 
@@ -270,52 +298,95 @@ app.post("/api/attendance", async (req, res) => {
         .maybeSingle(),
     ]);
 
-    if (sessionError || !session) {
+    if (sessionError) {
+      logDatabaseError("ATTENDANCE SESSION CHECK ERROR:", sessionError);
+
+      return res.status(500).json({
+        success: false,
+        code: "SESSION_CHECK_FAILED",
+        message: "Sesi belum dapat diperiksa. Silakan tekan Coba Lagi.",
+      });
+    }
+
+    if (!session) {
       return res.status(404).json({
         success: false,
-        message: "Sesi tidak ditemukan.",
+        code: "SESSION_NOT_FOUND",
+        message:
+          "Sesi absensi tidak ditemukan. Silakan scan QR terbaru atau hubungi admin.",
       });
     }
 
     if (!session.is_active) {
       return res.status(400).json({
         success: false,
-        message: "Sesi absen belum aktif.",
+        code: "SESSION_INACTIVE",
+        message: "Sesi absensi sedang tidak aktif. Silakan hubungi admin.",
       });
     }
 
     if (session.start_time && now < new Date(session.start_time)) {
       return res.status(400).json({
         success: false,
-        message: "Sesi absen belum dimulai.",
+        code: "SESSION_NOT_STARTED",
+        message:
+          "Sesi absensi belum dimulai. Silakan tunggu sampai waktu absensi dibuka.",
       });
     }
 
     if (session.end_time && now > new Date(session.end_time)) {
       return res.status(400).json({
         success: false,
-        message: "Sesi absen sudah berakhir.",
+        code: "SESSION_ENDED",
+        message:
+          "Waktu absensi sudah berakhir. Silakan hubungi admin jika memerlukan bantuan.",
       });
     }
 
-    if (tokenError || !validToken) {
+    if (tokenError) {
+      logDatabaseError("ATTENDANCE TOKEN CHECK ERROR:", tokenError);
+
+      return res.status(500).json({
+        success: false,
+        code: "TOKEN_CHECK_FAILED",
+        message: "QR belum dapat diperiksa. Silakan tekan Coba Lagi.",
+      });
+    }
+
+    if (!validToken) {
       return res.status(400).json({
         success: false,
-        message: "QR Code sudah kedaluwarsa. Silakan scan QR terbaru.",
+        code: "QR_EXPIRED",
+        message:
+          "QR sudah kedaluwarsa atau tidak berlaku. Silakan scan ulang QR yang ditampilkan admin.",
       });
     }
 
-    if (participantError || !participant) {
+    if (participantError) {
+      logDatabaseError("ATTENDANCE PARTICIPANT CHECK ERROR:", participantError);
+
+      return res.status(500).json({
+        success: false,
+        code: "PARTICIPANT_CHECK_FAILED",
+        message: "Data peserta belum dapat diperiksa. Silakan tekan Coba Lagi.",
+      });
+    }
+
+    if (!participant) {
       return res.status(404).json({
         success: false,
-        message: "Peserta tidak ditemukan.",
+        code: "PARTICIPANT_NOT_FOUND",
+        message:
+          "Data peserta tidak ditemukan. Muat ulang halaman atau hubungi admin.",
       });
     }
 
     if (participant.is_active === false) {
       return res.status(400).json({
         success: false,
-        message: "Peserta sedang nonaktif dan tidak dapat melakukan absensi.",
+        code: "PARTICIPANT_INACTIVE",
+        message:
+          "Nama Anda sedang nonaktif dan belum dapat melakukan absensi. Silakan hubungi admin.",
       });
     }
 
@@ -373,9 +444,16 @@ app.post("/api/attendance", async (req, res) => {
       localDeviceCheckError ||
       cookieDeviceCheckError
     ) {
+      logDatabaseError(
+        "ATTENDANCE DUPLICATE CHECK ERROR:",
+        participantCheckError || localDeviceCheckError || cookieDeviceCheckError,
+      );
+
       return res.status(500).json({
         success: false,
-        message: "Gagal memeriksa data absensi sebelumnya.",
+        code: "ATTENDANCE_CHECK_FAILED",
+        message:
+          "Status absensi sebelumnya belum dapat diperiksa. Silakan tekan Coba Lagi.",
       });
     }
 
@@ -383,7 +461,8 @@ app.post("/api/attendance", async (req, res) => {
       return res.status(400).json({
         success: false,
         code: "PARTICIPANT_ALREADY_PRESENT",
-        message: "Nama peserta ini sudah tercatat hadir pada sesi ini.",
+        message:
+          "Nama peserta ini sudah tercatat hadir pada sesi ini. Tidak perlu mengirim ulang.",
       });
     }
 
@@ -392,7 +471,7 @@ app.post("/api/attendance", async (req, res) => {
         success: false,
         code: "DEVICE_ALREADY_USED",
         message:
-          "Perangkat ini sudah digunakan untuk melakukan absensi pada sesi ini.",
+          "Perangkat ini sudah dipakai untuk satu peserta pada sesi ini. Jika merasa belum absen, silakan hubungi admin.",
       });
     }
 
@@ -401,7 +480,7 @@ app.post("/api/attendance", async (req, res) => {
         success: false,
         code: "DEVICE_ALREADY_USED",
         message:
-          "Perangkat ini sudah digunakan untuk melakukan absensi pada sesi ini.",
+          "Perangkat ini sudah dipakai untuk satu peserta pada sesi ini. Jika merasa belum absen, silakan hubungi admin.",
       });
     }
 
@@ -430,15 +509,17 @@ app.post("/api/attendance", async (req, res) => {
       if (insertError.code === "23505") {
         return res.status(400).json({
           success: false,
-          message:
-            "Data absensi sudah tercatat atau perangkat sudah digunakan.",
+          code: "ATTENDANCE_ALREADY_RECORDED",
+          message: "Absensi sudah tercatat. Tidak perlu mengirim ulang.",
         });
       }
 
+      logDatabaseError("ATTENDANCE INSERT ERROR:", insertError);
+
       return res.status(500).json({
         success: false,
-        message: "Gagal menyimpan absensi.",
-        error: insertError.message,
+        code: "ATTENDANCE_SAVE_FAILED",
+        message: "Absensi belum berhasil disimpan. Silakan tekan Coba Lagi.",
       });
     }
 
@@ -455,12 +536,12 @@ app.post("/api/attendance", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("ATTENDANCE ERROR:", error);
+    logDatabaseError("ATTENDANCE SERVER ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan pada server saat menyimpan absensi.",
-      error: error.message,
+      code: "ATTENDANCE_SERVER_ERROR",
+      message: "Absensi belum berhasil disimpan. Silakan tekan Coba Lagi.",
     });
   }
 });

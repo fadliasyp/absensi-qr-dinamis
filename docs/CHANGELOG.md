@@ -4,6 +4,14 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Pesan Absensi Mobile Tahap 4
+
+- Menambahkan batas tunggu 20 detik pada pemuatan peserta dan submit absensi.
+- Menambahkan tombol `Coba Lagi` untuk timeout, gangguan koneksi, dan error server yang dapat dicoba ulang.
+- Menyesuaikan pesan peserta untuk QR tidak valid/kedaluwarsa, status sesi, peserta nonaktif, absensi duplikat, dan kegagalan penyimpanan.
+- Menambahkan kode error API publik yang stabil, log error server-side, serta menghapus detail database dari respons peserta.
+- Menambahkan regression test timeout/pesan; seluruh 16 test lokal lulus.
+
 ### Changed — Performa Absensi Mobile Tahap 3
 
 - Menjalankan query independen secara paralel pada endpoint daftar peserta dan submit QR.

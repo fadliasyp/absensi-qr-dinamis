@@ -196,6 +196,23 @@
         color: #92400e;
       }
 
+      .message-retry {
+        width: auto;
+        margin-top: 12px;
+        padding: 9px 14px;
+        border: 1px solid currentColor;
+        border-radius: 10px;
+        background: transparent;
+        color: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .message-retry[hidden] {
+        display: none;
+      }
+
       button#submitBtn {
         border: none;
         padding: 17px 18px;
@@ -302,6 +319,9 @@
         >
           <strong id="messageTitle"></strong>
           <span id="messageText"></span>
+          <button id="messageRetryBtn" class="message-retry" type="button" hidden>
+            Coba Lagi
+          </button>
         </div>
 
         <div class="form-group">
@@ -365,19 +385,33 @@
       let selectedParticipantId = "";
       let memoryDeviceId = "";
 
-      function showMessage(type, message, title) {
+      function showMessage(type, message, title, retryAction) {
         const box = document.getElementById("messageBox");
+        const retryBtn = document.getElementById("messageRetryBtn");
 
         box.className = `message ${type}`;
         document.getElementById("messageTitle").textContent = title;
         document.getElementById("messageText").textContent = message;
+        retryBtn.hidden = typeof retryAction !== "function";
+        retryBtn.onclick =
+          typeof retryAction === "function"
+            ? function () {
+                hideMessage();
+                retryAction();
+              }
+            : null;
         box.hidden = false;
 
         return Promise.resolve();
       }
 
       function hideMessage() {
-        document.getElementById("messageBox").hidden = true;
+        const box = document.getElementById("messageBox");
+        const retryBtn = document.getElementById("messageRetryBtn");
+
+        box.hidden = true;
+        retryBtn.hidden = true;
+        retryBtn.onclick = null;
       }
 
       function popupSuccess(message, title = "Berhasil") {
@@ -455,18 +489,47 @@
       }
 
       async function loadParticipants() {
+        const kelompokSelect = document.getElementById("kelompokSelect");
+        const participantSelect = document.getElementById("participantSelect");
+
+        if (!sessionId || !token) {
+          kelompokSelect.options[0].textContent = "Link absensi tidak valid";
+          popupError(
+            "Link absensi tidak lengkap. Silakan scan ulang QR yang ditampilkan admin.",
+            "QR Tidak Valid",
+          );
+          return;
+        }
+
+        kelompokSelect.disabled = true;
+        kelompokSelect.options[0].textContent = "Memuat kelompok...";
+        participantSelect.disabled = true;
+        showLoadingPopup(
+          "Memuat Data Peserta",
+          "Mohon tunggu, daftar peserta sedang disiapkan.",
+        );
+
         try {
-          const response = await fetch(
+          const response = await fetchWithTimeout(
             `/api/participants?session=${sessionId}`,
           );
-          const result = await response.json();
+          const result = await readJsonResponse(response);
 
           if (!result.success) {
-            document.getElementById("kelompokSelect").options[0].textContent =
-              "Gagal memuat kelompok";
-            popupError(result.message || "Gagal mengambil daftar peserta.");
+            kelompokSelect.options[0].textContent = "Gagal memuat kelompok";
+            const canRetry = result.code !== "SESSION_NOT_FOUND";
+
+            showMessage(
+              "error",
+              result.message ||
+                "Daftar peserta belum dapat dimuat. Silakan coba lagi.",
+              "Data Peserta Belum Tersedia",
+              canRetry ? loadParticipants : null,
+            );
             return;
           }
+
+          hideMessage();
 
           allParticipants = result.participants || [];
 
@@ -474,13 +537,22 @@
           renderParticipants([]);
 
           if (allParticipants.length === 0) {
-            popupInfo("Belum ada data peserta yang tersedia.");
+            popupInfo(
+              "Belum ada peserta aktif yang dapat melakukan absensi pada sesi ini.",
+              "Peserta Belum Tersedia",
+            );
           }
         } catch (error) {
-          document.getElementById("kelompokSelect").options[0].textContent =
-            "Gagal memuat kelompok";
-          popupError(
-            "Terjadi kesalahan saat mengambil peserta: " + error.message,
+          kelompokSelect.options[0].textContent = "Gagal memuat kelompok";
+          const isTimeout = error && error.code === "REQUEST_TIMEOUT";
+
+          showMessage(
+            "error",
+            isTimeout
+              ? "Server membutuhkan waktu terlalu lama. Periksa koneksi, lalu tekan Coba Lagi."
+              : "Daftar peserta belum dapat dimuat. Periksa koneksi internet, lalu tekan Coba Lagi.",
+            isTimeout ? "Waktu Tunggu Habis" : "Koneksi Bermasalah",
+            loadParticipants,
           );
           console.error(error);
         }
@@ -603,6 +675,27 @@
         renderParticipants(filtered);
       }
 
+      function fetchWithTimeout(url, options, timeoutMs = 20000) {
+        return new Promise(function (resolve, reject) {
+          const timeoutId = setTimeout(function () {
+            const error = new Error("Waktu tunggu server habis.");
+            error.code = "REQUEST_TIMEOUT";
+            reject(error);
+          }, timeoutMs);
+
+          fetch(url, options).then(
+            function (response) {
+              clearTimeout(timeoutId);
+              resolve(response);
+            },
+            function (error) {
+              clearTimeout(timeoutId);
+              reject(error);
+            },
+          );
+        });
+      }
+
       async function readJsonResponse(response) {
         const contentType = response.headers.get("content-type") || "";
 
@@ -652,7 +745,7 @@
             "Sedang memproses kehadiran...",
           );
 
-          const response = await fetch("/api/attendance", {
+          const response = await fetchWithTimeout("/api/attendance", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -677,10 +770,27 @@
             if (
               code === "DEVICE_ALREADY_USED" ||
               code === "PARTICIPANT_ALREADY_PRESENT" ||
+              code === "ATTENDANCE_ALREADY_RECORDED" ||
               lowerMessage.includes("sudah") ||
               lowerMessage.includes("perangkat")
             ) {
               await popupInfo(message, "Absensi Sudah Tercatat");
+            } else if (
+              [
+                "SESSION_CHECK_FAILED",
+                "TOKEN_CHECK_FAILED",
+                "PARTICIPANT_CHECK_FAILED",
+                "ATTENDANCE_CHECK_FAILED",
+                "ATTENDANCE_SAVE_FAILED",
+                "ATTENDANCE_SERVER_ERROR",
+              ].indexOf(code) !== -1
+            ) {
+              showMessage(
+                "error",
+                message,
+                "Absensi Belum Tersimpan",
+                submitAttendance,
+              );
             } else {
               popupError(message);
             }
@@ -708,22 +818,16 @@
           submitBtn.disabled = true;
           submitBtn.textContent = "Sudah Absen";
         } catch (error) {
-          hideMessage();
+          const isTimeout = error && error.code === "REQUEST_TIMEOUT";
 
-          const message =
-            error.message || "Terjadi kesalahan saat menyimpan absensi.";
-
-          if (
-            message.toLowerCase().includes("failed to fetch") ||
-            message.toLowerCase().includes("server sedang bermasalah")
-          ) {
-            await popupError(
-              "Absensi belum bisa diproses karena server/API tidak merespons dengan benar. Silakan coba beberapa saat lagi.",
-              "Gagal Menghubungi Server",
-            );
-          } else {
-            popupError(message);
-          }
+          showMessage(
+            "error",
+            isTimeout
+              ? "Server belum memberi jawaban. Tunggu beberapa detik, lalu tekan Coba Lagi dengan nama yang sama. Jika sudah tersimpan, sistem akan memberi tahu bahwa absensi sudah tercatat."
+              : "Absensi belum mendapat jawaban dari server. Periksa koneksi internet, lalu tekan Coba Lagi.",
+            isTimeout ? "Waktu Tunggu Habis" : "Koneksi Bermasalah",
+            submitAttendance,
+          );
 
           submitBtn.disabled = false;
           submitBtn.textContent = "Hadir";

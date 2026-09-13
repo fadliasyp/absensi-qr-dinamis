@@ -31,6 +31,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Halaman absensi memiliki fallback device ID untuk browser lama serta tetap dapat mengirim request ketika akses localStorage ditolak.
 - Halaman absensi publik memakai select dan pesan status native tanpa dependency CDN/font eksternal.
 - Query independen pada pemuatan peserta dan submit QR dijalankan paralel dengan kolom minimum untuk mengurangi waktu tunggu Supabase.
+- Halaman absensi membatasi waktu tunggu request menjadi 20 detik, menyediakan retry, dan menjelaskan kegagalan QR, sesi, peserta, duplikat, koneksi, serta server dengan pesan yang dapat ditindaklanjuti.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
@@ -88,7 +89,7 @@ Belum diprioritaskan oleh pengguna:
 ## Known Issues and Risks
 
 - **Performa deployment:** cold start Vercel, jarak region Vercel–Supabase, jumlah peserta, dan index database belum diukur pada lingkungan nyata.
-- Error Supabase yang sudah ditangani tidak dicatat secara terstruktur; UI sering hanya menampilkan pesan umum sehingga penyebab produksi sulit dibedakan.
+- Endpoint publik peserta/absensi sudah mencatat konteks dan kode error Supabase di log server serta mengirim kode/pesan aman ke UI; observability endpoint admin lainnya masih belum seragam.
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
 - Penghapusan admin sudah menggunakan client service-role yang benar, tetapi belum diuji terhadap Supabase non-produksi.
 - **Security:** kode undangan registrasi berada di JavaScript browser sehingga tidak dapat dianggap rahasia.

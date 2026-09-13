@@ -13,6 +13,17 @@ function loadDeviceIdHelper(html, window) {
   )(window);
 }
 
+function loadFetchTimeoutHelper(html, fetchImpl) {
+  const start = html.indexOf("function fetchWithTimeout");
+  const end = html.indexOf("async function readJsonResponse");
+  const helperSource = html.slice(start, end);
+
+  return new Function(
+    "fetch",
+    `${helperSource}; return fetchWithTimeout;`,
+  )(fetchImpl);
+}
+
 test("attendance device ID works on older or storage-restricted browsers", async () => {
   const html = await readFile("public/absen.html", "utf8");
   const blockedStorage = {
@@ -57,4 +68,39 @@ test("public attendance form has no blocking third-party UI dependency", async (
   assert.match(html, /<select[^>]+id="kelompokSelect"/);
   assert.match(html, /<select[\s\S]*?id="participantSelect"/);
   assert.match(html, /id="messageBox"[\s\S]*?aria-live="polite"/);
+});
+
+test("attendance form explains failures and offers a safe retry", async () => {
+  const [html, api] = await Promise.all([
+    readFile("public/absen.html", "utf8"),
+    readFile("api/index.js", "utf8"),
+  ]);
+  const fetchWithTimeout = loadFetchTimeoutHelper(
+    html,
+    () => new Promise(() => {}),
+  );
+  const participantEndpoint = api.slice(
+    api.indexOf('app.get("/api/participants"'),
+    api.indexOf('app.post("/api/attendance"'),
+  );
+  const attendanceEndpoint = api.slice(
+    api.indexOf('app.post("/api/attendance"'),
+    api.indexOf('app.get("/api/attendance/:sessionId"'),
+  );
+
+  await assert.rejects(fetchWithTimeout("/api/test", undefined, 5), (error) => {
+    return error.code === "REQUEST_TIMEOUT";
+  });
+
+  assert.match(html, /id="messageRetryBtn"[\s\S]*?Coba Lagi/);
+  assert.match(html, /QR Tidak Valid/);
+  assert.match(html, /Waktu Tunggu Habis/);
+  assert.match(html, /Koneksi Bermasalah/);
+  assert.match(api, /code: "SESSION_NOT_STARTED"/);
+  assert.match(api, /code: "SESSION_ENDED"/);
+  assert.match(api, /code: "QR_EXPIRED"/);
+  assert.match(api, /code: "PARTICIPANT_INACTIVE"/);
+  assert.match(api, /code: "ATTENDANCE_SAVE_FAILED"/);
+  assert.doesNotMatch(participantEndpoint, /error:\s*\w+\.message/);
+  assert.doesNotMatch(attendanceEndpoint, /error:\s*\w+\.message/);
 });

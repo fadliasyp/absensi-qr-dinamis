@@ -19,7 +19,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, edit waktu mulai/selesai termasuk saat berjalan, dan hapus tersedia. Sesi final tidak dapat diubah; klaim cascade saat delete belum terverifikasi. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
-| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, UI native tanpa CDN, serta query Supabase paralel/kolom minimum sudah ditambahkan. |
+| Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, UI native tanpa CDN, query Supabase paralel/kolom minimum, timeout, pesan spesifik, dan retry aman sudah ditambahkan. |
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
@@ -52,6 +52,8 @@ Perilaku yang harus dipertahankan:
 - Tidak meminta geolocation dan tidak memvalidasi jarak.
 - Form publik tetap dapat memuat kontrol serta pesan tanpa CDN pihak ketiga.
 - Query independen berjalan paralel, tetapi insert baru dilakukan setelah seluruh validasi lolos.
+- Peserta menerima pesan berbeda untuk QR/sesi/peserta/duplikat/koneksi/server, bukan detail error database.
+- Request yang melewati 20 detik berhenti menunggu pada UI dan menyediakan tombol `Coba Lagi`; pesan submit mengingatkan peserta menunggu sebelum mencoba nama yang sama.
 
 File penting: `api/index.js`, `public/absen.html`.
 
