@@ -49,6 +49,7 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | GET | `/api/attendance/:sessionId` | Rekap sesi. |
 | POST | `/api/manual-attendance` | Insert/update status manual. |
 | POST, GET | `/api/sessions` | Buat dan daftar sesi. |
+| PUT | `/api/sessions/:sessionId` | Ubah waktu mulai/selesai sesi belum final dan sesuaikan kedaluwarsa token QR. |
 | DELETE | `/api/sessions/:sessionId` | Hapus sesi. |
 | POST | `/api/sessions/:sessionId/finalize` | Isi Alfa otomatis dan finalisasi. |
 | GET | `/api/sessions/:sessionId/export-pdf` | Export rekap PDF. |

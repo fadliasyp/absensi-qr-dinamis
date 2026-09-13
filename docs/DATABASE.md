@@ -31,6 +31,7 @@ Field yang digunakan:
 - `created_at`
 
 Relasi logis: banyak/atau satu token mengacu ke satu session. Implementasi mengambil token tertua (`created_at` ascending, limit 1), sehingga secara efektif menggunakan satu token per sesi tetapi constraint uniknya belum diketahui.
+Perubahan `sessions.end_time` melalui fitur edit masa aktif juga memperbarui `qr_tokens.expired_at` untuk sesi tersebut tanpa mengganti nilai token.
 
 ### `participants`
 

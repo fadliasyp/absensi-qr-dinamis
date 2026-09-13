@@ -617,6 +617,10 @@
         background: var(--green);
       }
 
+      .edit {
+        background: #0f766e;
+      }
+
       .delete {
         background: var(--red);
       }
@@ -875,8 +879,8 @@
             <div class="badge-top">📋 Daftar Sesi</div>
             <h2>Sesi Tersimpan</h2>
             <p class="subtitle">
-              Buka QR, kirim pengumuman WA, input manual, export PDF, atau
-              hapus sesi yang sudah tidak digunakan.
+              Buka QR, ubah masa aktif, kirim pengumuman WA, input manual,
+              export PDF, atau hapus sesi yang sudah tidak digunakan.
             </p>
           </div>
 
@@ -1004,6 +1008,14 @@
       function toISOStringFromLocalInput(value) {
         if (!value) return null;
         return new Date(value).toISOString();
+      }
+
+      function toLocalDateTimeInput(value) {
+        const date = new Date(value);
+        const localDate = new Date(
+          date.getTime() - date.getTimezoneOffset() * 60000,
+        );
+        return localDate.toISOString().slice(0, 16);
       }
 
       function getSessionStatus(session) {
@@ -1265,6 +1277,14 @@
                   Buka QR
                 </a>
 
+                <button
+                  class="action-link edit edit-session-btn"
+                  data-id="${session.id}"
+                  type="button"
+                >
+                  Edit Waktu
+                </button>
+
                 <a class="action-link manual" href="/manual.html?session=${session.id}">
                   Izin/Alfa
                 </a>
@@ -1295,7 +1315,12 @@
 
           table.appendChild(row);
 
+          const editBtn = row.querySelector(".edit-session-btn");
           const deleteBtn = row.querySelector(".delete-session-btn");
+
+          editBtn.addEventListener("click", function () {
+            editSession(this.dataset.id);
+          });
 
           deleteBtn.addEventListener("click", function () {
             const id = this.dataset.id;
@@ -1303,6 +1328,85 @@
             deleteSession(id, title);
           });
         });
+      }
+
+      async function editSession(sessionId) {
+        const session = allSessions.find((item) => item.id === sessionId);
+
+        if (!session) {
+          popupError("Sesi tidak ditemukan.");
+          return;
+        }
+
+        if (session.is_finalized) {
+          popupError("Masa aktif sesi yang sudah difinalisasi tidak dapat diubah.");
+          return;
+        }
+
+        const formResult = await Swal.fire({
+          icon: "info",
+          title: "Edit Masa Aktif Sesi",
+          html: `
+            <div style="text-align:left">
+              <label for="editStartInput">Waktu Mulai</label>
+              <input type="datetime-local" id="editStartInput" class="swal2-input" style="margin:0 0 14px;width:100%" />
+              <label for="editEndInput">Waktu Selesai</label>
+              <input type="datetime-local" id="editEndInput" class="swal2-input" style="margin:0;width:100%" />
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Simpan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#2563eb",
+          didOpen: () => {
+            document.getElementById("editStartInput").value =
+              toLocalDateTimeInput(session.start_time);
+            document.getElementById("editEndInput").value =
+              toLocalDateTimeInput(session.end_time);
+          },
+          preConfirm: () => {
+            const startValue = document.getElementById("editStartInput").value;
+            const endValue = document.getElementById("editEndInput").value;
+
+            if (!startValue || !endValue) {
+              Swal.showValidationMessage("Waktu mulai dan selesai wajib diisi.");
+              return false;
+            }
+
+            const startTime = toISOStringFromLocalInput(startValue);
+            const endTime = toISOStringFromLocalInput(endValue);
+
+            if (new Date(endTime) <= new Date(startTime)) {
+              Swal.showValidationMessage(
+                "Waktu selesai harus lebih besar dari waktu mulai.",
+              );
+              return false;
+            }
+
+            return { startTime, endTime };
+          },
+        });
+
+        if (!formResult.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formResult.value),
+          });
+          const result = await response.json();
+
+          if (!result.success) {
+            popupError(result.message || "Gagal mengubah masa aktif sesi.");
+            return;
+          }
+
+          await popupSuccess("Masa aktif sesi berhasil diubah.");
+          await loadSessions();
+        } catch (error) {
+          popupError("Terjadi kesalahan saat mengubah sesi: " + error.message);
+        }
       }
 
       async function deleteSession(sessionId, sessionTitle) {

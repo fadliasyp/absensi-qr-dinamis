@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Added — Edit Masa Aktif Sesi
+
+- Menambahkan tombol edit waktu mulai dan selesai pada daftar sesi, termasuk untuk sesi yang sudah mulai atau sedang berjalan.
+- Menambahkan validasi waktu di endpoint dan mengunci perubahan pada sesi yang sudah difinalisasi.
+- Menyesuaikan kedaluwarsa token QR ketika waktu selesai berubah tanpa membuat token baru.
+- Menambahkan regression test untuk kontrak edit masa aktif sesi.
+
 ### Removed — Geolocation Absensi
 
 - Menghapus permintaan GPS pada halaman peserta dan dashboard sesi admin.

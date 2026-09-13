@@ -706,6 +706,118 @@ app.get("/api/sessions", async (req, res) => {
 });
 
 // =========================
+// Endpoint mengubah masa aktif sesi
+// =========================
+app.put("/api/sessions/:sessionId", async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { startTime, endTime } = req.body;
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+
+    if (
+      !sessionId ||
+      !startTime ||
+      !endTime ||
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Waktu mulai dan waktu selesai yang valid wajib diisi.",
+      });
+    }
+
+    if (endDate <= startDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Waktu selesai harus lebih besar dari waktu mulai.",
+      });
+    }
+
+    const { data: session, error: findError } = await supabase
+      .from("sessions")
+      .select("id, start_time, end_time, is_finalized")
+      .eq("id", sessionId)
+      .maybeSingle();
+
+    if (findError) {
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengecek sesi.",
+        error: findError.message,
+      });
+    }
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Sesi tidak ditemukan.",
+      });
+    }
+
+    if (session.is_finalized) {
+      return res.status(400).json({
+        success: false,
+        message: "Masa aktif sesi yang sudah difinalisasi tidak dapat diubah.",
+      });
+    }
+
+    const updatedTimes = {
+      start_time: startDate.toISOString(),
+      end_time: endDate.toISOString(),
+    };
+    const { data, error: updateError } = await supabase
+      .from("sessions")
+      .update(updatedTimes)
+      .eq("id", sessionId)
+      .select()
+      .single();
+
+    if (updateError) {
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengubah masa aktif sesi.",
+        error: updateError.message,
+      });
+    }
+
+    const { error: tokenError } = await supabase
+      .from("qr_tokens")
+      .update({ expired_at: updatedTimes.end_time })
+      .eq("session_id", sessionId);
+
+    if (tokenError) {
+      await supabase
+        .from("sessions")
+        .update({
+          start_time: session.start_time,
+          end_time: session.end_time,
+        })
+        .eq("id", sessionId);
+
+      return res.status(500).json({
+        success: false,
+        message: "Gagal menyesuaikan masa aktif token QR.",
+        error: tokenError.message,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Masa aktif sesi berhasil diubah.",
+      session: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat mengubah masa aktif sesi.",
+      error: error.message,
+    });
+  }
+});
+
+// =========================
 // Endpoint untuk kirim WA ke yg ALFA
 // ========================
 app.get("/api/attendance/:sessionId/alfa", async (req, res) => {

@@ -1,5 +1,23 @@
 # Decision Log
 
+## 2026-09-13 — Masa Aktif Sesi Dapat Diubah Sebelum Finalisasi
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Waktu mulai dan selesai boleh diubah pada sesi akan datang maupun sesi yang sedang berjalan. Sesi yang sudah difinalisasi tidak boleh diubah, dan perubahan waktu selesai harus menyesuaikan kedaluwarsa token QR yang sama.
+
+### Context
+
+Pengguna memerlukan perpanjangan atau koreksi masa aktif setelah kegiatan dimulai tanpa membuat sesi dan QR baru.
+
+### Consequences
+
+Absensi langsung mengikuti rentang waktu baru. Identitas token QR, attendance yang sudah tercatat, dan pembatasan perangkat tidak berubah.
+
 ## 2026-09-13 — Absensi Tanpa Geolocation
 
 ### Status

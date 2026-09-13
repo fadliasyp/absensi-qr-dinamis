@@ -25,7 +25,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Timeout sesi admin: idle 30 menit dan umur sesi maksimum 8 jam pada browser.
 - CRUD peserta: tambah tunggal/bulk, daftar/filter, edit, hapus, nomor WhatsApp, dan status aktif/nonaktif.
 - Peserta nonaktif dikeluarkan dari pilihan absensi QR/manual, pengumuman, finalisasi Alfa, dan daftar WhatsApp Alfa serta ditolak oleh endpoint pencatatan.
-- Pembuatan, daftar/filter, dan penghapusan sesi.
+- Pembuatan, daftar/filter, edit masa aktif, dan penghapusan sesi. Waktu sesi dapat diubah saat sesi sudah mulai atau sedang berjalan selama belum difinalisasi.
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
 - Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
@@ -54,6 +54,7 @@ Belum diprioritaskan oleh pengguna:
 
 - Sesi harus aktif dan berada di antara `start_time` dan `end_time` agar QR/absensi diterima.
 - Token QR disimpan di `qr_tokens`. Implementasi mengambil token pertama milik sesi atau membuat satu token baru yang kedaluwarsa pada `end_time` (fallback 24 jam).
+- Saat masa aktif sesi diubah, `expired_at` token QR yang sudah ada ikut disesuaikan tanpa mengganti token.
 - Absensi reguler tidak meminta atau memvalidasi koordinat peserta. Nama tempat sesi hanya informasi opsional.
 - Satu peserta hanya boleh memiliki satu record per sesi.
 - `local_device_id` (localStorage) dan `cookie_device_id` dipakai untuk membatasi satu perangkat per sesi.
