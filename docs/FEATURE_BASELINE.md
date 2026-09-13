@@ -1,6 +1,6 @@
 # Feature Baseline
 
-Terakhir diperbarui: 2026-09-12
+Terakhir diperbarui: 2026-09-13
 
 ## Ringkasan Status
 
@@ -15,11 +15,11 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Hapus admin | WORKING | Client service-role sudah diimpor dan authorization super admin tetap dipertahankan; belum diuji terhadap Supabase. |
 | CRUD peserta | WORKING | Tambah tunggal/bulk, baca, edit, hapus, filter, nomor WA, serta status aktif/nonaktif tersedia. Integritas delete bergantung FK aktual. |
 | Peserta nonaktif | PARTIAL | Filter dan penolakan backend serta kontrol UI diimplementasikan dan diuji statis; migration kolom belum dijalankan atau diuji end-to-end pada Supabase. |
-| CRUD lokasi tersimpan | WORKING | Daftar, tambah, pakai ulang, hapus, dan ambil geolocation admin tersedia. |
+| Lokasi/geolocation | REMOVED | GPS, koordinat, radius, validasi jarak, lokasi tersimpan, dan endpoint lokasi dihapus dari alur aktif atas permintaan pengguna. Nama tempat opsional tetap tersedia; migration pelepasan `NOT NULL` belum diuji di Supabase. |
 | Pengelolaan sesi | WORKING | Buat, daftar/filter status, dan hapus tersedia. Klaim cascade saat delete belum terverifikasi. |
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
-| Absensi peserta | WORKING | Validasi token, waktu, geolocation/radius, identitas peserta, dan duplikasi tersedia. |
+| Absensi peserta | WORKING | Validasi token, waktu, identitas peserta, peserta aktif, dan duplikasi peserta/perangkat tersedia tanpa geolocation. |
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
@@ -45,18 +45,18 @@ Perilaku yang harus dipertahankan:
 
 - Menolak sesi yang tidak ditemukan/tidak aktif/belum mulai/sudah selesai.
 - Menolak token yang tidak cocok atau kedaluwarsa.
-- Mewajibkan geolocation dan menolak peserta di luar radius.
 - Menolak peserta yang sudah tercatat serta perangkat yang sudah dipakai pada sesi sama.
-- Menyimpan snapshot nama, gender, kelompok, waktu, koordinat, jarak, device, user agent, dan IP sesuai implementasi.
+- Menyimpan snapshot nama, gender, kelompok, waktu, device, user agent, dan IP sesuai implementasi.
+- Tidak meminta geolocation dan tidak memvalidasi jarak.
 
 File penting: `api/index.js`, `public/absen.html`.
 
 Cara verifikasi:
 
-1. Buat sesi aktif dengan lokasi dan radius uji.
-2. Scan QR dan hadir di dalam radius; pastikan satu record `Hadir` dibuat.
+1. Buat sesi aktif; nama tempat boleh dikosongkan.
+2. Scan QR tanpa izin lokasi; pastikan satu record `Hadir` dibuat.
 3. Ulangi peserta/perangkat yang sama; pastikan ditolak.
-4. Uji di luar radius, sebelum mulai, sesudah selesai, dan token salah.
+4. Uji sebelum mulai, sesudah selesai, token salah, peserta nonaktif, dan perangkat kedua.
 
 ### Manual dan Finalisasi
 

@@ -67,28 +67,6 @@ async function getSessionQrToken(sessionId, sessionEndTime) {
   };
 }
 
-function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
-  const earthRadius = 6371000;
-
-  const toRadians = (degree) => {
-    return degree * (Math.PI / 180);
-  };
-
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return earthRadius * c;
-}
-
 function formatTanggalSesiIndonesia(dateString) {
   if (!dateString) return "-";
 
@@ -260,26 +238,12 @@ app.get("/api/participants", async (req, res) => {
 
 app.post("/api/attendance", async (req, res) => {
   try {
-    const {
-      sessionId,
-      token,
-      participantId,
-      localDeviceId,
-      userLatitude,
-      userLongitude,
-    } = req.body;
+    const { sessionId, token, participantId, localDeviceId } = req.body;
 
     if (!sessionId || !token || !participantId || !localDeviceId) {
       return res.status(400).json({
         success: false,
         message: "Data absensi belum lengkap.",
-      });
-    }
-
-    if (userLatitude === undefined || userLongitude === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Lokasi wajib diaktifkan untuk melakukan absensi.",
       });
     }
 
@@ -300,44 +264,6 @@ app.post("/api/attendance", async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Sesi absen belum aktif.",
-      });
-    }
-
-    if (
-      session.latitude === null ||
-      session.longitude === null ||
-      session.latitude === undefined ||
-      session.longitude === undefined
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Titik lokasi sesi belum ditentukan oleh admin.",
-      });
-    }
-
-    const parsedUserLatitude = Number(userLatitude);
-    const parsedUserLongitude = Number(userLongitude);
-
-    if (Number.isNaN(parsedUserLatitude) || Number.isNaN(parsedUserLongitude)) {
-      return res.status(400).json({
-        success: false,
-        message: "Lokasi peserta tidak valid.",
-      });
-    }
-
-    const distanceMeters = calculateDistanceMeters(
-      Number(session.latitude),
-      Number(session.longitude),
-      parsedUserLatitude,
-      parsedUserLongitude,
-    );
-
-    const allowedRadius = Number(session.radius_meters || 50);
-
-    if (distanceMeters > allowedRadius) {
-      return res.status(400).json({
-        success: false,
-        message: `Absensi ditolak. Lokasi Anda berada di luar radius absensi. Jarak Anda sekitar ${Math.round(distanceMeters)} meter dari titik lokasi.`,
       });
     }
 
@@ -477,9 +403,6 @@ app.post("/api/attendance", async (req, res) => {
         cookie_device_id: cookieDeviceId,
         user_agent: req.headers["user-agent"],
         ip_address: ipAddress,
-        user_latitude: parsedUserLatitude,
-        user_longitude: parsedUserLongitude,
-        distance_meters: distanceMeters,
       })
       .select()
       .single();
@@ -707,45 +630,12 @@ app.post("/api/manual-attendance", async (req, res) => {
 // ========================
 app.post("/api/sessions", async (req, res) => {
   try {
-    const {
-      judul,
-      startTime,
-      endTime,
-      locationName,
-      latitude,
-      longitude,
-      radiusMeters,
-    } = req.body;
+    const { judul, startTime, endTime, locationName } = req.body;
 
     if (!judul || !startTime || !endTime) {
       return res.status(400).json({
         success: false,
         message: "Judul, waktu mulai, dan waktu selesai wajib diisi.",
-      });
-    }
-
-    if (!locationName || latitude === undefined || longitude === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Nama lokasi, latitude, dan longitude wajib diisi.",
-      });
-    }
-
-    const parsedLatitude = Number(latitude);
-    const parsedLongitude = Number(longitude);
-    const parsedRadius = Number(radiusMeters || 50);
-
-    if (Number.isNaN(parsedLatitude) || Number.isNaN(parsedLongitude)) {
-      return res.status(400).json({
-        success: false,
-        message: "Latitude dan longitude tidak valid.",
-      });
-    }
-
-    if (Number.isNaN(parsedRadius) || parsedRadius <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Radius lokasi tidak valid.",
       });
     }
 
@@ -757,10 +647,10 @@ app.post("/api/sessions", async (req, res) => {
         is_active: true,
         start_time: startTime,
         end_time: endTime,
-        location_name: locationName,
-        latitude: parsedLatitude,
-        longitude: parsedLongitude,
-        radius_meters: parsedRadius,
+        location_name:
+          typeof locationName === "string"
+            ? locationName.trim() || "Tidak ditentukan"
+            : "Tidak ditentukan",
       })
       .select()
       .single();
@@ -2654,24 +2544,6 @@ app.get("/api/sessions/:sessionId/qr-pdf", async (req, res) => {
       currentY += 18;
     }
 
-    if (session.radius_meters) {
-      doc
-        .font("Helvetica")
-        .fontSize(10)
-        .fillColor("#64748b")
-        .text(
-          `Radius absensi: ${session.radius_meters} meter dari titik lokasi`,
-          cardX + 40,
-          currentY,
-          {
-            width: cardWidth - 80,
-            align: "center",
-          },
-        );
-
-      currentY += 18;
-    }
-
     // ========================
     // FOOTER
     // ========================
@@ -2703,135 +2575,6 @@ app.get("/api/sessions/:sessionId/qr-pdf", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Terjadi kesalahan saat membuat PDF QR.",
-      error: error.message,
-    });
-  }
-});
-
-// ========================
-// Endpoint ambil daftar lokasi utama
-// ========================
-app.get("/api/locations", async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("locations")
-      .select("*")
-      .order("location_name", { ascending: true });
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Gagal mengambil daftar lokasi.",
-        error: error.message,
-      });
-    }
-
-    res.json({
-      success: true,
-      locations: data,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat mengambil lokasi.",
-      error: error.message,
-    });
-  }
-});
-
-// ========================
-// Endpoint simpan lokasi utama
-// ========================
-app.post("/api/locations", async (req, res) => {
-  try {
-    const { locationName, latitude, longitude, radiusMeters } = req.body;
-
-    if (!locationName || latitude === undefined || longitude === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Nama lokasi, latitude, dan longitude wajib diisi.",
-      });
-    }
-
-    const parsedLatitude = Number(latitude);
-    const parsedLongitude = Number(longitude);
-    const parsedRadius = Number(radiusMeters || 50);
-
-    if (Number.isNaN(parsedLatitude) || Number.isNaN(parsedLongitude)) {
-      return res.status(400).json({
-        success: false,
-        message: "Latitude dan longitude tidak valid.",
-      });
-    }
-
-    if (Number.isNaN(parsedRadius) || parsedRadius <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Radius lokasi tidak valid.",
-      });
-    }
-
-    const { data, error } = await supabase
-      .from("locations")
-      .insert({
-        location_name: locationName.trim(),
-        latitude: parsedLatitude,
-        longitude: parsedLongitude,
-        radius_meters: parsedRadius,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Gagal menyimpan lokasi.",
-        error: error.message,
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Lokasi utama berhasil disimpan.",
-      location: data,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat menyimpan lokasi.",
-      error: error.message,
-    });
-  }
-});
-
-// ========================
-// Endpoint hapus lokasi utama
-// ========================
-app.delete("/api/locations/:locationId", async (req, res) => {
-  try {
-    const { locationId } = req.params;
-
-    const { error } = await supabase
-      .from("locations")
-      .delete()
-      .eq("id", locationId);
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Gagal menghapus lokasi.",
-        error: error.message,
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Lokasi berhasil dihapus.",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat menghapus lokasi.",
       error: error.message,
     });
   }

@@ -25,7 +25,7 @@ WhatsApp page -------- wa.me link ----------> WhatsApp (manual send)
 Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan JavaScript inline:
 
 - `login.html`, `register.html`: authentication admin.
-- `admin-session.html`: lokasi dan sesi.
+- `admin-session.html`: pembuatan dan daftar sesi; nama tempat bersifat informasi opsional.
 - `admin.html`: QR, rekap, finalisasi, tautan export.
 - `peserta.html`: CRUD serta aktivasi/nonaktivasi peserta.
 - `manual.html`: status manual.
@@ -45,7 +45,7 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 |---|---|---|
 | GET | `/api/qr/:sessionId` | Validasi sesi dan buat QR/URL absensi. |
 | GET | `/api/participants?session=...` | Daftar peserta beserta status hadir pada sesi. |
-| POST | `/api/attendance` | Simpan kehadiran QR dengan validasi waktu/lokasi/device. |
+| POST | `/api/attendance` | Simpan kehadiran QR dengan validasi waktu/token/peserta/device tanpa geolocation. |
 | GET | `/api/attendance/:sessionId` | Rekap sesi. |
 | POST | `/api/manual-attendance` | Insert/update status manual. |
 | POST, GET | `/api/sessions` | Buat dan daftar sesi. |
@@ -57,8 +57,6 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | POST | `/api/participants` | Tambah peserta tunggal/bulk. |
 | GET | `/api/all-participants` | Daftar seluruh peserta. |
 | PUT, DELETE | `/api/participants/:participantId` | Edit/hapus peserta. |
-| GET, POST | `/api/locations` | Daftar/tambah lokasi. |
-| DELETE | `/api/locations/:locationId` | Hapus lokasi. |
 | DELETE | `/api/admin-users/:adminId` | Hapus admin dengan verifikasi bearer token dan role super admin. |
 
 Format error/sukses umumnya JSON dengan `success` dan `message`.
@@ -104,14 +102,14 @@ Saat `api/index.js` dijalankan langsung melalui `npm start`, handler yang sama m
 ### Absensi QR
 
 ```text
-Admin membuat sesi + lokasi
+Admin membuat sesi
   -> API menyimpan sessions
   -> Admin membuka QR
   -> API mengambil/membuat qr_tokens
   -> Peserta membuka /absen.html?session=...&token=...
-  -> Browser mengambil peserta + geolocation + device ID
+  -> Browser mengambil peserta + device ID
   -> POST /api/attendance
-  -> API validasi sesi/token/radius/duplikasi
+  -> API validasi sesi/token/peserta/duplikasi perangkat
   -> attendance disimpan
 ```
 
@@ -136,6 +134,7 @@ Operasi insert Alfa dan update sesi tidak berada dalam satu transaction; kegagal
 - `api/index.js` adalah sumber kebenaran backend deployment; `server.js` bukan mirror aktif.
 - Semua waktu yang ditampilkan kepada pengguna harus konsisten WIB.
 - Validasi kritis absensi harus tetap server-side.
+- Absensi QR tidak menggunakan geolocation; nama tempat tidak boleh dijadikan syarat kehadiran.
 - Supabase service-role hanya boleh dipakai backend.
 - Perubahan database harus disertai schema/migration yang dapat ditinjau.
 
@@ -146,4 +145,5 @@ Operasi insert Alfa dan update sesi tidak berada dalam satu transaction; kegagal
 - Handler monolitik dan halaman inline besar meningkatkan risiko regression.
 - Kode backup dapat membingungkan sumber kebenaran.
 - Finalisasi multi-langkah tidak atomik.
+- Tanpa geolocation, tautan QR dapat dipakai dari lokasi mana pun; pembatasan yang tersisa adalah waktu, token, peserta, dan perangkat per sesi.
 - Dependency development Vercel memerlukan upgrade mayor untuk menutup seluruh advisory audit; dependency runtime sudah bersih.

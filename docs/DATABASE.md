@@ -15,11 +15,11 @@ Field yang digunakan:
 - `kelompok`
 - `is_active`
 - `start_time`, `end_time`
-- `location_name`, `latitude`, `longitude`, `radius_meters`
+- `location_name`
 - `is_finalized`, `finalized_at`
 - `created_at`
 
-Sesi yang dibuat UI selalu menggunakan kelompok `Semua` dan `is_active: true`.
+Sesi yang dibuat UI selalu menggunakan kelompok `Semua` dan `is_active: true`. `location_name` hanya informasi tempat opsional. Kolom lama `latitude`, `longitude`, dan `radius_meters` mungkin masih ada di database, tetapi tidak lagi dibaca atau ditulis oleh alur aktif.
 
 ### `qr_tokens`
 
@@ -56,7 +56,8 @@ Field yang digunakan:
 - `keterangan` (`Hadir`, `Izin`, `Alfa`)
 - `local_device_id`, `cookie_device_id`
 - `user_agent`, `ip_address`
-- `user_latitude`, `user_longitude`, `distance_meters`
+
+Kolom lama `user_latitude`, `user_longitude`, dan `distance_meters` mungkin masih ada, tetapi alur absensi aktif tidak lagi menulisnya.
 
 Relasi logis:
 
@@ -67,16 +68,9 @@ Nested select `participants(no_wa)` membuktikan Supabase mengenali sebuah relasi
 
 Aplikasi memeriksa keunikan peserta per sesi serta masing-masing device ID per sesi sebelum insert. Error PostgreSQL `23505` juga ditangani, yang mengindikasikan ada unique constraint, tetapi kolom constraint yang sebenarnya belum dapat dibuktikan.
 
-### `locations`
+### `locations` (legacy)
 
-Field yang digunakan:
-
-- `id`
-- `location_name`
-- `latitude`, `longitude`
-- `radius_meters`
-
-Default aplikasi untuk radius adalah 50 meter.
+Tabel lokasi mungkin masih ada di database, tetapi tidak lagi diakses oleh API atau UI aktif. Data tidak dihapus agar perubahan tetap aman dan dapat dipulihkan.
 
 ### `admin_users`
 
@@ -98,7 +92,6 @@ Relasi yang diharapkan adalah `user_id` ke Supabase Auth user, tetapi definisi c
 auth.users  ?--- admin_users
 sessions    1---? qr_tokens
 sessions    1---* attendance *---1 participants
-locations   (disalin ke field lokasi sessions; tidak ada location_id yang digunakan)
 ```
 
 Tanda `?` berarti cardinality/constraint aktual belum diketahui.
@@ -111,13 +104,13 @@ Belum diketahui / perlu dikonfirmasi. Secara bisnis, kandidat yang harus diperik
 - uniqueness device per sesi, dengan perlakuan null yang sesuai
 - uniqueness token dan/atau satu token per sesi
 - foreign key dan cascade untuk session/participant deletion
-- check constraint nilai `keterangan`, `status`, dan radius positif
+- check constraint nilai `keterangan` dan `status`
 
 Daftar ini adalah kebutuhan audit, bukan klaim bahwa constraint tersebut ada.
 
 ## Migrations and Seed
 
-Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql`, tetapi belum memiliki schema awal atau seed lengkap. `note.sql` berisi query operasional/manual:
+Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql` dan pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, tetapi belum memiliki schema awal atau seed lengkap. Migration geolocation mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`. `note.sql` berisi query operasional/manual:
 
 - melihat rekap
 - membuat sesi contoh dua jam

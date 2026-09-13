@@ -1,6 +1,6 @@
 # Absensi QR Dinamis
 
-Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta aktif/nonaktif, kehadiran, pengumuman WhatsApp, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, lokasi, dan identitas perangkat.
+Aplikasi web absensi berbasis QR untuk mengelola sesi, peserta aktif/nonaktif, kehadiran, pengumuman WhatsApp, dan tindak lanjut peserta Alfa. Absensi peserta divalidasi terhadap waktu sesi, token QR, identitas peserta, dan identitas perangkat tanpa meminta geolocation.
 
 ## Stack
 
@@ -41,6 +41,12 @@ supabase/migrations/20260912000000_add_participant_is_active.sql
 ```
 
 Migration tersebut menambahkan `participants.is_active` dengan default `true`, sehingga peserta lama tetap aktif.
+
+Sebelum deploy versi tanpa geolocation, jalankan juga migration berikut agar kolom koordinat lama tidak lagi diwajibkan:
+
+```text
+supabase/migrations/20260913000000_remove_geolocation_requirements.sql
+```
 
 ## Menjalankan
 

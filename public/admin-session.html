@@ -239,7 +239,7 @@
 
       .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 14px;
         margin-bottom: 18px;
       }
@@ -464,52 +464,6 @@
         );
         box-shadow: 0 16px 30px rgba(37, 99, 235, 0.25);
         margin-top: 18px;
-      }
-
-      .btn-green {
-        background: linear-gradient(135deg, #15803d, var(--green), #22c55e);
-        box-shadow: 0 14px 28px rgba(22, 163, 74, 0.22);
-      }
-
-      .btn-purple {
-        background: linear-gradient(135deg, #6d28d9, var(--purple), #a855f7);
-        box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
-      }
-
-      .btn-red {
-        background: linear-gradient(135deg, #b91c1c, #ef4444, #f87171);
-        box-shadow: 0 14px 28px rgba(239, 68, 68, 0.22);
-      }
-
-      .location-actions {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 4px;
-      }
-
-      .message {
-        display: none;
-        margin-top: 16px;
-        padding: 14px 16px;
-        border-radius: 17px;
-        font-weight: 800;
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      .success {
-        display: block;
-        background: #e9fdf0;
-        color: #15803d;
-        border: 1px solid #bbf7d0;
-      }
-
-      .error {
-        display: block;
-        background: #fff1f2;
-        color: #be123c;
-        border: 1px solid #fecdd3;
       }
 
       .table-toolbar {
@@ -746,7 +700,6 @@
         }
 
         .grid,
-        .location-actions,
         .table-toolbar {
           grid-template-columns: 1fr;
         }
@@ -816,7 +769,7 @@
           <div>
             <div class="brand-title">Kelola Sesi Absensi</div>
             <div class="brand-subtitle">
-              Buat sesi, pilih lokasi, buka QR, dan kelola rekap absensi.
+              Buat sesi, buka QR, dan kelola rekap absensi.
             </div>
           </div>
         </div>
@@ -864,11 +817,6 @@
           <span class="stat-chip">Belum mulai</span>
         </div>
 
-        <div class="stat-card">
-          <p class="stat-label">Lokasi Utama</p>
-          <p class="stat-value" id="totalLokasi">0</p>
-          <span class="stat-chip">Tersimpan</span>
-        </div>
       </section>
 
       <div class="layout">
@@ -877,8 +825,8 @@
             <div class="badge-top">✨ Form Sesi Baru</div>
             <h2>Buat Sesi Absensi</h2>
             <p class="subtitle">
-              Isi detail pertemuan, pilih lokasi utama, atau gunakan lokasi saat
-              ini agar peserta hanya bisa absen dalam radius yang ditentukan.
+              Isi detail pertemuan. Peserta dapat absen tanpa memberikan akses
+              lokasi, tetapi satu perangkat tetap hanya dapat digunakan sekali.
             </p>
           </div>
 
@@ -905,78 +853,14 @@
                 <input type="datetime-local" id="endInput" />
               </div>
             </div>
-          </div>
-
-          <div class="form-section">
-            <div class="section-label">📍 Lokasi Absensi</div>
 
             <div class="field">
-              <label for="savedLocationSelect">Pilih Lokasi Utama</label>
-              <select id="savedLocationSelect" onchange="applySavedLocation()">
-                <option value="">Pilih lokasi tersimpan</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="locationNameInput">Nama Lokasi</label>
+              <label for="locationNameInput">Nama Tempat (Opsional)</label>
               <input
                 type="text"
                 id="locationNameInput"
                 placeholder="Contoh: Masjid Periuk Jaya"
               />
-            </div>
-
-            <div class="grid">
-              <div class="field">
-                <label for="latitudeInput">Latitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="latitudeInput"
-                  placeholder="-6.178123"
-                />
-              </div>
-
-              <div class="field">
-                <label for="longitudeInput">Longitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="longitudeInput"
-                  placeholder="106.631234"
-                />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="radiusInput">Radius Absensi Meter</label>
-              <input type="number" id="radiusInput" value="50" min="1" />
-            </div>
-
-            <div class="location-actions">
-              <button
-                type="button"
-                class="btn-green"
-                onclick="getAdminLocation()"
-              >
-                Gunakan Lokasi Saat Ini
-              </button>
-
-              <button
-                type="button"
-                class="btn-purple"
-                onclick="saveCurrentLocationAsMain()"
-              >
-                Simpan Lokasi Utama
-              </button>
-
-              <button
-                type="button"
-                class="btn-red"
-                onclick="deleteSelectedLocation()"
-              >
-                Hapus Lokasi Utama
-              </button>
             </div>
           </div>
 
@@ -984,7 +868,6 @@
             Buat Sesi
           </button>
 
-          <div id="messageBox" class="message"></div>
         </div>
 
         <div class="card">
@@ -1001,7 +884,7 @@
             <input
               id="searchInput"
               type="text"
-              placeholder="Cari judul atau lokasi sesi..."
+              placeholder="Cari judul atau tempat sesi..."
               oninput="renderSessions()"
             />
 
@@ -1055,7 +938,6 @@
     </script>
 
     <script>
-      let savedLocations = [];
       let allSessions = [];
 
       function safeText(value) {
@@ -1087,16 +969,6 @@
         });
       }
 
-      function popupInfo(message, title = "Informasi") {
-        return Swal.fire({
-          icon: "info",
-          title,
-          text: message,
-          confirmButtonText: "Oke",
-          confirmButtonColor: "#2563eb",
-        });
-      }
-
       async function popupConfirm(message, title = "Apakah Anda yakin?") {
         const result = await Swal.fire({
           icon: "warning",
@@ -1111,17 +983,6 @@
         });
 
         return result.isConfirmed;
-      }
-
-      function showMessage(message, type) {
-        const box = document.getElementById("messageBox");
-        box.textContent = message;
-        box.className = `message ${type}`;
-        box.style.display = "block";
-
-        setTimeout(() => {
-          box.style.display = "none";
-        }, 4500);
       }
 
       function formatDateTime(dateString) {
@@ -1194,8 +1055,6 @@
         document.getElementById("totalSesi").textContent = total;
         document.getElementById("totalAktif").textContent = active;
         document.getElementById("totalUpcoming").textContent = upcoming;
-        document.getElementById("totalLokasi").textContent =
-          savedLocations.length;
       }
 
       function resetFilter() {
@@ -1205,7 +1064,7 @@
       }
 
       async function refreshDashboard() {
-        await Promise.all([loadLocations(), loadSessions()]);
+        await loadSessions();
 
         Swal.fire({
           icon: "success",
@@ -1215,202 +1074,6 @@
         });
       }
 
-      async function loadLocations() {
-        try {
-          const response = await fetch("/api/locations");
-          const result = await response.json();
-
-          if (!result.success) {
-            showMessage(
-              result.message || "Gagal mengambil daftar lokasi.",
-              "error",
-            );
-            return;
-          }
-
-          savedLocations = result.locations || [];
-
-          const select = document.getElementById("savedLocationSelect");
-          select.innerHTML = `<option value="">Pilih lokasi tersimpan</option>`;
-
-          savedLocations.forEach((location) => {
-            const option = document.createElement("option");
-            option.value = location.id;
-            option.textContent = `${location.location_name} (${location.radius_meters || 50} m)`;
-            select.appendChild(option);
-          });
-
-          updateStats();
-        } catch (error) {
-          showMessage(
-            "Terjadi kesalahan saat mengambil lokasi: " + error.message,
-            "error",
-          );
-        }
-      }
-      // jbj
-
-      function applySavedLocation() {
-        const selectedId = document.getElementById("savedLocationSelect").value;
-
-        if (!selectedId) return;
-
-        const location = savedLocations.find((item) => item.id === selectedId);
-
-        if (!location) {
-          showMessage("Lokasi tidak ditemukan.", "error");
-          return;
-        }
-
-        document.getElementById("locationNameInput").value =
-          location.location_name;
-        document.getElementById("latitudeInput").value = location.latitude;
-        document.getElementById("longitudeInput").value = location.longitude;
-        document.getElementById("radiusInput").value =
-          location.radius_meters || 50;
-
-        showMessage(
-          `Lokasi "${location.location_name}" berhasil digunakan.`,
-          "success",
-        );
-      }
-
-      async function saveCurrentLocationAsMain() {
-        const locationName = document
-          .getElementById("locationNameInput")
-          .value.trim();
-
-        const latitude = document.getElementById("latitudeInput").value;
-        const longitude = document.getElementById("longitudeInput").value;
-        const radiusMeters = document.getElementById("radiusInput").value;
-
-        if (!locationName || !latitude || !longitude) {
-          popupError(
-            "Nama lokasi, latitude, dan longitude wajib diisi sebelum disimpan.",
-          );
-          return;
-        }
-
-        try {
-          const response = await fetch("/api/locations", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              locationName,
-              latitude,
-              longitude,
-              radiusMeters,
-            }),
-          });
-
-          const result = await response.json();
-
-          if (!result.success) {
-            popupError(result.message || "Gagal menyimpan lokasi utama.");
-            return;
-          }
-
-          await popupSuccess(
-            result.message || "Lokasi utama berhasil disimpan.",
-          );
-
-          await loadLocations();
-        } catch (error) {
-          popupError(
-            "Terjadi kesalahan saat menyimpan lokasi: " + error.message,
-          );
-        }
-      }
-
-      async function deleteSelectedLocation() {
-        const select = document.getElementById("savedLocationSelect");
-        const selectedId = select.value;
-
-        if (!selectedId) {
-          popupError("Pilih lokasi utama yang ingin dihapus terlebih dahulu.");
-          return;
-        }
-
-        const location = savedLocations.find((item) => item.id === selectedId);
-        const locationName = location?.location_name || "lokasi ini";
-
-        const confirmation = await popupConfirm(
-          `Yakin ingin menghapus lokasi utama "${locationName}"? Lokasi ini akan hilang dari daftar lokasi tersimpan, tetapi sesi yang sudah dibuat tetap aman.`,
-          "Hapus lokasi utama?",
-        );
-
-        if (!confirmation) return;
-
-        try {
-          const response = await fetch(`/api/locations/${selectedId}`, {
-            method: "DELETE",
-          });
-
-          const result = await response.json();
-
-          if (!result.success) {
-            popupError(result.message || "Gagal menghapus lokasi utama.");
-            return;
-          }
-
-          await popupSuccess(
-            result.message || "Lokasi utama berhasil dihapus.",
-          );
-
-          document.getElementById("savedLocationSelect").value = "";
-          document.getElementById("locationNameInput").value = "";
-          document.getElementById("latitudeInput").value = "";
-          document.getElementById("longitudeInput").value = "";
-          document.getElementById("radiusInput").value = "50";
-
-          await loadLocations();
-        } catch (error) {
-          popupError(
-            "Terjadi kesalahan saat menghapus lokasi: " + error.message,
-          );
-        }
-      }
-
-      async function getAdminLocation() {
-        if (!navigator.geolocation) {
-          popupError("Browser tidak mendukung geolocation.");
-          return;
-        }
-
-        await popupInfo(
-          "Sistem akan meminta izin lokasi untuk mengambil titik koordinat lokasi utama.",
-          "Ambil Lokasi Saat Ini",
-        );
-
-        showMessage("Mengambil lokasi admin...", "success");
-
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            document.getElementById("latitudeInput").value =
-              position.coords.latitude;
-            document.getElementById("longitudeInput").value =
-              position.coords.longitude;
-
-            popupSuccess(
-              "Lokasi berhasil diambil. Silakan isi nama lokasi dan radius.",
-              "Lokasi Berhasil",
-            );
-          },
-          function () {
-            popupError(
-              "Gagal mengambil lokasi. Pastikan izin lokasi diaktifkan di browser.",
-            );
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0,
-          },
-        );
-      }
-
       async function createSession() {
         const judul = document.getElementById("judulInput").value.trim();
         const startValue = document.getElementById("startInput").value;
@@ -1418,10 +1081,6 @@
         const locationName = document
           .getElementById("locationNameInput")
           .value.trim();
-
-        const latitude = document.getElementById("latitudeInput").value;
-        const longitude = document.getElementById("longitudeInput").value;
-        const radiusMeters = document.getElementById("radiusInput").value;
         const createBtn = document.getElementById("createBtn");
 
         if (!judul) {
@@ -1442,11 +1101,6 @@
           return;
         }
 
-        if (!locationName || !latitude || !longitude) {
-          popupError("Nama lokasi, latitude, dan longitude wajib diisi.");
-          return;
-        }
-
         createBtn.disabled = true;
         createBtn.textContent = "Membuat...";
 
@@ -1461,9 +1115,6 @@
               startTime,
               endTime,
               locationName,
-              latitude,
-              longitude,
-              radiusMeters,
             }),
           });
 
@@ -1480,10 +1131,6 @@
           document.getElementById("startInput").value = "";
           document.getElementById("endInput").value = "";
           document.getElementById("locationNameInput").value = "";
-          document.getElementById("latitudeInput").value = "";
-          document.getElementById("longitudeInput").value = "";
-          document.getElementById("radiusInput").value = "50";
-          document.getElementById("savedLocationSelect").value = "";
 
           await loadSessions();
         } catch (error) {
@@ -1565,7 +1212,6 @@
             const searchable = [
               session.judul,
               session.location_name,
-              session.radius_meters,
             ]
               .join(" ")
               .toLowerCase();
@@ -1601,9 +1247,6 @@
               <div class="location-name">${safeText(
                 session.location_name || "-",
               )}</div>
-              <small>Radius ${safeText(
-                session.radius_meters || 50,
-              )} meter</small>
             </td>
 
             <td>${formatDateTime(session.start_time)}</td>
@@ -1689,7 +1332,6 @@
         }
       }
 
-      loadLocations();
       loadSessions();
     </script>
   </body>

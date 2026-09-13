@@ -556,36 +556,6 @@
         }
       }
 
-      function getUserLocation() {
-        return new Promise((resolve, reject) => {
-          if (!navigator.geolocation) {
-            reject(new Error("Browser tidak mendukung fitur lokasi."));
-            return;
-          }
-
-          navigator.geolocation.getCurrentPosition(
-            function (position) {
-              resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-            },
-            function () {
-              reject(
-                new Error(
-                  "Lokasi wajib diaktifkan untuk melakukan absensi. Silakan izinkan akses lokasi.",
-                ),
-              );
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 15000,
-              maximumAge: 0,
-            },
-          );
-        });
-      }
-
       function renderKelompokOptions(participants) {
         kelompokList = [
           ...new Set(
@@ -884,10 +854,8 @@
 
           showLoadingPopup(
             "Menyimpan Absensi",
-            "Sedang mengambil lokasi dan memproses kehadiran...",
+            "Sedang memproses kehadiran...",
           );
-
-          const userLocation = await getUserLocation();
 
           const response = await fetch("/api/attendance", {
             method: "POST",
@@ -899,8 +867,6 @@
               token,
               participantId: selectedParticipantId,
               localDeviceId,
-              userLatitude: userLocation.latitude,
-              userLongitude: userLocation.longitude,
             }),
           });
 
@@ -924,24 +890,6 @@
                 title: "Absensi Sudah Tercatat",
                 text: message,
                 confirmButtonText: "Oke, Saya Mengerti",
-                confirmButtonColor: "#f59e0b",
-              });
-            } else if (
-              lowerMessage.includes("luar radius") ||
-              lowerMessage.includes("jarak")
-            ) {
-              await Swal.fire({
-                icon: "warning",
-                title: "Lokasi di Luar Area Absensi",
-                html: `
-        <div style="text-align:center; line-height:1.6;">
-          <p>${escapeHtml(message)}</p>
-          <p style="margin-top:10px; color:#64748b; font-size:14px;">
-            Silakan mendekat ke titik lokasi absensi yang sudah ditentukan, lalu coba lagi.
-          </p>
-        </div>
-      `,
-                confirmButtonText: "Saya Mengerti",
                 confirmButtonColor: "#f59e0b",
               });
             } else {
@@ -979,17 +927,6 @@
             error.message || "Terjadi kesalahan saat menyimpan absensi.";
 
           if (
-            message.toLowerCase().includes("lokasi") ||
-            message.toLowerCase().includes("geolocation")
-          ) {
-            await Swal.fire({
-              icon: "warning",
-              title: "Lokasi Belum Aktif",
-              text: message,
-              confirmButtonText: "Oke, Saya Aktifkan",
-              confirmButtonColor: "#f59e0b",
-            });
-          } else if (
             message.toLowerCase().includes("failed to fetch") ||
             message.toLowerCase().includes("server sedang bermasalah")
           ) {

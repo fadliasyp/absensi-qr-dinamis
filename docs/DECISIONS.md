@@ -1,5 +1,23 @@
 # Decision Log
 
+## 2026-09-13 — Absensi Tanpa Geolocation
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Alur aktif tidak meminta GPS, menyimpan koordinat baru, atau membatasi kehadiran berdasarkan radius. Nama tempat tetap boleh disimpan sebagai informasi opsional. Pembatasan satu perangkat per sesi melalui local device ID dan cookie tetap dipertahankan.
+
+### Context
+
+Pengguna meminta seluruh fitur geolocation di sisi peserta dan admin dihapus tanpa menghilangkan aturan satu HP hanya boleh satu kali absen.
+
+### Consequences
+
+QR dapat digunakan dari lokasi mana pun selama sesi, token, peserta, dan perangkat valid. Kolom serta data lokasi lama tidak dihapus dari database agar tidak melakukan migration destruktif.
+
 ## 2026-09-12 — Nonaktif Mempertahankan Riwayat Absensi
 
 ### Status

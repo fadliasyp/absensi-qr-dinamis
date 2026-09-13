@@ -1,10 +1,10 @@
 # Project Context
 
-Terakhir diperbarui: 2026-09-12
+Terakhir diperbarui: 2026-09-13
 
 ## Overview
 
-Absensi QR Dinamis adalah project existing berupa aplikasi web absensi. Admin mengelola peserta, lokasi, dan sesi; peserta membuka URL dari QR, memilih identitas, memberi izin geolocation, lalu mengirim kehadiran. Supabase menyimpan data dan menyediakan authentication admin.
+Absensi QR Dinamis adalah project existing berupa aplikasi web absensi. Admin mengelola peserta dan sesi; peserta membuka URL dari QR, memilih identitas, lalu mengirim kehadiran tanpa memberi izin geolocation. Supabase menyimpan data dan menyediakan authentication admin.
 
 Target pengguna:
 
@@ -26,9 +26,8 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - CRUD peserta: tambah tunggal/bulk, daftar/filter, edit, hapus, nomor WhatsApp, dan status aktif/nonaktif.
 - Peserta nonaktif dikeluarkan dari pilihan absensi QR/manual, pengumuman, finalisasi Alfa, dan daftar WhatsApp Alfa serta ditolak oleh endpoint pencatatan.
 - Pembuatan, daftar/filter, dan penghapusan sesi.
-- Penyimpanan dan pemakaian ulang titik lokasi beserta radius.
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
-- Absensi peserta dengan validasi sesi aktif, waktu, token, lokasi/radius, peserta ganda, dan perangkat ganda.
+- Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
@@ -55,7 +54,7 @@ Belum diprioritaskan oleh pengguna:
 
 - Sesi harus aktif dan berada di antara `start_time` dan `end_time` agar QR/absensi diterima.
 - Token QR disimpan di `qr_tokens`. Implementasi mengambil token pertama milik sesi atau membuat satu token baru yang kedaluwarsa pada `end_time` (fallback 24 jam).
-- Absensi reguler mewajibkan koordinat peserta dan menolak jarak di luar `radius_meters` (default 50 meter).
+- Absensi reguler tidak meminta atau memvalidasi koordinat peserta. Nama tempat sesi hanya informasi opsional.
 - Satu peserta hanya boleh memiliki satu record per sesi.
 - `local_device_id` (localStorage) dan `cookie_device_id` dipakai untuk membatasi satu perangkat per sesi.
 - Input manual dapat membuat record atau mengganti status record yang sudah ada menjadi `Hadir`, `Izin`, atau `Alfa`.
@@ -80,7 +79,6 @@ Belum diprioritaskan oleh pengguna:
 
 - Schema awal, seed, constraint, index, RLS policy, dan konfigurasi Supabase Auth tidak tersimpan lengkap di repository; baru ada migration tambahan status peserta.
 - Banyak halaman dan handler berada dalam file besar, sehingga perubahan harus sangat terarah.
-- Geolocation browser biasanya memerlukan secure context (HTTPS, selain pengecualian localhost).
 - Data nyata dan deployment tidak boleh digunakan untuk discovery tanpa izin.
 
 ## Known Issues and Risks
@@ -122,7 +120,7 @@ Belum diprioritaskan oleh pengguna:
 
 ## Things We Must Not Break
 
-- Validasi waktu, token QR, radius, peserta ganda, dan perangkat ganda.
+- Validasi waktu, token QR, peserta aktif, peserta ganda, dan perangkat ganda.
 - Kemampuan admin mengganti status manual dan finalisasi Alfa.
 - Format status persis `Hadir`, `Izin`, `Alfa`.
 - Query parameter `session` dan `token` pada URL absensi.

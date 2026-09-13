@@ -2,6 +2,17 @@
 
 Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang direkonstruksi tanpa bukti.
 
+## 2026-09-13
+
+### Removed — Geolocation Absensi
+
+- Menghapus permintaan GPS pada halaman peserta dan dashboard sesi admin.
+- Menghapus validasi koordinat/radius serta penyimpanan jarak dari endpoint attendance.
+- Menghapus pengelolaan lokasi tersimpan dan endpoint API lokasi tanpa menghapus data tabel lama.
+- Menghapus informasi radius dari PDF QR; nama tempat tetap menjadi informasi opsional.
+- Menambahkan migration non-destruktif untuk melepas constraint `NOT NULL` dari kolom geolocation lama.
+- Mempertahankan pembatasan satu perangkat per sesi melalui local device ID dan cookie serta menambahkan regression test khusus.
+
 ## 2026-09-12
 
 ### Added — Status Peserta Aktif/Nonaktif

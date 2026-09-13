@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 for (const file of [
+  "public/absen.html",
+  "public/admin-session.html",
   "public/alfa-wa.html",
   "public/pengumuman-wa.html",
   "public/peserta.html",

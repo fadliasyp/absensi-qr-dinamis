@@ -65,7 +65,7 @@ Jangan menambah framework, dependency, atau abstraction tanpa kebutuhan nyata.
 - Jangan menggunakan service-role key di browser.
 - Perlakukan invite code yang berada di frontend sebagai informasi publik, bukan secret.
 - Audit Supabase Row Level Security sebelum mengandalkan akses langsung dari browser.
-- Pertahankan validasi token QR, waktu, radius lokasi, peserta ganda, dan perangkat ganda.
+- Pertahankan validasi token QR, waktu, peserta aktif, peserta ganda, dan perangkat ganda.
 
 ## Testing Rules
 
@@ -89,7 +89,7 @@ Gunakan `Belum diketahui / perlu dikonfirmasi` ketika fakta tidak dapat dibuktik
 
 ## Feature Regression Protection
 
-Sebelum mengubah QR, absensi, lokasi, finalisasi, authentication, atau PDF:
+Sebelum mengubah QR, absensi, finalisasi, authentication, atau PDF:
 
 1. Baca baseline dan telusuri semua consumer.
 2. Catat dampak terhadap UI, API, database, dan deployment.
@@ -117,3 +117,4 @@ Saat task selesai, kosongkan task aktif menjadi `Belum ada task aktif`, simpan t
 - Status japri gratis berarti tautan WhatsApp telah dibuka, bukan konfirmasi pesan terkirim; jangan mengubah label menjadi klaim delivery tanpa API resmi.
 - Status japri `announcement` dan `alfa` harus tetap terpisah dan saat ini hanya persisten pada browser admin yang sama.
 - Hanya peserta dengan `participants.is_active = true` yang boleh muncul pada pilihan absensi/manual/pengumuman, diterima endpoint absensi, atau ikut finalisasi dan daftar WhatsApp Alfa. Nonaktif tidak menghapus riwayat attendance lama.
+- Absensi QR tidak memakai geolocation atau pembatasan radius. Nama tempat sesi hanya informasi opsional; validasi satu perangkat per sesi melalui local device ID dan cookie harus tetap dipertahankan.
