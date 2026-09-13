@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Custom Picker Absensi
+
+- Mengganti pilihan native Kelompok dan Nama Peserta dengan modal pilihan lokal bergaya biru Absenku.
+- Menambahkan pencarian, metadata ketersediaan peserta, indikator terpilih, scrolling mobile, dan kontrol tutup yang aksesibel.
+- Mempertahankan halaman publik tanpa CDN serta seluruh validasi/filter absensi yang sudah ada.
+- Memperbarui regression test custom picker; seluruh 17 test lokal lulus.
+
 ### Verified — Constraint Attendance
 
 - Memverifikasi unique constraint peserta per sesi serta partial unique index local/cookie device per sesi pada Supabase aktual.

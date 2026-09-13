@@ -29,7 +29,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pembuatan URL/QR per sesi dan unduhan lembar QR PDF.
 - Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
 - Halaman absensi memiliki fallback device ID untuk browser lama serta tetap dapat mengirim request ketika akses localStorage ditolak.
-- Halaman absensi publik memakai select dan pesan status native tanpa dependency CDN/font eksternal.
+- Halaman absensi publik memakai custom picker lokal bergaya biru untuk kelompok/nama dan pesan status inline tanpa dependency CDN/font eksternal.
 - Query independen pada pemuatan peserta dan submit QR dijalankan paralel dengan kolom minimum untuk mengurangi waktu tunggu Supabase.
 - Halaman absensi membatasi waktu tunggu request menjadi 20 detik, menyediakan retry, dan menjelaskan kegagalan QR, sesi, peserta, duplikat, koneksi, serta server dengan pesan yang dapat ditindaklanjuti.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
@@ -43,7 +43,7 @@ Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Audit unique constraint attendance selesai tanpa migration baru karena seluruh constraint/index yang dibutuhkan sudah tersedia.
+Belum ada task pengembangan aktif. Custom picker halaman absensi selesai dan seluruh test lokal lulus.
 
 ## Pending Work
 

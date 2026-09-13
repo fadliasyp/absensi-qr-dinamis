@@ -61,12 +61,16 @@ test("attendance device ID works on older or storage-restricted browsers", async
   assert.ok(getFallbackId());
 });
 
-test("public attendance form has no blocking third-party UI dependency", async () => {
+test("public attendance form has a local styled picker without CDN", async () => {
   const html = await readFile("public/absen.html", "utf8");
 
   assert.doesNotMatch(html, /cdn\.jsdelivr|fonts\.googleapis|SweetAlert|Swal\./i);
-  assert.match(html, /<select[^>]+id="kelompokSelect"/);
-  assert.match(html, /<select[\s\S]*?id="participantSelect"/);
+  assert.match(html, /<button[\s\S]*?id="kelompokSelect"/);
+  assert.match(html, /<button[\s\S]*?id="participantSelect"/);
+  assert.match(html, /id="pickerSheet"[\s\S]*?role="dialog"/);
+  assert.match(html, /id="pickerOptions"[\s\S]*?role="listbox"/);
+  assert.match(html, /function openPicker\(type\)/);
+  assert.match(html, /function selectPickerItem\(item\)/);
   assert.match(html, /id="messageBox"[\s\S]*?aria-live="polite"/);
 });
 
