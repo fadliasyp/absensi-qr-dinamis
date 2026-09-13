@@ -20,7 +20,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | QR per sesi | WORKING | URL absensi dan QR dibuat untuk sesi aktif dalam rentang waktu. Token tidak berotasi selama record masih ada. |
 | PDF QR | WORKING | PDFKit menghasilkan lembar QR dan memakai header asset bila tersedia. |
 | Absensi peserta | WORKING | Validasi tetap lengkap tanpa geolocation; fallback ID perangkat, custom picker dan popup pemberitahuan lokal tanpa CDN, refresh status sebelum memilih nama, timeout, pesan spesifik, dan retry aman tersedia. Peserta hadir tidak ditampilkan; constraint peserta/perangkat per sesi terverifikasi. |
-| Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`. |
+| Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`; pilihan Kelompok/Nama Peserta memakai custom picker dengan metadata gender dan badge data lama. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
 | Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel tersedia. |
@@ -73,6 +73,7 @@ Status: `WORKING` / kandidat baseline
 Perilaku yang harus dipertahankan:
 
 - Admin dapat insert atau update satu status ke `Hadir`, `Izin`, atau `Alfa`.
+- Kelompok dan Nama Peserta dipilih melalui custom picker; peserta yang sudah memiliki attendance tetap tersedia untuk diperbarui dan ditandai badge `Sudah Ada Data`.
 - Finalisasi ditolak sebelum sesi berakhir atau bila sudah difinalisasi.
 - Peserta tanpa record menjadi Alfa; record yang sudah ada tidak digandakan.
 

@@ -33,7 +33,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pemilih Nama Peserta mengambil status terbaru setiap kali dibuka dan hanya menampilkan peserta aktif yang belum memiliki attendance pada sesi tersebut.
 - Query independen pada pemuatan peserta dan submit QR dijalankan paralel dengan kolom minimum untuk mengurangi waktu tunggu Supabase.
 - Halaman absensi membatasi waktu tunggu request menjadi 20 detik, menyediakan retry, dan menjelaskan kegagalan QR, sesi, peserta, duplikat, koneksi, serta server dengan pesan yang dapat ditindaklanjuti.
-- Input manual status `Hadir`, `Izin`, atau `Alfa`.
+- Input manual status `Hadir`, `Izin`, atau `Alfa` dengan custom picker Kelompok/Nama Peserta; gender dan status data lama tampil sebagai metadata/badge terpisah.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
 - Daftar peserta Alfa serta penyusunan tautan/pesan WhatsApp; pengiriman tetap dilakukan manual oleh pengguna.
@@ -44,7 +44,7 @@ Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Regresi edit waktu akibat pemilihan kolom tabel yang keliru sudah diperbaiki; alur sesi dan token QR telah diaudit statis serta seluruh test lokal lulus.
+Belum ada task pengembangan aktif. Pilihan Kelompok/Nama Peserta pada input manual sudah memakai custom picker lokal dan seluruh test lokal lulus.
 
 ## Pending Work
 

@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Custom Picker Absensi Manual
+
+- Mengganti pilihan native Kelompok dan Nama Peserta pada halaman Input Hadir/Izin/Alfa dengan modal pilihan lokal bergaya biru.
+- Memisahkan nama peserta, gender, dan status `Sudah Ada Data` menjadi elemen kartu serta badge agar nama panjang tetap mudah dibaca.
+- Menambahkan jumlah peserta per kelompok, indikator pilihan, daftar scroll terpusat, kontrol tutup, dan dukungan Escape tanpa mengubah alur penyimpanan manual.
+- Menambahkan pemeriksaan sintaks halaman manual dan regression test custom picker; seluruh 20 test lokal lulus.
+
 ### Fixed — Edit Masa Aktif Sesi
 
 - Memperbaiki query hasil update tabel `sessions` yang keliru meminta kolom milik `attendance` sehingga perubahan waktu selalu ditolak Supabase.

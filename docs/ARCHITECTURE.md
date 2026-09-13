@@ -28,7 +28,7 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `admin-session.html`: pembuatan dan daftar sesi; nama tempat bersifat informasi opsional.
 - `admin.html`: QR, rekap, finalisasi, tautan export.
 - `peserta.html`: CRUD serta aktivasi/nonaktivasi peserta.
-- `manual.html`: status manual.
+- `manual.html`: status manual dengan custom picker lokal untuk kelompok dan peserta.
 - `alfa-wa.html`: tindak lanjut Alfa.
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
 - `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.

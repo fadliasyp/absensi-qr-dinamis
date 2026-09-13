@@ -69,6 +69,10 @@
         mask-image: linear-gradient(to bottom, black, transparent 85%);
       }
 
+      body.picker-open {
+        overflow: hidden;
+      }
+
       .page {
         width: min(980px, 100%);
         margin: 0 auto;
@@ -311,6 +315,251 @@
         transform: translateY(-1px);
       }
 
+      .picker-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 56px;
+        padding: 14px 16px;
+        border: 1.5px solid #dbe4f0;
+        background: linear-gradient(135deg, #f8fbff, #ffffff);
+        color: #64748b;
+        text-align: left;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+
+      .picker-trigger:not(:disabled):hover,
+      .picker-trigger[aria-expanded="true"] {
+        border-color: var(--primary);
+        color: #172554;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
+      }
+
+      .picker-trigger:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
+      }
+
+      .picker-trigger.has-value {
+        border-color: #93c5fd;
+        background: linear-gradient(135deg, #eff6ff, #ffffff);
+        color: #172554;
+      }
+
+      .picker-trigger-value {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .picker-chevron {
+        flex: 0 0 auto;
+        color: var(--primary);
+        font-size: 22px;
+        line-height: 1;
+      }
+
+      .field-hint {
+        margin-top: 7px;
+        color: #64748b;
+        font-size: 12.5px;
+        font-weight: 650;
+        line-height: 1.5;
+      }
+
+      .picker-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.65);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+      }
+
+      .picker-overlay[hidden] {
+        display: none;
+      }
+
+      .picker-sheet {
+        display: flex;
+        flex-direction: column;
+        width: min(520px, 100%);
+        max-height: calc(100vh - 40px);
+        max-height: calc(100dvh - 40px);
+        overflow: hidden;
+        border: 1px solid rgba(219, 234, 254, 0.95);
+        border-radius: 28px;
+        background: #f8fbff;
+        box-shadow: 0 28px 80px rgba(15, 23, 42, 0.34);
+        animation: picker-pop 0.18s ease-out;
+      }
+
+      @keyframes picker-pop {
+        from {
+          opacity: 0;
+          transform: scale(0.97) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .picker-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 20px;
+        border-bottom: 1px solid #dbeafe;
+        background: #ffffff;
+      }
+
+      .picker-eyebrow {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+
+      .picker-title {
+        margin: 0;
+        color: #172554;
+        font-size: 23px;
+        line-height: 1.25;
+      }
+
+      .picker-close {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 auto;
+        padding: 0;
+        border: 1px solid #dbeafe;
+        border-radius: 15px;
+        background: #eff6ff;
+        color: var(--primary);
+        font-size: 29px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .picker-options {
+        min-height: 120px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 14px;
+      }
+
+      .picker-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 72px;
+        margin-bottom: 10px;
+        padding: 14px 15px;
+        border: 1px solid #dfe7f1;
+        border-radius: 19px;
+        background: #ffffff;
+        color: #172554;
+        text-align: left;
+        cursor: pointer;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+      }
+
+      .picker-option:last-child {
+        margin-bottom: 0;
+      }
+
+      .picker-option.selected {
+        border-color: #60a5fa;
+        background: linear-gradient(135deg, #eff6ff, #ffffff);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .picker-option-main {
+        min-width: 0;
+      }
+
+      .picker-option-name {
+        display: block;
+        overflow-wrap: anywhere;
+        color: #172554;
+        font-size: 16px;
+        font-weight: 900;
+        line-height: 1.35;
+      }
+
+      .picker-option-meta {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-top: 7px;
+      }
+
+      .picker-meta-text,
+      .picker-status-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 25px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 850;
+      }
+
+      .picker-meta-text {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+
+      .picker-status-badge {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .picker-check {
+        width: 28px;
+        height: 28px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border: 2px solid #bfdbfe;
+        border-radius: 50%;
+        color: transparent;
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .picker-option.selected .picker-check {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: #ffffff;
+      }
+
+      .picker-empty {
+        padding: 34px 18px;
+        border: 1px dashed #bfdbfe;
+        border-radius: 18px;
+        background: #ffffff;
+        color: #64748b;
+        text-align: center;
+        font-weight: 750;
+        line-height: 1.6;
+      }
+
       .status-choice {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -542,6 +791,24 @@
         button {
           font-size: 14px;
         }
+
+        .picker-overlay {
+          padding: 12px;
+        }
+
+        .picker-sheet {
+          max-height: calc(100vh - 24px);
+          max-height: calc(100dvh - 24px);
+          border-radius: 24px;
+        }
+
+        .picker-header {
+          padding: 17px;
+        }
+
+        .picker-options {
+          padding: 11px;
+        }
       }
     </style>
   </head>
@@ -598,16 +865,48 @@
 
           <div class="form-group">
             <label for="kelompokSelect">👥 Kelompok</label>
-            <select id="kelompokSelect">
-              <option value="">Pilih kelompok</option>
-            </select>
+            <button
+              id="kelompokSelect"
+              class="picker-trigger"
+              type="button"
+              value=""
+              aria-haspopup="dialog"
+              aria-controls="pickerOverlay"
+              aria-expanded="false"
+              onclick="openPicker('kelompok')"
+              disabled
+            >
+              <span id="kelompokSelectText" class="picker-trigger-value">
+                Memuat kelompok...
+              </span>
+              <span class="picker-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div id="kelompokHint" class="field-hint">
+              Pilih kelompok peserta.
+            </div>
           </div>
 
           <div class="form-group">
             <label for="participantSelect">🙋 Nama Peserta</label>
-            <select id="participantSelect">
-              <option value="">Pilih nama peserta</option>
-            </select>
+            <button
+              id="participantSelect"
+              class="picker-trigger"
+              type="button"
+              value=""
+              aria-haspopup="dialog"
+              aria-controls="pickerOverlay"
+              aria-expanded="false"
+              onclick="openPicker('participant')"
+              disabled
+            >
+              <span id="participantSelectText" class="picker-trigger-value">
+                Pilih kelompok terlebih dahulu
+              </span>
+              <span class="picker-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div id="participantHint" class="field-hint">
+              Pilih kelompok terlebih dahulu.
+            </div>
           </div>
 
           <div class="form-group">
@@ -696,6 +995,38 @@
       </main>
     </div>
 
+    <div
+      id="pickerOverlay"
+      class="picker-overlay"
+      onclick="handlePickerBackdrop(event)"
+      hidden
+    >
+      <section
+        id="pickerSheet"
+        class="picker-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pickerTitle"
+        tabindex="-1"
+      >
+        <div class="picker-header">
+          <div>
+            <span class="picker-eyebrow">Absensi Manual</span>
+            <h2 id="pickerTitle" class="picker-title">Pilih data</h2>
+          </div>
+          <button
+            class="picker-close"
+            type="button"
+            aria-label="Tutup pilihan"
+            onclick="closePicker()"
+          >
+            &times;
+          </button>
+        </div>
+        <div id="pickerOptions" class="picker-options" role="listbox"></div>
+      </section>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/auth-config.js"></script>
     <script src="/admin-auth.js"></script>
@@ -736,6 +1067,18 @@
       }
 
       let allParticipants = [];
+      let kelompokList = [];
+      let filteredParticipants = [];
+      let activePickerType = "";
+      let lastPickerTrigger = null;
+
+      function setPickerTrigger(triggerId, textId, value, label) {
+        const trigger = document.getElementById(triggerId);
+
+        trigger.value = value || "";
+        trigger.classList.toggle("has-value", Boolean(value));
+        document.getElementById(textId).textContent = label;
+      }
 
       function showMessage(message, type) {
         const box = document.getElementById("messageBox");
@@ -847,9 +1190,7 @@
       function renderKelompokOptions(participants) {
         const kelompokSelect = document.getElementById("kelompokSelect");
 
-        kelompokSelect.innerHTML = `<option value="">Pilih kelompok</option>`;
-
-        const kelompokList = [
+        kelompokList = [
           ...new Set(
             participants
               .map((participant) => participant.kelompok)
@@ -858,35 +1199,41 @@
         ];
 
         kelompokList.sort((a, b) => a.localeCompare(b));
-
-        kelompokList.forEach((kelompok) => {
-          const option = document.createElement("option");
-          option.value = kelompok;
-          option.textContent = kelompok;
-          kelompokSelect.appendChild(option);
-        });
+        kelompokSelect.disabled = kelompokList.length === 0;
+        setPickerTrigger(
+          "kelompokSelect",
+          "kelompokSelectText",
+          "",
+          kelompokList.length ? "Pilih kelompok" : "Kelompok belum tersedia",
+        );
+        document.getElementById("kelompokHint").textContent = kelompokList.length
+          ? `${kelompokList.length} kelompok tersedia.`
+          : "Belum ada kelompok peserta aktif.";
       }
 
       function renderParticipants(participants) {
         const participantSelect = document.getElementById("participantSelect");
+        const selectedKelompok =
+          document.getElementById("kelompokSelect").value;
 
-        participantSelect.innerHTML = `<option value="">Pilih nama peserta</option>`;
-
-        participants.forEach((participant) => {
-          const option = document.createElement("option");
-          option.value = participant.id;
-
-          const namaPeserta = participant.nama || participant.name || "-";
-          const genderPeserta = participant.gender
-            ? ` - ${participant.gender}`
-            : "";
-
-          option.textContent = participant.isPresent
-            ? `${namaPeserta}${genderPeserta} - Sudah Ada Data`
-            : `${namaPeserta}${genderPeserta}`;
-
-          participantSelect.appendChild(option);
-        });
+        filteredParticipants = participants;
+        participantSelect.disabled = participants.length === 0;
+        setPickerTrigger(
+          "participantSelect",
+          "participantSelectText",
+          "",
+          participants.length
+            ? "Pilih nama peserta"
+            : selectedKelompok
+              ? "Peserta belum tersedia"
+              : "Pilih kelompok terlebih dahulu",
+        );
+        document.getElementById("participantHint").textContent =
+          participants.length > 0
+            ? `${participants.length} peserta tersedia. Badge hijau berarti sudah memiliki data.`
+            : selectedKelompok
+              ? "Belum ada peserta aktif dalam kelompok ini."
+              : "Pilih kelompok terlebih dahulu.";
       }
 
       function filterParticipantsByKelompok() {
@@ -905,12 +1252,142 @@
         renderParticipants(filtered);
       }
 
-      document
-        .getElementById("kelompokSelect")
-        .addEventListener("change", function () {
-          document.getElementById("participantSelect").value = "";
-          filterParticipantsByKelompok();
+      function openPicker(type) {
+        const trigger = document.getElementById(
+          type === "kelompok" ? "kelompokSelect" : "participantSelect",
+        );
+
+        if (trigger.disabled) return;
+
+        activePickerType = type;
+        lastPickerTrigger = trigger;
+        trigger.setAttribute("aria-expanded", "true");
+        document.getElementById("pickerTitle").textContent =
+          type === "kelompok" ? "Pilih Kelompok" : "Pilih Nama Peserta";
+        document.getElementById("pickerOverlay").hidden = false;
+        document.body.classList.add("picker-open");
+        renderPickerOptions();
+
+        const options = document.getElementById("pickerOptions");
+        options.scrollTop = 0;
+        document.getElementById("pickerSheet").focus();
+      }
+
+      function closePicker() {
+        document.getElementById("pickerOverlay").hidden = true;
+        document.body.classList.remove("picker-open");
+
+        if (lastPickerTrigger) {
+          lastPickerTrigger.setAttribute("aria-expanded", "false");
+          lastPickerTrigger.focus();
+        }
+
+        activePickerType = "";
+        lastPickerTrigger = null;
+      }
+
+      function handlePickerBackdrop(event) {
+        if (event.target.id === "pickerOverlay") closePicker();
+      }
+
+      function renderPickerOptions() {
+        const container = document.getElementById("pickerOptions");
+        const selectedValue = document.getElementById(
+          activePickerType === "kelompok"
+            ? "kelompokSelect"
+            : "participantSelect",
+        ).value;
+        const items =
+          activePickerType === "kelompok"
+            ? kelompokList.map((kelompok) => ({
+                value: kelompok,
+                name: kelompok,
+                meta: `${allParticipants.filter((participant) => participant.kelompok === kelompok).length} peserta`,
+              }))
+            : filteredParticipants.map((participant) => ({
+                value: participant.id,
+                name: participant.nama || participant.name || "-",
+                meta: participant.gender || "Gender belum diisi",
+                isPresent: participant.isPresent,
+              }));
+
+        container.textContent = "";
+
+        if (items.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "picker-empty";
+          empty.textContent = "Belum ada pilihan yang tersedia.";
+          container.appendChild(empty);
+          return;
+        }
+
+        items.forEach((item) => {
+          const option = document.createElement("button");
+          const main = document.createElement("span");
+          const name = document.createElement("strong");
+          const meta = document.createElement("span");
+          const metaText = document.createElement("span");
+          const check = document.createElement("span");
+          const isSelected = item.value === selectedValue;
+
+          option.type = "button";
+          option.className = `picker-option${isSelected ? " selected" : ""}`;
+          option.setAttribute("role", "option");
+          option.setAttribute("aria-selected", String(isSelected));
+          option.onclick = function () {
+            selectPickerItem(item);
+          };
+
+          main.className = "picker-option-main";
+          name.className = "picker-option-name";
+          name.textContent = item.name;
+          meta.className = "picker-option-meta";
+          metaText.className = "picker-meta-text";
+          metaText.textContent = item.meta;
+          check.className = "picker-check";
+          check.setAttribute("aria-hidden", "true");
+          check.textContent = "✓";
+
+          meta.appendChild(metaText);
+
+          if (item.isPresent) {
+            const status = document.createElement("span");
+            status.className = "picker-status-badge";
+            status.textContent = "Sudah Ada Data";
+            meta.appendChild(status);
+          }
+
+          main.appendChild(name);
+          main.appendChild(meta);
+          option.appendChild(main);
+          option.appendChild(check);
+          container.appendChild(option);
         });
+      }
+
+      function selectPickerItem(item) {
+        if (activePickerType === "kelompok") {
+          const previousValue = document.getElementById("kelompokSelect").value;
+
+          setPickerTrigger(
+            "kelompokSelect",
+            "kelompokSelectText",
+            item.value,
+            item.name,
+          );
+
+          if (previousValue !== item.value) filterParticipantsByKelompok();
+        } else if (activePickerType === "participant") {
+          setPickerTrigger(
+            "participantSelect",
+            "participantSelectText",
+            item.value,
+            item.name,
+          );
+        }
+
+        closePicker();
+      }
 
       async function submitManualAttendance() {
         const participantId =
@@ -1029,7 +1506,12 @@
             confirmButtonColor: "#2563eb",
           });
 
-          document.getElementById("participantSelect").value = "";
+          setPickerTrigger(
+            "participantSelect",
+            "participantSelectText",
+            "",
+            "Pilih nama peserta",
+          );
           document.getElementById("keteranganSelect").value = "";
           updateStatusPills();
 
@@ -1048,6 +1530,10 @@
           submitBtn.textContent = "Simpan Absensi Manual";
         }
       }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && activePickerType) closePicker();
+      });
 
       loadParticipants();
     </script>

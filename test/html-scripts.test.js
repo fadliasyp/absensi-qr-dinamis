@@ -5,6 +5,7 @@ import test from "node:test";
 for (const file of [
   "public/absen.html",
   "public/admin-session.html",
+  "public/manual.html",
   "public/alfa-wa.html",
   "public/pengumuman-wa.html",
   "public/peserta.html",
@@ -17,6 +18,21 @@ for (const file of [
     scripts.forEach(([, source]) => new Function(source));
   });
 }
+
+test("manual attendance uses styled local pickers for group and participant", async () => {
+  const html = await readFile("public/manual.html", "utf8");
+
+  assert.doesNotMatch(html, /<select id="kelompokSelect"/);
+  assert.doesNotMatch(html, /<select id="participantSelect"/);
+  assert.match(html, /<button[\s\S]*?id="kelompokSelect"/);
+  assert.match(html, /<button[\s\S]*?id="participantSelect"/);
+  assert.match(html, /id="pickerSheet"[\s\S]*?role="dialog"/);
+  assert.match(html, /id="pickerOptions"[\s\S]*?role="listbox"/);
+  assert.match(html, /className = "picker-status-badge"/);
+  assert.match(html, /status\.textContent = "Sudah Ada Data"/);
+  assert.match(html, /function selectPickerItem\(item\)/);
+  assert.match(html, /id="keteranganSelect"/);
+});
 
 test("announcement uses the agreed fixed template", async () => {
   const html = await readFile("public/pengumuman-wa.html", "utf8");
