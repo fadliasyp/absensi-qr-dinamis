@@ -110,7 +110,8 @@ Admin membuat sesi
   -> Peserta membuka /absen.html?session=...&token=...
   -> Browser mengambil peserta + device ID
   -> POST /api/attendance
-  -> API validasi sesi/token/peserta/duplikasi perangkat
+  -> API paralel validasi sesi/token/peserta
+  -> API paralel memeriksa duplikasi peserta/perangkat
   -> attendance disimpan
 ```
 

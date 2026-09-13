@@ -30,6 +30,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Absensi peserta dengan validasi sesi aktif, waktu, token, peserta aktif, peserta ganda, dan perangkat ganda tanpa geolocation.
 - Halaman absensi memiliki fallback device ID untuk browser lama serta tetap dapat mengirim request ketika akses localStorage ditolak.
 - Halaman absensi publik memakai select dan pesan status native tanpa dependency CDN/font eksternal.
+- Query independen pada pemuatan peserta dan submit QR dijalankan paralel dengan kolom minimum untuk mengurangi waktu tunggu Supabase.
 - Input manual status `Hadir`, `Izin`, atau `Alfa`.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
 - Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
@@ -86,7 +87,7 @@ Belum diprioritaskan oleh pengguna:
 
 ## Known Issues and Risks
 
-- **Performa:** endpoint daftar peserta melakukan query sesi, seluruh peserta aktif, lalu attendance secara berurutan dan memakai `select("*")`. Endpoint submit melakukan hingga tujuh operasi Supabase berurutan sebelum berhasil.
+- **Performa deployment:** cold start Vercel, jarak region Vercel–Supabase, jumlah peserta, dan index database belum diukur pada lingkungan nyata.
 - Error Supabase yang sudah ditangani tidak dicatat secara terstruktur; UI sering hanya menampilkan pesan umum sehingga penyebab produksi sulit dibedakan.
 - **Security:** mayoritas endpoint pengelolaan data tidak memverifikasi sesi/role admin di server. Proteksi halaman dilakukan di browser dan tidak melindungi API dari request langsung.
 - Penghapusan admin sudah menggunakan client service-role yang benar, tetapi belum diuji terhadap Supabase non-produksi.

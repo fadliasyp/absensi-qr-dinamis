@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Changed — Performa Absensi Mobile Tahap 3
+
+- Menjalankan query independen secara paralel pada endpoint daftar peserta dan submit QR.
+- Mengganti `select("*")` dengan kolom minimum pada dua endpoint publik tersebut.
+- Mengurangi submit dari tujuh round-trip Supabase berurutan menjadi tiga fase tanpa menghapus validasi.
+- Menangani kegagalan query pemeriksaan duplikasi sebelum insert dan menambahkan regression test kontrak performa.
+
 ### Fixed — Ketergantungan CDN Absensi Mobile Tahap 2
 
 - Menghapus SweetAlert2 CDN dan Google Fonts dari halaman absensi publik.

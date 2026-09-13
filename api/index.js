@@ -84,7 +84,7 @@ app.get("/api/qr/:sessionId", async (req, res) => {
     const { sessionId } = req.params;
     const { data: session, error: sessionError } = await supabase
       .from("sessions")
-      .select("*")
+      .select("id, judul, is_active, start_time, end_time")
       .eq("id", sessionId)
       .maybeSingle();
 
@@ -164,11 +164,27 @@ app.get("/api/participants", async (req, res) => {
       });
     }
 
-    const { data: session, error: sessionError } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("id", sessionId)
-      .maybeSingle();
+    const [
+      { data: session, error: sessionError },
+      { data: participants, error: participantError },
+      { data: hadir, error: hadirError },
+    ] = await Promise.all([
+      supabase
+        .from("sessions")
+        .select("id")
+        .eq("id", sessionId)
+        .maybeSingle(),
+      supabase
+        .from("participants")
+        .select("id, nama, gender, kelompok, no_wa")
+        .eq("is_active", true)
+        .order("kelompok", { ascending: true })
+        .order("nama", { ascending: true }),
+      supabase
+        .from("attendance")
+        .select("participant_id")
+        .eq("session_id", sessionId),
+    ]);
 
     if (sessionError || !session) {
       return res.status(404).json({
@@ -177,19 +193,6 @@ app.get("/api/participants", async (req, res) => {
       });
     }
 
-    // const { data: participants, error: participantError } = await supabase
-    //   .from("participants")
-    //   .select("*")
-    //   .eq("kelompok", session.kelompok)
-    //   .order("nama", { ascending: true });
-
-    const { data: participants, error: participantError } = await supabase
-      .from("participants")
-      .select("*")
-      .eq("is_active", true)
-      .order("kelompok", { ascending: true })
-      .order("nama", { ascending: true });
-
     if (participantError) {
       return res.status(500).json({
         success: false,
@@ -197,11 +200,6 @@ app.get("/api/participants", async (req, res) => {
         error: participantError.message,
       });
     }
-
-    const { data: hadir, error: hadirError } = await supabase
-      .from("attendance")
-      .select("participant_id")
-      .eq("session_id", sessionId);
 
     if (hadirError) {
       return res.status(500).json({
@@ -247,11 +245,30 @@ app.post("/api/attendance", async (req, res) => {
       });
     }
 
-    const { data: session, error: sessionError } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("id", sessionId)
-      .maybeSingle();
+    const now = new Date();
+    const [
+      { data: session, error: sessionError },
+      { data: validToken, error: tokenError },
+      { data: participant, error: participantError },
+    ] = await Promise.all([
+      supabase
+        .from("sessions")
+        .select("id, is_active, start_time, end_time")
+        .eq("id", sessionId)
+        .maybeSingle(),
+      supabase
+        .from("qr_tokens")
+        .select("token")
+        .eq("session_id", sessionId)
+        .eq("token", token)
+        .gt("expired_at", now.toISOString())
+        .maybeSingle(),
+      supabase
+        .from("participants")
+        .select("id, nama, gender, kelompok, is_active")
+        .eq("id", participantId)
+        .maybeSingle(),
+    ]);
 
     if (sessionError || !session) {
       return res.status(404).json({
@@ -267,8 +284,6 @@ app.post("/api/attendance", async (req, res) => {
       });
     }
 
-    const now = new Date();
-
     if (session.start_time && now < new Date(session.start_time)) {
       return res.status(400).json({
         success: false,
@@ -283,26 +298,12 @@ app.post("/api/attendance", async (req, res) => {
       });
     }
 
-    const { data: validToken, error: tokenError } = await supabase
-      .from("qr_tokens")
-      .select("*")
-      .eq("session_id", sessionId)
-      .eq("token", token)
-      .gt("expired_at", now.toISOString())
-      .maybeSingle();
-
     if (tokenError || !validToken) {
       return res.status(400).json({
         success: false,
         message: "QR Code sudah kedaluwarsa. Silakan scan QR terbaru.",
       });
     }
-
-    const { data: participant, error: participantError } = await supabase
-      .from("participants")
-      .select("*")
-      .eq("id", participantId)
-      .maybeSingle();
 
     if (participantError || !participant) {
       return res.status(404).json({
@@ -339,12 +340,44 @@ app.post("/api/attendance", async (req, res) => {
       });
     }
 
-    const { data: existingParticipant } = await supabase
-      .from("attendance")
-      .select("id")
-      .eq("session_id", sessionId)
-      .eq("participant_id", participantId)
-      .maybeSingle();
+    const [
+      { data: existingParticipant, error: participantCheckError },
+      { data: existingLocalDevice, error: localDeviceCheckError },
+      { data: existingCookieDevice, error: cookieDeviceCheckError },
+    ] = await Promise.all([
+      supabase
+        .from("attendance")
+        .select("id")
+        .eq("session_id", sessionId)
+        .eq("participant_id", participantId)
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("attendance")
+        .select("id")
+        .eq("session_id", sessionId)
+        .eq("local_device_id", localDeviceId)
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("attendance")
+        .select("id")
+        .eq("session_id", sessionId)
+        .eq("cookie_device_id", cookieDeviceId)
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+    if (
+      participantCheckError ||
+      localDeviceCheckError ||
+      cookieDeviceCheckError
+    ) {
+      return res.status(500).json({
+        success: false,
+        message: "Gagal memeriksa data absensi sebelumnya.",
+      });
+    }
 
     if (existingParticipant) {
       return res.status(400).json({
@@ -354,13 +387,6 @@ app.post("/api/attendance", async (req, res) => {
       });
     }
 
-    const { data: existingLocalDevice } = await supabase
-      .from("attendance")
-      .select("id")
-      .eq("session_id", sessionId)
-      .eq("local_device_id", localDeviceId)
-      .maybeSingle();
-
     if (existingLocalDevice) {
       return res.status(400).json({
         success: false,
@@ -369,13 +395,6 @@ app.post("/api/attendance", async (req, res) => {
           "Perangkat ini sudah digunakan untuk melakukan absensi pada sesi ini.",
       });
     }
-
-    const { data: existingCookieDevice } = await supabase
-      .from("attendance")
-      .select("id")
-      .eq("session_id", sessionId)
-      .eq("cookie_device_id", cookieDeviceId)
-      .maybeSingle();
 
     if (existingCookieDevice) {
       return res.status(400).json({
@@ -404,7 +423,7 @@ app.post("/api/attendance", async (req, res) => {
         user_agent: req.headers["user-agent"],
         ip_address: ipAddress,
       })
-      .select()
+      .select("nama, gender, kelompok, keterangan, waktu_hadir")
       .single();
 
     if (insertError) {
@@ -771,7 +790,7 @@ app.put("/api/sessions/:sessionId", async (req, res) => {
       .from("sessions")
       .update(updatedTimes)
       .eq("id", sessionId)
-      .select()
+      .select("nama, gender, kelompok, keterangan, waktu_hadir")
       .single();
 
     if (updateError) {
