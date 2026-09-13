@@ -6,17 +6,17 @@ Belum ada task aktif.
 
 ## Status
 
-Penyaringan nama peserta yang sudah hadir selesai diperkuat pada 2026-09-13. Daftar diperbarui dari server setiap kali pemilih Nama Peserta dibuka.
+Tata letak custom picker Kelompok dan Nama Peserta selesai dirapikan pada 2026-09-13 berdasarkan hasil penggunaan mobile.
 
 ## Completed
 
-- Mempertahankan filter `isPresent` yang mengeluarkan peserta hadir dari custom picker.
-- Mengambil ulang daftar peserta/status kehadiran sebelum pemilih Nama Peserta ditampilkan.
-- Menampilkan status memuat dan menolak menampilkan daftar lama bila refresh gagal.
-- Menghapus pilihan yang menjadi tidak tersedia dan memperbarui jumlah peserta belum hadir.
-- Menandai peserta hadir secara lokal setelah submit sukses atau respons `PARTICIPANT_ALREADY_PRESENT`.
-- Tidak menambahkan polling terus-menerus atau dependency realtime.
-- Menambahkan regression test untuk refresh serta penghilangan peserta hadir; seluruh 18 test lokal lulus.
+- Menghapus kolom pencarian dari pemilih Kelompok maupun Nama Peserta.
+- Mengubah bottom sheet yang menempel ke bawah menjadi modal mengambang di tengah dengan jarak aman atas/bawah.
+- Membulatkan seluruh sudut modal dan membatasi tingginya terhadap dynamic viewport mobile.
+- Membuat daftar scroll di dalam modal serta selalu kembali ke posisi paling atas saat dibuka.
+- Menghilangkan keterangan kelompok yang berulang pada setiap kartu nama peserta.
+- Mempertahankan refresh status dan filter peserta yang sudah hadir.
+- Memperbarui regression test tata letak; seluruh 18 test lokal lulus.
 
 ## Files Being Modified
 
@@ -24,7 +24,7 @@ Tidak ada pekerjaan source code lanjutan yang direncanakan.
 
 ## Next Steps
 
-Setelah deploy, buka QR yang sama di dua perangkat. Absenkan satu nama pada perangkat pertama, lalu buka pilihan Nama Peserta di perangkat kedua dan pastikan nama tersebut sudah hilang.
+Setelah deploy, periksa posisi dan scrolling modal pada Android Chrome/in-app browser, iPhone Safari, serta Huawei Browser/WebView.
 
 ## Blockers
 

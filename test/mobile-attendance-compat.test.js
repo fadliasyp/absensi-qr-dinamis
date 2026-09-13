@@ -69,6 +69,9 @@ test("public attendance form has a local styled picker without CDN", async () =>
   assert.match(html, /<button[\s\S]*?id="participantSelect"/);
   assert.match(html, /id="pickerSheet"[\s\S]*?role="dialog"/);
   assert.match(html, /id="pickerOptions"[\s\S]*?role="listbox"/);
+  assert.doesNotMatch(html, /id="pickerSearch"|class="picker-search"/);
+  assert.match(html, /\.picker-overlay\s*\{[\s\S]*?align-items: center/);
+  assert.match(html, /container\.scrollTop = 0/);
   assert.match(html, /function openPicker\(type\)/);
   assert.match(html, /function selectPickerItem\(item\)/);
   assert.match(html, /id="messageBox"[\s\S]*?aria-live="polite"/);

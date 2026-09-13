@@ -4,6 +4,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-13
 
+### Fixed — Tata Letak Custom Picker Mobile
+
+- Menghapus pencarian dari pemilih Kelompok dan Nama Peserta.
+- Mengubah bottom sheet menjadi modal terpusat dengan jarak aman, empat sudut membulat, dan tinggi mengikuti dynamic viewport.
+- Merapikan kartu peserta, scrolling internal, dan reset posisi daftar ke paling atas setiap dibuka.
+- Memperbarui regression test tampilan; seluruh 18 test lokal lulus.
+
 ### Changed — Peserta Hadir Hilang dari Pilihan
 
 - Menyegarkan daftar/status attendance dari server setiap kali pemilih Nama Peserta dibuka.

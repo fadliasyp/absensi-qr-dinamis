@@ -51,7 +51,7 @@ Perilaku yang harus dipertahankan:
 - Database menegakkan keunikan peserta, local device ID, dan cookie device ID per sesi selain pemeriksaan aplikasi.
 - Menyimpan snapshot nama, gender, kelompok, waktu, device, user agent, dan IP sesuai implementasi.
 - Tidak meminta geolocation dan tidak memvalidasi jarak.
-- Form publik memakai custom picker lokal untuk kelompok/nama serta tetap memuat kontrol dan pesan tanpa CDN pihak ketiga.
+- Form publik memakai custom picker lokal terpusat tanpa pencarian untuk kelompok/nama serta tetap memuat kontrol dan pesan tanpa CDN pihak ketiga.
 - Pemilih Nama Peserta mengambil data terbaru saat dibuka dan tidak menampilkan peserta dengan `isPresent: true`.
 - Query independen berjalan paralel, tetapi insert baru dilakukan setelah seluruh validasi lolos.
 - Peserta menerima pesan berbeda untuk QR/sesi/peserta/duplikat/koneksi/server, bukan detail error database.
