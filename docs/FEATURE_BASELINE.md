@@ -1,6 +1,6 @@
 # Feature Baseline
 
-Terakhir diperbarui: 2026-09-13
+Terakhir diperbarui: 2026-09-15
 
 ## Ringkasan Status
 
@@ -24,9 +24,9 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
 | Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel tersedia. |
-| Tindak lanjut WhatsApp Alfa | WORKING | Daftar/filter, preview/salin pesan, dan tautan `wa.me`; pengguna tetap menekan Kirim. |
+| Tindak lanjut WhatsApp Alfa | WORKING | Daftar/filter, preview/salin pesan, tautan `wa.me`, serta custom template per sesi pada browser admin; pengguna tetap menekan Kirim. |
 | Status japri WhatsApp Alfa | WORKING | Warna/statistik/filter berubah saat tautan dibuka, persisten dan realtime pada browser admin yang sama. |
-| Pengumuman WhatsApp sesi | WORKING | Pesan sesi dapat diedit dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
+| Pengumuman WhatsApp sesi | WORKING | Pesan dapat diedit, disimpan sebagai custom template per sesi pada browser admin, dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
 | Status japri pengumuman | WORKING | Dipisahkan per session ID dan dari status Alfa; dapat dikembalikan menjadi belum dijapri. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
 | Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
@@ -106,10 +106,13 @@ Perilaku yang harus dipertahankan:
 - Refresh halaman mempertahankan status pada browser yang sama; perubahan antar-tab tersinkron.
 - Admin dapat mengembalikan status menjadi belum dijapri.
 - Label UI menjelaskan bahwa status berarti tautan WhatsApp dibuka, bukan konfirmasi delivery.
+- Template Alfa dan Pengumuman dapat berbeda untuk setiap session ID dan tidak saling menimpa.
+- Variabel template mengganti data peserta/sesi ketika link, salinan, atau preview dibuat.
+- Template hanya persisten pada HP/browser admin yang sama dan dapat dikembalikan ke template awal.
 
-File penting: `public/pengumuman-wa.html`, `public/alfa-wa.html`, `public/wa-contact-status.js`.
+File penting: `public/pengumuman-wa.html`, `public/alfa-wa.html`, `public/wa-contact-status.js`, `public/wa-message-template.js`.
 
-Cara verifikasi: buka dua tab untuk sesi yang sama, klik `Kirim WA` pada satu tab, pastikan kedua tab berubah, refresh, lalu uji `Tandai Belum` dan pastikan status pengumuman tidak mengubah status Alfa.
+Cara verifikasi: buka dua tab untuk sesi yang sama, klik `Kirim WA` pada satu tab, pastikan kedua tab berubah, refresh, lalu uji `Tandai Belum` dan pastikan status pengumuman tidak mengubah status Alfa. Simpan template berbeda pada dua sesi dan kedua jenis pesan, refresh tiap halaman, lalu pastikan masing-masing tetap memuat template sendiri.
 
 ### Peserta Aktif/Nonaktif
 

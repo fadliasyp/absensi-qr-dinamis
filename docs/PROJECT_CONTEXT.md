@@ -1,6 +1,6 @@
 # Project Context
 
-Terakhir diperbarui: 2026-09-13
+Terakhir diperbarui: 2026-09-15
 
 ## Overview
 
@@ -39,12 +39,13 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Daftar peserta Alfa serta penyusunan tautan/pesan WhatsApp; pengiriman tetap dilakukan manual oleh pengguna.
 - Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
+- Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Pilihan Kelompok/Nama Peserta pada input manual sudah memakai custom picker lokal dan seluruh test lokal lulus.
+Belum ada task pengembangan aktif. Custom template WhatsApp per sesi pada tab Alfa dan Pengumuman sudah diterapkan dan regression test lokal lulus.
 
 ## Pending Work
 
@@ -70,6 +71,7 @@ Belum diprioritaskan oleh pengguna:
 - Sesi yang dibuat UI saat ini menggunakan `kelompok: "Semua"`; daftar peserta tidak dibatasi berdasarkan kelompok sesi.
 - Format tanggal/waktu laporan menggunakan locale Indonesia dan zona `Asia/Jakarta`.
 - Status japri dicatat saat admin membuka tautan WhatsApp. Status ini bukan bukti delivery dan disimpan terpisah per sesi/jenis pesan di localStorage browser admin.
+- Custom template WhatsApp disimpan terpisah berdasarkan session ID dan jenis `alfa`/`announcement` di localStorage; template tidak tersedia lintas HP/browser.
 
 ## Technical Facts
 
@@ -113,6 +115,7 @@ Belum diprioritaskan oleh pengguna:
 - `public/alfa-wa.html`: tindak lanjut WhatsApp
 - `public/pengumuman-wa.html`: generator pengumuman dan daftar japri peserta
 - `public/wa-contact-status.js`: status japri lokal dan sinkronisasi antar-tab
+- `public/wa-message-template.js`: penyimpanan serta substitusi variabel template WhatsApp
 - `public/admin-auth.js`: guard halaman dan timeout login
 - `public/login.html`, `public/register.html`, `public/admin-approval.html`: alur admin
 - `vercel.json`: routing deployment

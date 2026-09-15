@@ -1,5 +1,23 @@
 # Decision Log
 
+## 2026-09-15 — Template WhatsApp Disimpan Lokal per Sesi dan Jenis
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Simpan custom template Alfa dan Pengumuman di `localStorage` browser admin dengan key terpisah berdasarkan jenis pesan dan session ID. Pengiriman tetap berupa japri manual melalui tautan WhatsApp.
+
+### Context
+
+Admin memerlukan isi pesan yang dapat berbeda pada setiap sesi dan pada masing-masing tab tanpa layanan WhatsApp berbayar.
+
+### Consequences
+
+Tidak diperlukan perubahan database, API, atau dependency. Template tidak ikut berpindah ke HP/browser admin lain; variabel peserta dan sesi baru diganti ketika pesan dibuat.
+
 ## 2026-09-13 — Tidak Menambah Constraint Attendance yang Redundant
 
 ### Status

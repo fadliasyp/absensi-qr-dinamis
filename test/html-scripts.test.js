@@ -34,16 +34,34 @@ test("manual attendance uses styled local pickers for group and participant", as
   assert.match(html, /id="keteranganSelect"/);
 });
 
-test("announcement uses the agreed fixed template", async () => {
+test("announcement keeps the agreed default text as an editable template", async () => {
   const html = await readFile("public/pengumuman-wa.html", "utf8");
 
   assert.match(html, /\*Pengajian Muda Mudi Desa\*/);
-  assert.match(html, /Hari\/Tanggal: \$\{formatDate\(session\.start_time\)\}/);
+  assert.match(html, /Hari\/Tanggal: \{tanggal\}/);
   assert.match(html, /Waktu: 09\.00–11\.00 WIB/);
   assert.match(html, /Lokasi: SB kelompok PJ 2/);
   assert.match(html, /\*Materi : Al-Qur'an &amp; K\. Adillah\*|\*Materi : Al-Qur'an & K\. Adillah\*/);
-  assert.match(html, /\*\$\{participant\.nama \|\| participant\.name \|\| ""\}\*/);
-  assert.match(html, /kelompok \*\$\{participant\.kelompok\}\*/);
+  assert.match(html, /\{panggilan\} \*\{nama\}\*/);
+  assert.match(html, /kelompok \*\{kelompok\}\*/);
+  assert.match(html, /WaMessageTemplate\.render\(messageInput\.value\.trim\(\)/);
+});
+
+test("WA custom templates are isolated by session and message type", async () => {
+  const announcement = await readFile("public/pengumuman-wa.html", "utf8");
+  const alfa = await readFile("public/alfa-wa.html", "utf8");
+
+  assert.match(announcement, /src="\/wa-message-template\.js"/);
+  assert.match(
+    announcement,
+    /WaMessageTemplate\.get\(\s*"announcement",\s*sessionId,?\s*\)/,
+  );
+  assert.match(announcement, /WaMessageTemplate\.set\("announcement", sessionId, template\)/);
+  assert.match(announcement, /WaMessageTemplate\.clear\("announcement", sessionId\)/);
+  assert.match(alfa, /src="\/wa-message-template\.js"/);
+  assert.match(alfa, /WaMessageTemplate\.get\(\s*"alfa",\s*sessionId,?\s*\)/);
+  assert.match(alfa, /WaMessageTemplate\.set\("alfa", sessionId, template\)/);
+  assert.match(alfa, /WaMessageTemplate\.clear\("alfa", sessionId\)/);
 });
 
 test("WA lists restore the last contacted participant when returning", async () => {

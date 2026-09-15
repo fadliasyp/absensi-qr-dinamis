@@ -2,6 +2,16 @@
 
 Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang direkonstruksi tanpa bukti.
 
+## 2026-09-15
+
+### Added — Custom Template WhatsApp per Sesi
+
+- Menambahkan editor template pada tab Alfa dan Pengumuman dengan variabel nama, panggilan, kelompok, tanggal, dan data sesi yang relevan.
+- Menyimpan template secara terpisah berdasarkan session ID dan jenis `alfa`/`announcement` pada browser admin.
+- Menambahkan aksi simpan dan kembali ke template awal; perubahan langsung dipakai oleh link, salinan, dan preview pesan.
+- Mempertahankan alur japri manual, status kontak lokal, filter peserta aktif, serta pesan awal yang sudah digunakan.
+- Menambahkan helper tanpa dependency dan regression test isolasi template.
+
 ## 2026-09-13
 
 ### Changed — Custom Picker Absensi Manual

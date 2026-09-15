@@ -311,6 +311,75 @@
         font-weight: 650;
       }
 
+      .template-help {
+        margin: 12px 0 0;
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .template-help code {
+        display: inline-block;
+        margin: 2px 3px 2px 0;
+        padding: 2px 7px;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 850;
+      }
+
+      .template-input {
+        width: 100%;
+        min-height: 230px;
+        margin-top: 13px;
+        padding: 15px;
+        resize: vertical;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 18px;
+        background: #f8fafc;
+        color: var(--dark);
+        font: inherit;
+        line-height: 1.65;
+        outline: none;
+      }
+
+      .template-input:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+      }
+
+      .template-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .template-btn {
+        min-height: 44px;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #2563eb, #60a5fa);
+        color: #ffffff;
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .template-btn.secondary {
+        background: #e2e8f0;
+        color: #334155;
+      }
+
+      .template-status {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
       .toolbar {
         display: grid;
         grid-template-columns: 1fr 0.75fr 0.65fr auto;
@@ -719,6 +788,40 @@
         </div>
       </section>
 
+      <section class="card" style="margin-bottom: 18px">
+        <p class="section-kicker">Pesan WhatsApp</p>
+        <h2>Template Pesan Alfa</h2>
+        <p class="section-desc">
+          Template dapat berbeda untuk setiap sesi. Variabel akan diganti
+          otomatis sesuai peserta.
+        </p>
+        <p class="template-help">
+          Variabel:
+          <code>{panggilan}</code><code>{nama}</code><code>{kelompok}</code>
+          <code>{tanggal}</code><code>{nama_sesi}</code>
+        </p>
+        <textarea
+          id="alfaMessageInput"
+          class="template-input"
+          aria-label="Template pesan Alfa"
+        ></textarea>
+        <div class="template-actions">
+          <button id="saveTemplateBtn" class="template-btn" type="button">
+            Simpan Template Sesi Ini
+          </button>
+          <button
+            id="resetTemplateBtn"
+            class="template-btn secondary"
+            type="button"
+          >
+            Kembalikan Template Awal
+          </button>
+          <span id="templateStatus" class="template-status">
+            Tersimpan hanya pada HP/browser admin ini.
+          </span>
+        </div>
+      </section>
+
       <section class="card">
         <div class="card-header">
           <div>
@@ -766,6 +869,7 @@
     <script src="/auth-config.js"></script>
     <script src="/admin-auth.js"></script>
     <script src="/wa-contact-status.js"></script>
+    <script src="/wa-message-template.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -777,9 +881,11 @@
       const sessionId = urlParams.get("session");
 
       let alfaData = [];
+      let currentSession = null;
       let currentTanggalSesi = "hari ini";
       const lastContactedKey = `wa-last-contacted:alfa:${sessionId}`;
       let lastContactedId = sessionStorage.getItem(lastContactedKey) || "";
+      const alfaMessageInput = document.getElementById("alfaMessageInput");
 
       function restoreLastContacted() {
         if (document.hidden || !lastContactedId) return;
@@ -865,18 +971,77 @@
         return "Kak";
       }
 
-      function createWaMessage(name, gender, kelompok, tanggalSesi) {
-        const sapaan = getSapaan(gender);
-        const infoKelompok = kelompok ? ` kelompok ${kelompok}` : "";
-        const tanggalText = tanggalSesi || "hari ini";
+      function defaultAlfaTemplate() {
+        return `Assalamu’alaikum, {panggilan} *{nama}* kelompok {kelompok}.
 
-        return `Assalamu’alaikum, ${sapaan} *${name}*${infoKelompok}.
-
-Kami dari pengurus muda/i desa Periuk Jaya ingin mengabarkan bahwa pada ${tanggalText}, ${sapaan} *${name}* tercatat *Tidak Hadir* di sambung muda/i desa.
+Kami dari pengurus muda/i desa Periuk Jaya ingin mengabarkan bahwa pada {tanggal}, {panggilan} *{nama}* tercatat *Tidak Hadir* di sambung muda/i desa.
 
 Semoga di pertemuan berikutnya bisa kembali hadir dan sambung bersama ya.
 
-Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dalam segala urusan. Aamiin`;
+Dan semoga {panggilan} *{nama}* selalu Allah berikan kesehatan dan kelancaran dalam segala urusan. Aamiin`;
+      }
+
+      function createWaMessage(name, gender, kelompok, tanggalSesi) {
+        return WaMessageTemplate.render(alfaMessageInput.value.trim(), {
+          panggilan: getSapaan(gender),
+          nama: name,
+          kelompok: kelompok || "",
+          tanggal: tanggalSesi || "hari ini",
+          nama_sesi: currentSession?.judul || "",
+        });
+      }
+
+      function saveMessageTemplate() {
+        const template = alfaMessageInput.value.trim();
+
+        if (!template) {
+          Swal.fire({
+            icon: "warning",
+            title: "Template masih kosong",
+            text: "Isi template sebelum disimpan.",
+            confirmButtonColor: "#2563eb",
+          });
+          return;
+        }
+
+        if (!WaMessageTemplate.set("alfa", sessionId, template)) {
+          Swal.fire({
+            icon: "error",
+            title: "Template gagal disimpan",
+            text: "Penyimpanan browser tidak tersedia. Template tetap bisa dipakai sampai halaman ditutup.",
+            confirmButtonColor: "#ef4444",
+          });
+          return;
+        }
+
+        document.getElementById("templateStatus").textContent =
+          "Template sesi ini sudah tersimpan di browser.";
+        Swal.fire({
+          icon: "success",
+          title: "Template tersimpan",
+          timer: 1300,
+          showConfirmButton: false,
+        });
+      }
+
+      async function resetMessageTemplate() {
+        const result = await Swal.fire({
+          icon: "question",
+          title: "Kembalikan template awal?",
+          text: "Template khusus untuk sesi ini akan dihapus dari browser.",
+          showCancelButton: true,
+          confirmButtonText: "Ya, kembalikan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#2563eb",
+        });
+
+        if (!result.isConfirmed) return;
+
+        WaMessageTemplate.clear("alfa", sessionId);
+        alfaMessageInput.value = defaultAlfaTemplate();
+        document.getElementById("templateStatus").textContent =
+          "Menggunakan template awal.";
+        renderAlfaList();
       }
 
       function getGenderBadge(gender) {
@@ -1013,7 +1178,15 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
           }
 
           alfaData = result.alfa || [];
+          currentSession = result.session || null;
           currentTanggalSesi = formatTanggalSesi(result.session?.start_time);
+          if (!alfaMessageInput.value.trim()) {
+            const savedTemplate = WaMessageTemplate.get("alfa", sessionId);
+            alfaMessageInput.value = savedTemplate || defaultAlfaTemplate();
+            document.getElementById("templateStatus").textContent = savedTemplate
+              ? "Template khusus sesi ini dimuat dari browser."
+              : "Menggunakan template awal.";
+          }
 
           updateStats();
           updateKelompokFilter();
@@ -1239,6 +1412,13 @@ Dan semoga ${sapaan} *${name}* selalu Allah berikan kesehatan dan kelancaran dal
 
       window.addEventListener("focus", restoreLastContacted);
       document.addEventListener("visibilitychange", restoreLastContacted);
+      alfaMessageInput.addEventListener("input", renderAlfaList);
+      document
+        .getElementById("saveTemplateBtn")
+        .addEventListener("click", saveMessageTemplate);
+      document
+        .getElementById("resetTemplateBtn")
+        .addEventListener("click", resetMessageTemplate);
 
       loadAlfaList();
     </script>

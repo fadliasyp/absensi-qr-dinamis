@@ -150,6 +150,37 @@
         font-weight: 650;
       }
 
+      .template-help {
+        margin: 10px 0 0;
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .template-help code {
+        display: inline-block;
+        margin: 2px 3px 2px 0;
+        padding: 2px 7px;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 850;
+      }
+
+      .template-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .template-status {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
       textarea {
         width: 100%;
         min-height: 220px;
@@ -369,12 +400,30 @@
       </section>
 
       <section class="panel">
-        <h2>Isi Pengumuman</h2>
+        <h2>Template Pengumuman</h2>
         <p class="description">
-          Sapaan dan nama peserta ditambahkan otomatis. Isi pesan di bawah dapat
-          diedit sebelum dikirim.
+          Template dapat berbeda untuk setiap sesi. Variabel akan diganti
+          otomatis sesuai peserta dan data sesi.
         </p>
-        <textarea id="messageInput" aria-label="Isi pengumuman"></textarea>
+        <p class="template-help">
+          Variabel:
+          <code>{panggilan}</code><code>{nama}</code><code>{kelompok}</code>
+          <code>{tanggal}</code><code>{nama_sesi}</code>
+          <code>{waktu_mulai}</code><code>{waktu_selesai}</code>
+          <code>{lokasi}</code>
+        </p>
+        <textarea id="messageInput" aria-label="Template pengumuman"></textarea>
+        <div class="template-actions">
+          <button id="saveTemplateBtn" class="btn" type="button">
+            Simpan Template Sesi Ini
+          </button>
+          <button id="resetTemplateBtn" class="btn secondary" type="button">
+            Kembalikan Template Awal
+          </button>
+          <span id="templateStatus" class="template-status">
+            Tersimpan hanya pada HP/browser admin ini.
+          </span>
+        </div>
       </section>
 
       <section class="stats">
@@ -412,6 +461,7 @@
     <script src="/auth-config.js"></script>
     <script src="/admin-auth.js"></script>
     <script src="/wa-contact-status.js"></script>
+    <script src="/wa-message-template.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       protectAdminPage();
@@ -493,11 +543,13 @@
         });
       }
 
-      function defaultAnnouncement(session) {
-        return `Kami dari pengurus muda/i Desa Periuk Jaya mengundang untuk mengikuti:
+      function defaultAnnouncement() {
+        return `Assalamu’alaikum, {panggilan} *{nama}* kelompok *{kelompok}*.
+
+Kami dari pengurus muda/i Desa Periuk Jaya mengundang untuk mengikuti:
 
 *Pengajian Muda Mudi Desa*
-Hari/Tanggal: ${formatDate(session.start_time)}
+Hari/Tanggal: {tanggal}
 Waktu: 09.00–11.00 WIB
 Lokasi: SB kelompok PJ 2
 
@@ -509,11 +561,69 @@ Mohon kehadirannya. Semoga Allah memberikan kelancaran dan kebarokahan. Aamiin.`
       }
 
       function participantMessage(participant) {
-        const greeting = getGreeting(participant.gender);
-        const group = participant.kelompok ? ` kelompok *${participant.kelompok}*` : "";
-        return `Assalamu’alaikum, ${greeting} *${participant.nama || participant.name || ""}*${group}.
+        return WaMessageTemplate.render(messageInput.value.trim(), {
+          panggilan: getGreeting(participant.gender),
+          nama: participant.nama || participant.name || "",
+          kelompok: participant.kelompok || "",
+          tanggal: formatDate(currentSession?.start_time),
+          nama_sesi: currentSession?.judul || "",
+          waktu_mulai: formatTime(currentSession?.start_time),
+          waktu_selesai: formatTime(currentSession?.end_time),
+          lokasi: currentSession?.location_name || "-",
+        });
+      }
 
-${messageInput.value.trim()}`;
+      function saveMessageTemplate() {
+        const template = messageInput.value.trim();
+
+        if (!template) {
+          Swal.fire({
+            icon: "warning",
+            title: "Template masih kosong",
+            text: "Isi template sebelum disimpan.",
+            confirmButtonColor: "#2563eb",
+          });
+          return;
+        }
+
+        if (!WaMessageTemplate.set("announcement", sessionId, template)) {
+          Swal.fire({
+            icon: "error",
+            title: "Template gagal disimpan",
+            text: "Penyimpanan browser tidak tersedia. Template tetap bisa dipakai sampai halaman ditutup.",
+            confirmButtonColor: "#ef4444",
+          });
+          return;
+        }
+
+        document.getElementById("templateStatus").textContent =
+          "Template sesi ini sudah tersimpan di browser.";
+        Swal.fire({
+          icon: "success",
+          title: "Template tersimpan",
+          timer: 1300,
+          showConfirmButton: false,
+        });
+      }
+
+      async function resetMessageTemplate() {
+        const result = await Swal.fire({
+          icon: "question",
+          title: "Kembalikan template awal?",
+          text: "Template khusus untuk sesi ini akan dihapus dari browser.",
+          showCancelButton: true,
+          confirmButtonText: "Ya, kembalikan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#2563eb",
+        });
+
+        if (!result.isConfirmed) return;
+
+        WaMessageTemplate.clear("announcement", sessionId);
+        messageInput.value = defaultAnnouncement();
+        document.getElementById("templateStatus").textContent =
+          "Menggunakan template awal.";
+        renderParticipants();
       }
 
       function updateStats() {
@@ -651,7 +761,16 @@ ${messageInput.value.trim()}`;
           document.getElementById("sessionTitle").textContent = currentSession.judul || "-";
           document.getElementById("sessionTime").textContent = `${formatDate(currentSession.start_time)}, ${formatTime(currentSession.start_time)}–${formatTime(currentSession.end_time)} WIB`;
           document.getElementById("sessionLocation").textContent = currentSession.location_name || "-";
-          if (!messageInput.value.trim()) messageInput.value = defaultAnnouncement(currentSession);
+          if (!messageInput.value.trim()) {
+            const savedTemplate = WaMessageTemplate.get(
+              "announcement",
+              sessionId,
+            );
+            messageInput.value = savedTemplate || defaultAnnouncement();
+            document.getElementById("templateStatus").textContent = savedTemplate
+              ? "Template khusus sesi ini dimuat dari browser."
+              : "Menggunakan template awal.";
+          }
 
           updateGroupFilter();
           updateStats();
@@ -686,6 +805,12 @@ ${messageInput.value.trim()}`;
       window.addEventListener("focus", restoreLastContacted);
       document.addEventListener("visibilitychange", restoreLastContacted);
       messageInput.addEventListener("input", renderParticipants);
+      document
+        .getElementById("saveTemplateBtn")
+        .addEventListener("click", saveMessageTemplate);
+      document
+        .getElementById("resetTemplateBtn")
+        .addEventListener("click", resetMessageTemplate);
       document.getElementById("resetBtn").addEventListener("click", () => {
         document.getElementById("searchInput").value = "";
         document.getElementById("groupFilter").value = "";
