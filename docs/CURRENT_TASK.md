@@ -16,6 +16,7 @@ Database peserta dinamis per kelompok selesai diimplementasikan secara lokal pad
 - Menambahkan rekap admin seluruh kelompok per field lengkap dengan progress, ringkasan jawaban, pencarian, dan filter.
 - Mengubah nonaktif field menjadi arsip: field hilang dari link ketua, tetapi definisi dan seluruh nilai lama tetap tersimpan serta dapat dilihat admin.
 - Merapikan halaman admin dengan kartu ringkasan dan modal tambah/edit field agar layar utama lebih ringkas.
+- Memisahkan rekap peserta dan link kelompok ke dua tab; navigasi tab tetap terlihat saat scroll dan dapat dibuka langsung melalui hash URL.
 - Membatasi endpoint link agar hanya dapat membaca peserta aktif dan mengubah field peserta pada kelompoknya sendiri.
 - Menambahkan migration additive serta regression test; seluruh 26 test lokal lulus.
 

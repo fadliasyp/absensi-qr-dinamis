@@ -126,6 +126,41 @@
         margin-top: 16px;
       }
 
+      .dashboard-tabs {
+        position: sticky;
+        top: 8px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+        backdrop-filter: blur(12px);
+      }
+
+      .dashboard-tab {
+        color: #475569;
+        background: transparent;
+      }
+
+      .dashboard-tab.active {
+        color: #ffffff;
+        background: var(--primary);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.24);
+      }
+
+      .tab-panel {
+        display: grid;
+        gap: 16px;
+      }
+
+      .tab-panel[hidden] {
+        display: none;
+      }
+
       .summary-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -597,68 +632,81 @@
           </article>
         </section>
 
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <p class="kicker">Field Dinamis</p>
-              <h2>Field Data</h2>
+        <nav class="dashboard-tabs" role="tablist" aria-label="Menu database peserta">
+          <button id="participantsTab" class="dashboard-tab active" type="button" role="tab" aria-selected="true" aria-controls="participantsPanel" onclick="showDashboardTab('participants')">
+            Peserta
+          </button>
+          <button id="linksTab" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="linksPanel" onclick="showDashboardTab('links')">
+            Link Kelompok
+          </button>
+        </nav>
+
+        <div id="participantsPanel" class="tab-panel" role="tabpanel" aria-labelledby="participantsTab">
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <p class="kicker">Field Dinamis</p>
+                <h2>Field Data</h2>
+              </div>
+              <button type="button" onclick="openNewField()">+ Tambah Field</button>
             </div>
-            <button type="button" onclick="openNewField()">+ Tambah Field</button>
-          </div>
 
-          <div id="fieldList" class="list field-grid">
-            <div class="empty">Memuat field...</div>
-          </div>
-        </section>
-
-        <section id="resultsSection" class="card">
-          <div class="section-head">
-            <div>
-              <p class="kicker">Rekap Semua Kelompok</p>
-              <h2>Hasil Pengisian</h2>
+            <div id="fieldList" class="list field-grid">
+              <div class="empty">Memuat field...</div>
             </div>
-            <span id="resultFieldStatus" class="badge inactive">Belum ada field</span>
-          </div>
+          </section>
 
-          <div id="resultFieldTabs" class="field-tabs"></div>
-
-          <div class="result-progress">
-            <strong id="resultProgressLabel">0 dari 0 terisi</strong>
-            <span id="resultProgressText">0%</span>
-            <div class="progress-track" aria-hidden="true">
-              <div id="resultProgressBar" class="progress-bar"></div>
+          <section id="resultsSection" class="card">
+            <div class="section-head">
+              <div>
+                <p class="kicker">Rekap Semua Kelompok</p>
+                <h2>Hasil Pengisian</h2>
+              </div>
+              <span id="resultFieldStatus" class="badge inactive">Belum ada field</span>
             </div>
-          </div>
 
-          <div id="optionSummary" class="option-summary"></div>
+            <div id="resultFieldTabs" class="field-tabs"></div>
 
-          <div class="result-toolbar">
-            <input id="resultSearchInput" type="search" placeholder="Cari peserta" />
-            <select id="resultGroupFilter" aria-label="Filter kelompok">
-              <option value="">Semua kelompok</option>
-            </select>
-            <select id="resultAnswerFilter" aria-label="Filter jawaban">
-              <option value="">Semua jawaban</option>
-            </select>
-          </div>
-
-          <div id="resultList" class="result-list">
-            <div class="empty">Memuat hasil...</div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <p class="kicker">Akses Ketua Kelompok</p>
-              <h2>Link per Kelompok</h2>
+            <div class="result-progress">
+              <strong id="resultProgressLabel">0 dari 0 terisi</strong>
+              <span id="resultProgressText">0%</span>
+              <div class="progress-track" aria-hidden="true">
+                <div id="resultProgressBar" class="progress-bar"></div>
+              </div>
             </div>
-          </div>
 
-          <div id="groupList" class="groups">
-            <div class="empty">Memuat kelompok...</div>
-          </div>
-        </section>
+            <div id="optionSummary" class="option-summary"></div>
+
+            <div class="result-toolbar">
+              <input id="resultSearchInput" type="search" placeholder="Cari peserta" />
+              <select id="resultGroupFilter" aria-label="Filter kelompok">
+                <option value="">Semua kelompok</option>
+              </select>
+              <select id="resultAnswerFilter" aria-label="Filter jawaban">
+                <option value="">Semua jawaban</option>
+              </select>
+            </div>
+
+            <div id="resultList" class="result-list">
+              <div class="empty">Memuat hasil...</div>
+            </div>
+          </section>
+        </div>
+
+        <div id="linksPanel" class="tab-panel" role="tabpanel" aria-labelledby="linksTab" hidden>
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <p class="kicker">Akses Ketua Kelompok</p>
+                <h2>Link per Kelompok</h2>
+              </div>
+            </div>
+
+            <div id="groupList" class="groups">
+              <div class="empty">Memuat kelompok...</div>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
 
@@ -709,6 +757,24 @@
       let resultValues = new Map();
       let selectedResultFieldId = "";
       let editingFieldId = null;
+
+      function showDashboardTab(tabName, updateHash = true) {
+        const showLinks = tabName === "links";
+        const participantsTab = document.getElementById("participantsTab");
+        const linksTab = document.getElementById("linksTab");
+
+        document.getElementById("participantsPanel").hidden = showLinks;
+        document.getElementById("linksPanel").hidden = !showLinks;
+        participantsTab.classList.toggle("active", !showLinks);
+        linksTab.classList.toggle("active", showLinks);
+        participantsTab.setAttribute("aria-selected", String(!showLinks));
+        linksTab.setAttribute("aria-selected", String(showLinks));
+
+        if (updateHash) {
+          history.replaceState(null, "", showLinks ? "#links" : "#participants");
+          document.querySelector(".dashboard-tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
 
       function safeText(value) {
         return String(value ?? "")
@@ -1253,6 +1319,7 @@
         if (event.key === "Escape") closeFieldForm();
       });
 
+      showDashboardTab(location.hash === "#links" ? "links" : "participants", false);
       loadAll();
     </script>
   </body>

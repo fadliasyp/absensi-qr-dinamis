@@ -1,6 +1,6 @@
 # Project Context
 
-Terakhir diperbarui: 2026-09-20
+Terakhir diperbarui: 2026-09-21
 
 ## Overview
 
@@ -40,7 +40,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 - Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
-- Database peserta per kelompok dengan field pilihan dinamis, arsip yang mempertahankan hasil, rekap admin lintas kelompok, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
+- Database peserta per kelompok dengan tab Peserta/Link Kelompok, field pilihan dinamis, arsip yang mempertahankan hasil, rekap admin lintas kelompok, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 

@@ -36,6 +36,10 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(adminPage, /Authorization: `Bearer \$\{session\.access_token\}`/);
   assert.match(adminPage, /id="resultsSection"/);
   assert.match(adminPage, /id="fieldModal"/);
+  assert.match(adminPage, /id="participantsTab"/);
+  assert.match(adminPage, /id="linksTab"/);
+  assert.match(adminPage, /function showDashboardTab\(tabName, updateHash = true\)/);
+  assert.match(adminPage, /location\.hash === "#links"/);
   assert.match(adminPage, /Arsipkan/);
   assert.match(adminPage, /Lihat Hasil/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);

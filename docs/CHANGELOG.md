@@ -2,6 +2,14 @@
 
 Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang direkonstruksi tanpa bukti.
 
+## 2026-09-21
+
+### Changed — Tab Database Peserta
+
+- Memisahkan field/hasil peserta dan pengelolaan link kelompok ke tab tersendiri agar daftar link tidak berada di bawah daftar peserta yang panjang.
+- Membuat navigasi tab tetap terlihat saat scroll, mengembalikan posisi ke area tab ketika berpindah, dan mempertahankan tab melalui hash URL.
+- Memakai HTML, CSS, dan JavaScript bawaan tanpa dependency baru serta mempertahankan pemuatan data dan aksi link yang sudah ada.
+
 ## 2026-09-20
 
 ### Added — Database Peserta Dinamis per Kelompok
