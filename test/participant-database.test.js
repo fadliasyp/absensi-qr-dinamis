@@ -58,6 +58,10 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(adminPage, /id="exportModal"/);
   assert.match(adminPage, /class="export-group"/);
   assert.match(adminPage, /new Set\(\["nama", "gender", "kelompok"\]\)/);
+  assert.match(adminPage, /function showBlockingLoading\(title\)/);
+  assert.match(adminPage, /allowOutsideClick: false/);
+  assert.match(adminPage, /showBlockingLoading\("Membuat PDF\.\.\."\)/);
+  assert.match(adminPage, /showBlockingLoading\("Menonaktifkan link\.\.\."\)/);
   assert.match(adminPage, /Arsipkan/);
   assert.match(adminPage, /Lihat Hasil/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);

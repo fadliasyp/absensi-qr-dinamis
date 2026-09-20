@@ -1028,6 +1028,18 @@
         return result;
       }
 
+      function showBlockingLoading(title) {
+        Swal.fire({
+          title,
+          text: "Mohon tunggu sampai proses selesai.",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false,
+          showConfirmButton: false,
+          didOpen: () => Swal.showLoading(),
+        });
+      }
+
       function fieldOptionsFromInput() {
         return document
           .getElementById("fieldOptions")
@@ -1475,6 +1487,7 @@
         const group = exportingGroup;
         button.disabled = true;
         button.textContent = "Membuat PDF...";
+        showBlockingLoading("Membuat PDF...");
         try {
           const response = await fetch(
             `/api/participant-database/groups/${group.id}/export-pdf`,
@@ -1502,6 +1515,7 @@
           link.remove();
           setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
           lastExportFields = new Set(selectedFields);
+          Swal.close();
           closeExportModal();
         } catch (error) {
           Swal.fire({ icon: "error", title: "Export gagal", text: error.message });
@@ -1538,6 +1552,7 @@
           if (!confirmation.isConfirmed) return;
         }
 
+        showBlockingLoading(group.has_active_link ? "Membuat ulang link..." : "Membuat link...");
         try {
           const result = await request(
             `/api/participant-database/groups/${group.id}/link`,
@@ -1593,11 +1608,18 @@
         });
         if (!confirmation.isConfirmed) return;
 
+        showBlockingLoading("Menonaktifkan link...");
         try {
           await request(`/api/participant-database/groups/${group.id}/link`, {
             method: "DELETE",
           });
           await loadGroups();
+          Swal.fire({
+            icon: "success",
+            title: "Link dinonaktifkan",
+            timer: 1300,
+            showConfirmButton: false,
+          });
         } catch (error) {
           Swal.fire({ icon: "error", title: "Gagal", text: error.message });
         }

@@ -4,6 +4,11 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-21
 
+### Changed — Loading Aksi Link Kelompok
+
+- Menampilkan spinner pengunci layar selama pembuatan, regenerasi, dan penonaktifan link serta pembuatan PDF berlangsung.
+- Mencegah popup ditutup lewat klik luar, Escape, atau Enter agar aksi ganda tidak terjadi sebelum request selesai.
+
 ### Changed — Logo Browser
 
 - Menyalin Logo Absenku ke aset publik dengan nama URL aman dan memasangnya sebagai favicon serta Apple touch icon pada seluruh halaman aktif.

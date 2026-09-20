@@ -41,7 +41,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 - Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
 - Logo Absenku dipakai sebagai favicon dan Apple touch icon pada seluruh halaman aktif.
-- Database peserta per kelompok dengan tab Peserta/Link Kelompok, field pilihan dinamis, arsip yang mempertahankan data, rekap field aktif, filter custom, export PDF per kelompok, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
+- Database peserta per kelompok dengan tab Peserta/Link Kelompok, field pilihan dinamis, arsip yang mempertahankan data, rekap field aktif, filter custom, export PDF per kelompok, loading pengunci aksi link, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
