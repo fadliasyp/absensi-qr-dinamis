@@ -33,6 +33,8 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
 - `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.
 - `wa-message-template.js`: penyimpanan dan substitusi variabel template WhatsApp lokal per sesi/jenis.
+- `database-peserta.html`: definisi field dinamis dan pengelolaan link kelompok oleh admin.
+- `isi-data-kelompok.html`: pengisian field peserta per kelompok tanpa login dengan autosave.
 - `admin-approval.html`: status akun admin.
 - `absen.html`: UI publik peserta dengan custom picker serta popup pemberitahuan lokal tanpa dependency CDN.
 
@@ -60,6 +62,11 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | GET | `/api/all-participants` | Daftar seluruh peserta. |
 | PUT, DELETE | `/api/participants/:participantId` | Edit/hapus peserta. |
 | DELETE | `/api/admin-users/:adminId` | Hapus admin dengan verifikasi bearer token dan role super admin. |
+| GET | `/api/participant-database/groups` | Sinkronkan/daftar kelompok dan link untuk admin terautentikasi. |
+| POST, DELETE | `/api/participant-database/groups/:groupId/link` | Buat ulang atau cabut link kelompok. |
+| GET, POST, PUT | `/api/participant-database/fields` | Kelola definisi field pilihan dinamis. |
+| GET | `/api/group-participant-database` | Data peserta aktif satu kelompok berdasarkan token link. |
+| PUT | `/api/group-participant-database/value` | Autosave nilai peserta dengan validasi token, kelompok, field, dan opsi. |
 
 Format error/sukses umumnya JSON dengan `success` dan `message`.
 
@@ -74,6 +81,7 @@ Data diakses dengan `@supabase/supabase-js`; tidak ada ORM. Tabel yang terlihat:
 - Role `super_admin` diperlukan oleh UI approval.
 - Browser logout setelah idle 30 menit atau maksimum sesi 8 jam.
 - Authorization API belum diterapkan secara konsisten. Endpoint hapus admin sudah memverifikasi bearer token dan role super admin.
+- Endpoint pengelolaan database peserta baru memverifikasi bearer token serta status admin. Endpoint ketua menggunakan token kelompok tanpa Supabase Auth.
 
 ## Storage
 
@@ -82,6 +90,8 @@ Tidak ditemukan Supabase Storage atau filesystem persistence untuk data. `assets
 Status japri WhatsApp disimpan dalam `localStorage` browser admin dengan key terpisah untuk jenis `announcement` dan `alfa` serta session ID. Custom event memperbarui tab aktif dan browser `storage` event menyinkronkan tab lain pada origin yang sama. Status ini tidak tersedia lintas HP/browser.
 
 Template pesan WhatsApp juga disimpan dalam `localStorage` dengan key yang memuat jenis pesan dan session ID. Template Alfa dan Pengumuman tidak saling menimpa, tetapi template ini tidak disimpan ke database dan tidak tersedia lintas HP/browser.
+
+Token link kelompok diletakkan pada URL fragment agar tidak ikut terkirim sebagai URL/referrer. Browser meneruskannya lewat header `X-Group-Access-Token`; database hanya menyimpan hash dan nonce token. Backend membentuk ulang link untuk admin menggunakan `GROUP_LINK_SECRET`, dengan fallback `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## External Services
 
@@ -134,6 +144,19 @@ Operasi insert Alfa dan update sesi tidak berada dalam satu transaction; kegagal
 ### Status Peserta
 
 `participants.is_active` menjadi filter backend untuk pilihan absensi QR/manual, pengumuman WhatsApp, finalisasi, dan daftar WhatsApp Alfa. Endpoint absensi juga menolak ID peserta nonaktif agar status tidak dapat dilewati lewat request langsung. Menonaktifkan peserta tidak menghapus row peserta maupun riwayat `attendance` yang sudah tercatat.
+
+### Database Peserta per Kelompok
+
+```text
+Admin membuat field + link kelompok
+  -> backend menyimpan definisi field dan hash token
+  -> ketua membuka URL #token=...
+  -> browser mengirim token melalui header
+  -> backend membatasi peserta aktif berdasarkan kelompok token
+  -> ketua memilih opsi
+  -> backend memvalidasi peserta, kelompok, field, dan opsi
+  -> upsert participant_custom_values
+```
 
 ## Architectural Rules
 

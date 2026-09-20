@@ -6,27 +6,27 @@ Belum ada task aktif.
 
 ## Status
 
-Template pesan WhatsApp khusus per sesi untuk tab Alfa dan Pengumuman selesai diterapkan pada 2026-09-15.
+Database peserta dinamis per kelompok selesai diimplementasikan secara lokal pada 2026-09-20. Migration baru belum dijalankan pada Supabase.
 
 ## Completed
 
-- Menambahkan editor template lengkap pada tab Alfa dan Pengumuman.
-- Menyediakan variabel peserta/sesi yang diganti otomatis ketika link WhatsApp, salinan, atau preview dibuat.
-- Menyimpan template di browser admin dengan key terpisah berdasarkan jenis pesan dan session ID.
-- Menambahkan tombol simpan dan kembali ke template awal tanpa mengubah status japri maupun pengiriman manual WhatsApp.
-- Menambahkan regression test isolasi penyimpanan dan integrasi kedua halaman; 22 test lokal lulus setelah satu smoke test server yang sempat fluktuatif berhasil saat dijalankan ulang.
+- Menambahkan pengelolaan field pilihan dinamis yang berlaku untuk seluruh kelompok.
+- Menambahkan link rahasia per kelompok tanpa login, dengan token ter-hash, pencabutan, dan regenerasi link.
+- Menambahkan halaman mobile bagi ketua kelompok untuk memilih nilai dan menyimpannya otomatis tanpa tombol kirim.
+- Membatasi endpoint link agar hanya dapat membaca peserta aktif dan mengubah field peserta pada kelompoknya sendiri.
+- Menambahkan migration additive serta regression test; seluruh 26 test lokal lulus.
 
 ## Files Being Modified
 
-Tidak ada pekerjaan source code lanjutan yang direncanakan.
+`api/index.js`, dua halaman baru di `public/`, navigation admin, migration, test, dan dokumentasi telah diperbarui.
 
 ## Next Steps
 
-Setelah deploy, simpan template berbeda pada dua sesi dan kedua tab, lalu pastikan pesan yang terbuka di WhatsApp memakai template yang benar.
+Jalankan migration `20260920000000_add_dynamic_participant_database.sql`, deploy, buat satu field serta link kelompok, lalu uji autosave dari HP.
 
 ## Blockers
 
-Tampilan mobile nyata dan alur WhatsApp produksi tidak dijalankan dari sesi ini. Template hanya tersedia pada HP/browser admin yang menyimpannya.
+Migration belum dijalankan dan integrasi Supabase/HP nyata belum diuji. Fitur baru belum dapat dipakai sebelum migration diterapkan.
 
 ## Notes for Next Session
 

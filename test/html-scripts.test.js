@@ -9,6 +9,8 @@ for (const file of [
   "public/alfa-wa.html",
   "public/pengumuman-wa.html",
   "public/peserta.html",
+  "public/database-peserta.html",
+  "public/isi-data-kelompok.html",
 ]) {
   test(`${file} has valid inline JavaScript`, async () => {
     const html = await readFile(file, "utf8");

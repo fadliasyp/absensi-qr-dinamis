@@ -1,6 +1,6 @@
 # Project Context
 
-Terakhir diperbarui: 2026-09-15
+Terakhir diperbarui: 2026-09-20
 
 ## Overview
 
@@ -40,12 +40,13 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 - Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
+- Database peserta per kelompok dengan field pilihan dinamis, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
 ## Current Work
 
-Belum ada task pengembangan aktif. Custom template WhatsApp per sesi pada tab Alfa dan Pengumuman sudah diterapkan dan regression test lokal lulus.
+Belum ada task pengembangan aktif. Database peserta dinamis per kelompok sudah diimplementasikan dan regression test lokal lulus, tetapi migration serta pengujian Supabase nyata masih menunggu pengguna.
 
 ## Pending Work
 
@@ -72,6 +73,8 @@ Belum diprioritaskan oleh pengguna:
 - Format tanggal/waktu laporan menggunakan locale Indonesia dan zona `Asia/Jakarta`.
 - Status japri dicatat saat admin membuka tautan WhatsApp. Status ini bukan bukti delivery dan disimpan terpisah per sesi/jenis pesan di localStorage browser admin.
 - Custom template WhatsApp disimpan terpisah berdasarkan session ID dan jenis `alfa`/`announcement` di localStorage; template tidak tersedia lintas HP/browser.
+- Ketua kelompok mengakses database melalui token link tanpa login. Token hanya boleh membaca peserta aktif dan menyimpan field tambahan pada kelompok yang sama.
+- Field inti peserta tetap dipakai alur lama; field tambahan pilihan berlaku global dan nilainya disimpan terpisah per peserta.
 
 ## Technical Facts
 
@@ -116,6 +119,8 @@ Belum diprioritaskan oleh pengguna:
 - `public/pengumuman-wa.html`: generator pengumuman dan daftar japri peserta
 - `public/wa-contact-status.js`: status japri lokal dan sinkronisasi antar-tab
 - `public/wa-message-template.js`: penyimpanan serta substitusi variabel template WhatsApp
+- `public/database-peserta.html`: pengelolaan field dinamis dan link kelompok oleh admin
+- `public/isi-data-kelompok.html`: pengisian autosave tanpa login untuk ketua kelompok
 - `public/admin-auth.js`: guard halaman dan timeout login
 - `public/login.html`, `public/register.html`, `public/admin-approval.html`: alur admin
 - `vercel.json`: routing deployment
@@ -140,6 +145,7 @@ Belum diprioritaskan oleh pengguna:
 - Pemisahan anon key browser dan service-role key backend.
 - Pemisahan status japri pengumuman dan Alfa untuk setiap sesi.
 - Filter dan penolakan server-side untuk peserta nonaktif tanpa menghapus riwayat attendance lama.
+- Pembatasan token database kelompok agar tidak dapat membaca atau mengubah peserta kelompok lain.
 
 ## Hal yang Belum Diketahui / Perlu Dikonfirmasi
 

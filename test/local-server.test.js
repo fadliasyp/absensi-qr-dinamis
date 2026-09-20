@@ -22,7 +22,7 @@ test("npm start entrypoint serves the public application", async (t) => {
   let serverError = "";
   child.stderr.on("data", (data) => (serverError += String(data)));
 
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
     try {
       response = await fetch(`http://127.0.0.1:${port}/login.html`);
       break;
@@ -41,6 +41,16 @@ test("npm start entrypoint serves the public application", async (t) => {
     `http://127.0.0.1:${port}/pengumuman-wa.html?session=test-session`,
   );
   assert.equal(announcementPage.status, 200);
+
+  const participantDatabasePage = await fetch(
+    `http://127.0.0.1:${port}/database-peserta.html`,
+  );
+  assert.equal(participantDatabasePage.status, 200);
+
+  const groupEntryPage = await fetch(
+    `http://127.0.0.1:${port}/isi-data-kelompok.html#token=test-token`,
+  );
+  assert.equal(groupEntryPage.status, 200);
 
   const unauthorizedDelete = await fetch(
     `http://127.0.0.1:${port}/api/admin-users/test-admin`,

@@ -2,6 +2,17 @@
 
 Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang direkonstruksi tanpa bukti.
 
+## 2026-09-20
+
+### Added — Database Peserta Dinamis per Kelompok
+
+- Menambahkan halaman admin untuk membuat, mengedit, mengaktifkan, dan menonaktifkan field pilihan dinamis.
+- Menambahkan link akses tanpa login yang terpisah untuk setiap kelompok, dapat disalin, dibuka, dicabut, dan dibuat ulang.
+- Menyimpan hanya hash dan nonce token di database; token link dibentuk backend menggunakan secret server.
+- Menambahkan halaman mobile ketua kelompok dengan pencarian, filter kelengkapan, picker besar, progress, dan autosave per pilihan.
+- Membatasi setiap token pada peserta aktif kelompok terkait serta memvalidasi field dan pilihan di backend.
+- Menambahkan migration additive, RLS/revoke untuk tabel baru, pemeriksaan sintaks, smoke route, dan regression test.
+
 ## 2026-09-15
 
 ### Added — Custom Template WhatsApp per Sesi

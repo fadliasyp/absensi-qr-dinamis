@@ -1,5 +1,41 @@
 # Decision Log
 
+## 2026-09-20 — Link Rahasia Menggantikan Login Ketua Kelompok
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Ketua kelompok mengakses halaman pengisian melalui link rahasia per kelompok tanpa akun login. Token ditempatkan pada URL fragment, dikirim ke API lewat header khusus, dan dibatasi server-side pada satu kelompok.
+
+### Context
+
+Pengguna menginginkan alur yang ramah bagi ketua kelompok: buka link, pilih nilai, dan tersimpan otomatis.
+
+### Consequences
+
+Admin dapat mencabut atau membuat ulang link. Siapa pun yang memperoleh link dapat mengubah isian kelompok tersebut, dan identitas individu yang melakukan perubahan tidak dapat dibuktikan tanpa login.
+
+## 2026-09-20 — Field Inti Tetap, Field Tambahan Bersifat Dinamis
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Pertahankan `nama`, `gender`, `kelompok`, nomor WhatsApp, dan status aktif sebagai field inti. Field tambahan didefinisikan pada tabel tersendiri dan nilainya disimpan per peserta/field.
+
+### Context
+
+Field inti dipakai oleh absensi, sapaan WhatsApp, finalisasi, dan laporan. Membuatnya sepenuhnya dinamis akan merusak kontrak fitur lama.
+
+### Consequences
+
+Admin dapat menambah banyak field pilihan tanpa migration baru. Tahap awal hanya mendukung field bertipe pilihan; tipe teks/tanggal ditambahkan bila ada kebutuhan nyata.
+
 ## 2026-09-15 — Template WhatsApp Disimpan Lokal per Sesi dan Jenis
 
 ### Status

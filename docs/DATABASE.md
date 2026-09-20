@@ -46,6 +46,39 @@ Field yang digunakan:
 
 `nama` dan `kelompok` diwajibkan oleh API. Nomor WhatsApp dan gender dapat null menurut payload aplikasi. Migration `20260912000000_add_participant_is_active.sql` menambahkan `is_active boolean not null default true`; migration belum dijalankan atau diverifikasi terhadap Supabase dari sesi ini.
 
+### `participant_groups`
+
+Ditambahkan oleh migration `20260920000000_add_dynamic_participant_database.sql` sebagai registry nama kelompok dan akses link ketua. Field:
+
+- `id`, `name`
+- `access_token_hash`, `access_token_nonce`
+- `is_active`
+- `created_at`, `updated_at`
+
+Nama kelompok disinkronkan dari nilai `participants.kelompok`. Token mentah tidak disimpan; backend membentuk link menggunakan secret server dan memeriksa hash ketika link dipakai.
+
+### `participant_custom_fields`
+
+Definisi field pilihan tambahan yang berlaku untuk seluruh kelompok:
+
+- `id`, `label`
+- `options` berupa array JSON
+- `is_required`, `is_active`
+- `created_at`, `updated_at`
+
+Nama field unik tanpa membedakan kapitalisasi. Tahap awal hanya mendukung field dengan pilihan yang ditentukan admin.
+
+### `participant_custom_values`
+
+Nilai field dinamis setiap peserta:
+
+- `participant_id`, `field_id` sebagai primary key gabungan
+- `value`
+- `updated_via_group_id`
+- `updated_at`
+
+Foreign key peserta dan field memakai `ON DELETE CASCADE`; referensi kelompok pengisi memakai `ON DELETE SET NULL`. API memastikan nilai termasuk opsi aktif dan peserta berada pada kelompok token.
+
 ### `attendance`
 
 Field yang digunakan:
@@ -93,6 +126,8 @@ Relasi yang diharapkan adalah `user_id` ke Supabase Auth user, tetapi definisi c
 auth.users  ?--- admin_users
 sessions    1---? qr_tokens
 sessions    1---* attendance *---1 participants
+participant_groups 1---* participant_custom_values *---1 participants
+participant_custom_fields 1---* participant_custom_values
 ```
 
 Tanda `?` berarti cardinality/constraint aktual belum diketahui.
@@ -120,7 +155,7 @@ Hasil audit menunjukkan unique index yang dibutuhkan sudah ada, sehingga tidak d
 
 ## Migrations and Seed
 
-Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql`, pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, serta folder `supabase/checks/` untuk query audit baca-saja. Repository belum memiliki schema awal atau seed lengkap. Migration geolocation—dikonfirmasi pengguna sudah dijalankan pada 2026-09-13—mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`; hasil schema belum diverifikasi langsung. `note.sql` berisi query operasional/manual:
+Repository memiliki migration tambahan untuk status peserta di `supabase/migrations/20260912000000_add_participant_is_active.sql`, pelepasan kewajiban kolom geolocation lama di `supabase/migrations/20260913000000_remove_geolocation_requirements.sql`, database peserta dinamis di `supabase/migrations/20260920000000_add_dynamic_participant_database.sql`, serta folder `supabase/checks/` untuk query audit baca-saja. Repository belum memiliki schema awal atau seed lengkap. Migration geolocation—dikonfirmasi pengguna sudah dijalankan pada 2026-09-13—mempertahankan kolom/data lama dan hanya melepas constraint `NOT NULL`; migration database peserta dinamis belum dijalankan. `note.sql` berisi query operasional/manual:
 
 - melihat rekap
 - membuat sesi contoh dua jam
@@ -134,6 +169,8 @@ Jangan menjalankan `note.sql` sebagai migration; file tersebut mengandung operas
 ## Row Level Security
 
 Belum diketahui / perlu dikonfirmasi. Ini kritis karena halaman browser memakai anon client untuk membaca/mengubah `admin_users`, sementara endpoint API memakai anon client untuk mayoritas operasi database.
+
+Ketiga tabel database peserta dinamis mengaktifkan RLS dan mencabut privilege `anon`/`authenticated`. Aksesnya hanya melalui endpoint backend dengan service-role setelah verifikasi admin atau token kelompok.
 
 ## Data Safety
 

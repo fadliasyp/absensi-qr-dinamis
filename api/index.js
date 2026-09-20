@@ -29,6 +29,157 @@ function getBaseUrl(req) {
   return `${protocol}://${host}`;
 }
 
+function hashGroupAccessToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+function createGroupAccessToken(groupId, nonce) {
+  const secret =
+    process.env.GROUP_LINK_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!secret) {
+    throw new Error("Secret link kelompok belum dikonfigurasi.");
+  }
+
+  return crypto
+    .createHmac("sha256", secret)
+    .update(`${groupId}:${nonce}`)
+    .digest("base64url");
+}
+
+function normalizeGroupName(value) {
+  return String(value || "").trim().toLocaleLowerCase("id-ID");
+}
+
+function validateCustomFieldInput(label, options) {
+  const cleanLabel = String(label || "").trim();
+
+  if (!cleanLabel || cleanLabel.length > 80) {
+    return { error: "Nama field wajib diisi dan maksimal 80 karakter." };
+  }
+
+  if (!Array.isArray(options) || options.length === 0 || options.length > 30) {
+    return { error: "Field harus memiliki 1 sampai 30 pilihan." };
+  }
+
+  const cleanOptions = [];
+  const optionKeys = new Set();
+
+  for (const option of options) {
+    const cleanOption = String(option || "").trim();
+    const optionKey = cleanOption.toLocaleLowerCase("id-ID");
+
+    if (!cleanOption || cleanOption.length > 80) {
+      return { error: "Setiap pilihan wajib diisi dan maksimal 80 karakter." };
+    }
+
+    if (!optionKeys.has(optionKey)) {
+      optionKeys.add(optionKey);
+      cleanOptions.push(cleanOption);
+    }
+  }
+
+  return { label: cleanLabel, options: cleanOptions };
+}
+
+async function getApprovedAdmin(req) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length).trim()
+    : "";
+
+  if (!token) {
+    return { status: 401, message: "Token login admin tidak ditemukan." };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabaseAdmin.auth.getUser(token);
+
+  if (userError || !user) {
+    return { status: 401, message: "Token login admin tidak valid." };
+  }
+
+  const { data: admin, error: adminError } = await supabaseAdmin
+    .from("admin_users")
+    .select("id, user_id, role, status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (adminError || !admin || admin.status !== "approved") {
+    return { status: 403, message: "Akun admin belum memiliki akses." };
+  }
+
+  return { admin };
+}
+
+async function getParticipantGroupFromToken(req) {
+  const token = String(req.headers["x-group-access-token"] || "").trim();
+
+  if (!token || token.length < 32) {
+    return { status: 401, message: "Link kelompok tidak valid." };
+  }
+
+  const { data: group, error } = await supabaseAdmin
+    .from("participant_groups")
+    .select("id, name, is_active")
+    .eq("access_token_hash", hashGroupAccessToken(token))
+    .maybeSingle();
+
+  if (error) {
+    logDatabaseError("Gagal memeriksa link kelompok", error);
+    return { status: 500, message: "Link kelompok gagal diperiksa." };
+  }
+
+  if (!group || !group.is_active) {
+    return {
+      status: 403,
+      message: "Link kelompok sudah tidak berlaku. Minta link baru kepada admin.",
+    };
+  }
+
+  return { group };
+}
+
+async function syncParticipantGroups() {
+  const { data: participants, error: participantError } = await supabaseAdmin
+    .from("participants")
+    .select("kelompok");
+
+  if (participantError) throw participantError;
+
+  const groupsByKey = new Map();
+
+  (participants || []).forEach((participant) => {
+    const name = String(participant.kelompok || "").trim();
+    if (name && !groupsByKey.has(normalizeGroupName(name))) {
+      groupsByKey.set(normalizeGroupName(name), name);
+    }
+  });
+
+  const { data: existingGroups, error: groupError } = await supabaseAdmin
+    .from("participant_groups")
+    .select("id, name");
+
+  if (groupError) throw groupError;
+
+  const existingKeys = new Set(
+    (existingGroups || []).map((group) => normalizeGroupName(group.name)),
+  );
+  const missingGroups = [...groupsByKey.entries()]
+    .filter(([key]) => !existingKeys.has(key))
+    .map(([, name]) => ({ name }));
+
+  if (missingGroups.length > 0) {
+    const { error: insertError } = await supabaseAdmin
+      .from("participant_groups")
+      .insert(missingGroups);
+
+    if (insertError && insertError.code !== "23505") throw insertError;
+  }
+}
+
 async function getSessionQrToken(sessionId, sessionEndTime) {
   const { data: existingToken, error: tokenError } = await supabase
     .from("qr_tokens")
@@ -2802,6 +2953,561 @@ app.get("/api/sessions/:sessionId/qr-pdf", async (req, res) => {
       success: false,
       message: "Terjadi kesalahan saat membuat PDF QR.",
       error: error.message,
+    });
+  }
+});
+
+// ========================
+// Database peserta dinamis per kelompok
+// ========================
+
+app.get("/api/participant-database/groups", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    await syncParticipantGroups();
+
+    const [{ data: groups, error: groupError }, { data: participants, error: participantError }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("participant_groups")
+          .select("id, name, access_token_hash, access_token_nonce, is_active, updated_at")
+          .order("name", { ascending: true }),
+        supabaseAdmin
+          .from("participants")
+          .select("id, kelompok, is_active"),
+      ]);
+
+    if (groupError || participantError) {
+      logDatabaseError(
+        "Gagal mengambil kelompok database peserta",
+        groupError || participantError,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengambil daftar kelompok.",
+      });
+    }
+
+    const participantCounts = new Map();
+    (participants || []).forEach((participant) => {
+      if (participant.is_active === false) return;
+      const key = normalizeGroupName(participant.kelompok);
+      participantCounts.set(key, (participantCounts.get(key) || 0) + 1);
+    });
+
+    res.json({
+      success: true,
+      groups: (groups || []).map((group) => {
+        const canBuildToken = Boolean(
+          group.access_token_hash && group.access_token_nonce && group.is_active,
+        );
+        const token = canBuildToken
+          ? createGroupAccessToken(group.id, group.access_token_nonce)
+          : "";
+        const hasActiveLink = Boolean(
+          token && hashGroupAccessToken(token) === group.access_token_hash,
+        );
+
+        return {
+          id: group.id,
+          name: group.name,
+          is_active: group.is_active,
+          has_active_link: hasActiveLink,
+          link: token
+            ? `${getBaseUrl(req)}/isi-data-kelompok.html#token=${token}`
+            : null,
+          participant_count:
+            participantCounts.get(normalizeGroupName(group.name)) || 0,
+          updated_at: group.updated_at,
+        };
+      }),
+    });
+  } catch (error) {
+    logDatabaseError("Database peserta kelompok gagal dimuat", error);
+    res.status(500).json({
+      success: false,
+      message:
+        "Database peserta belum siap. Pastikan migration terbaru sudah dijalankan.",
+    });
+  }
+});
+
+app.post("/api/participant-database/groups/:groupId/link", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const { data: existingGroup, error: findError } = await supabaseAdmin
+      .from("participant_groups")
+      .select("id, name")
+      .eq("id", req.params.groupId)
+      .maybeSingle();
+
+    if (findError) {
+      logDatabaseError("Gagal mengambil kelompok untuk link", findError);
+      return res.status(500).json({
+        success: false,
+        message: "Kelompok gagal diperiksa.",
+      });
+    }
+
+    if (!existingGroup) {
+      return res.status(404).json({
+        success: false,
+        message: "Kelompok tidak ditemukan.",
+      });
+    }
+
+    const nonce = crypto.randomBytes(16).toString("base64url");
+    const token = createGroupAccessToken(existingGroup.id, nonce);
+    const { data: group, error } = await supabaseAdmin
+      .from("participant_groups")
+      .update({
+        access_token_hash: hashGroupAccessToken(token),
+        access_token_nonce: nonce,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", req.params.groupId)
+      .select("id, name")
+      .maybeSingle();
+
+    if (error) {
+      logDatabaseError("Gagal membuat link kelompok", error);
+      return res.status(500).json({
+        success: false,
+        message: "Link kelompok gagal dibuat.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Link kelompok berhasil dibuat. Link lama sudah tidak berlaku.",
+      group: { id: group.id, name: group.name },
+      link: `${getBaseUrl(req)}/isi-data-kelompok.html#token=${token}`,
+    });
+  } catch (error) {
+    logDatabaseError("Pembuatan link kelompok gagal", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat membuat link kelompok.",
+    });
+  }
+});
+
+app.delete(
+  "/api/participant-database/groups/:groupId/link",
+  async (req, res) => {
+    try {
+      const access = await getApprovedAdmin(req);
+      if (!access.admin) {
+        return res.status(access.status).json({
+          success: false,
+          message: access.message,
+        });
+      }
+
+      const { data: group, error } = await supabaseAdmin
+        .from("participant_groups")
+        .update({
+          access_token_hash: null,
+          access_token_nonce: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", req.params.groupId)
+        .select("id")
+        .maybeSingle();
+
+      if (error) {
+        logDatabaseError("Gagal menonaktifkan link kelompok", error);
+        return res.status(500).json({
+          success: false,
+          message: "Link kelompok gagal dinonaktifkan.",
+        });
+      }
+
+      if (!group) {
+        return res.status(404).json({
+          success: false,
+          message: "Kelompok tidak ditemukan.",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Link kelompok sudah dinonaktifkan.",
+      });
+    } catch (error) {
+      logDatabaseError("Penonaktifan link kelompok gagal", error);
+      res.status(500).json({
+        success: false,
+        message: "Terjadi kesalahan saat menonaktifkan link kelompok.",
+      });
+    }
+  },
+);
+
+app.get("/api/participant-database/fields", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const { data: fields, error } = await supabaseAdmin
+      .from("participant_custom_fields")
+      .select("id, label, options, is_required, is_active, created_at, updated_at")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      logDatabaseError("Gagal mengambil field peserta", error);
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengambil field data peserta.",
+      });
+    }
+
+    res.json({ success: true, fields: fields || [] });
+  } catch (error) {
+    logDatabaseError("Field peserta gagal dimuat", error);
+    res.status(500).json({
+      success: false,
+      message:
+        "Field peserta belum siap. Pastikan migration terbaru sudah dijalankan.",
+    });
+  }
+});
+
+app.post("/api/participant-database/fields", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const validated = validateCustomFieldInput(req.body.label, req.body.options);
+    if (validated.error) {
+      return res.status(400).json({
+        success: false,
+        message: validated.error,
+      });
+    }
+
+    const { data: field, error } = await supabaseAdmin
+      .from("participant_custom_fields")
+      .insert({
+        label: validated.label,
+        options: validated.options,
+        is_required: req.body.is_required === true,
+      })
+      .select("id, label, options, is_required, is_active, created_at, updated_at")
+      .single();
+
+    if (error) {
+      logDatabaseError("Gagal menambah field peserta", error);
+      return res.status(error.code === "23505" ? 409 : 500).json({
+        success: false,
+        message:
+          error.code === "23505"
+            ? "Nama field tersebut sudah digunakan."
+            : "Field data peserta gagal ditambahkan.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Field baru tersedia untuk seluruh kelompok.",
+      field,
+    });
+  } catch (error) {
+    logDatabaseError("Penambahan field peserta gagal", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat menambahkan field peserta.",
+    });
+  }
+});
+
+app.put("/api/participant-database/fields/:fieldId", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const validated = validateCustomFieldInput(req.body.label, req.body.options);
+    if (validated.error) {
+      return res.status(400).json({
+        success: false,
+        message: validated.error,
+      });
+    }
+
+    const { data: field, error } = await supabaseAdmin
+      .from("participant_custom_fields")
+      .update({
+        label: validated.label,
+        options: validated.options,
+        is_required: req.body.is_required === true,
+        is_active: req.body.is_active !== false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", req.params.fieldId)
+      .select("id, label, options, is_required, is_active, created_at, updated_at")
+      .maybeSingle();
+
+    if (error) {
+      logDatabaseError("Gagal memperbarui field peserta", error);
+      return res.status(error.code === "23505" ? 409 : 500).json({
+        success: false,
+        message:
+          error.code === "23505"
+            ? "Nama field tersebut sudah digunakan."
+            : "Field data peserta gagal diperbarui.",
+      });
+    }
+
+    if (!field) {
+      return res.status(404).json({
+        success: false,
+        message: "Field data peserta tidak ditemukan.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Field data peserta berhasil diperbarui.",
+      field,
+    });
+  } catch (error) {
+    logDatabaseError("Pembaruan field peserta gagal", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memperbarui field peserta.",
+    });
+  }
+});
+
+app.get("/api/group-participant-database", async (req, res) => {
+  try {
+    const access = await getParticipantGroupFromToken(req);
+    if (!access.group) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const [{ data: participants, error: participantError }, { data: fields, error: fieldError }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("participants")
+          .select("id, nama, gender")
+          .eq("kelompok", access.group.name)
+          .eq("is_active", true)
+          .order("nama", { ascending: true }),
+        supabaseAdmin
+          .from("participant_custom_fields")
+          .select("id, label, options, is_required")
+          .eq("is_active", true)
+          .order("created_at", { ascending: true }),
+      ]);
+
+    if (participantError || fieldError) {
+      logDatabaseError(
+        "Gagal mengambil database peserta kelompok",
+        participantError || fieldError,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Data kelompok gagal dimuat.",
+      });
+    }
+
+    const participantIds = (participants || []).map((item) => item.id);
+    let values = [];
+
+    if (participantIds.length > 0) {
+      const { data, error } = await supabaseAdmin
+        .from("participant_custom_values")
+        .select("participant_id, field_id, value, updated_at")
+        .in("participant_id", participantIds);
+
+      if (error) {
+        logDatabaseError("Gagal mengambil nilai field peserta", error);
+        return res.status(500).json({
+          success: false,
+          message: "Isian peserta gagal dimuat.",
+        });
+      }
+
+      values = data || [];
+    }
+
+    res.json({
+      success: true,
+      group: { id: access.group.id, name: access.group.name },
+      participants: participants || [],
+      fields: fields || [],
+      values,
+    });
+  } catch (error) {
+    logDatabaseError("Database peserta kelompok gagal dimuat", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memuat data kelompok.",
+    });
+  }
+});
+
+app.put("/api/group-participant-database/value", async (req, res) => {
+  try {
+    const access = await getParticipantGroupFromToken(req);
+    if (!access.group) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const participantId = String(req.body.participant_id || "").trim();
+    const fieldId = String(req.body.field_id || "").trim();
+    const value = String(req.body.value || "").trim();
+
+    if (!participantId || !fieldId) {
+      return res.status(400).json({
+        success: false,
+        message: "Peserta dan field wajib dipilih.",
+      });
+    }
+
+    const [{ data: participant, error: participantError }, { data: field, error: fieldError }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("participants")
+          .select("id, kelompok, is_active")
+          .eq("id", participantId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("participant_custom_fields")
+          .select("id, options, is_active")
+          .eq("id", fieldId)
+          .maybeSingle(),
+      ]);
+
+    if (participantError || fieldError) {
+      logDatabaseError(
+        "Gagal memvalidasi isian peserta",
+        participantError || fieldError,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Isian peserta gagal divalidasi.",
+      });
+    }
+
+    if (
+      !participant ||
+      participant.is_active === false ||
+      normalizeGroupName(participant.kelompok) !==
+        normalizeGroupName(access.group.name)
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Peserta tidak termasuk dalam kelompok link ini.",
+      });
+    }
+
+    if (!field || !field.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "Field sudah tidak tersedia.",
+      });
+    }
+
+    if (!value) {
+      const { error: deleteError } = await supabaseAdmin
+        .from("participant_custom_values")
+        .delete()
+        .eq("participant_id", participantId)
+        .eq("field_id", fieldId);
+
+      if (deleteError) {
+        logDatabaseError("Gagal mengosongkan isian peserta", deleteError);
+        return res.status(500).json({
+          success: false,
+          message: "Isian peserta gagal dikosongkan.",
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: "Isian peserta dikosongkan.",
+        value: null,
+      });
+    }
+
+    const validOptions = Array.isArray(field.options) ? field.options : [];
+    if (!validOptions.includes(value)) {
+      return res.status(400).json({
+        success: false,
+        message: "Pilihan tersebut tidak tersedia.",
+      });
+    }
+
+    const updatedAt = new Date().toISOString();
+    const { error: saveError } = await supabaseAdmin
+      .from("participant_custom_values")
+      .upsert(
+        {
+          participant_id: participantId,
+          field_id: fieldId,
+          value,
+          updated_via_group_id: access.group.id,
+          updated_at: updatedAt,
+        },
+        { onConflict: "participant_id,field_id" },
+      );
+
+    if (saveError) {
+      logDatabaseError("Gagal menyimpan isian peserta", saveError);
+      return res.status(500).json({
+        success: false,
+        message: "Pilihan gagal disimpan. Silakan coba lagi.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Pilihan tersimpan.",
+      value: { participant_id: participantId, field_id: fieldId, value, updated_at: updatedAt },
+    });
+  } catch (error) {
+    logDatabaseError("Penyimpanan isian peserta gagal", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat menyimpan pilihan.",
     });
   }
 });

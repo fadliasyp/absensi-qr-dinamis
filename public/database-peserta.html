@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Peserta per Kelompok</title>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --green: #16a34a;
+        --red: #dc2626;
+        --dark: #0f172a;
+        --muted: #64748b;
+        --line: #dbe3ef;
+        --card: rgba(255, 255, 255, 0.96);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 20px 12px 42px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: var(--dark);
+        background:
+          radial-gradient(circle at top left, #dbeafe 0, transparent 34%),
+          radial-gradient(circle at top right, #dcfce7 0, transparent 30%),
+          #f8fafc;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      .page {
+        width: min(1120px, 100%);
+        margin: auto;
+      }
+
+      .topbar,
+      .section-head,
+      .actions,
+      .field-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .topbar {
+        margin-bottom: 15px;
+      }
+
+      .back-link,
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 15px;
+        border: 0;
+        border-radius: 14px;
+        color: #ffffff;
+        background: var(--primary);
+        font-weight: 850;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.65;
+        cursor: wait;
+      }
+
+      .secondary {
+        color: #334155;
+        background: #e2e8f0;
+      }
+
+      .danger {
+        background: var(--red);
+      }
+
+      .success {
+        background: var(--green);
+      }
+
+      .hero {
+        padding: 27px;
+        border-radius: 28px;
+        color: #ffffff;
+        background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+        box-shadow: 0 22px 55px rgba(37, 99, 235, 0.2);
+      }
+
+      .hero h1 {
+        margin: 0 0 7px;
+        font-size: clamp(28px, 5vw, 43px);
+      }
+
+      .hero p {
+        margin: 0;
+        line-height: 1.6;
+        font-weight: 650;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.45fr);
+        gap: 16px;
+        margin-top: 16px;
+        align-items: start;
+      }
+
+      .card {
+        padding: 21px;
+        border: 1px solid var(--line);
+        border-radius: 25px;
+        background: var(--card);
+        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.08);
+      }
+
+      .card h2,
+      .card h3,
+      .card p {
+        margin-top: 0;
+      }
+
+      .kicker {
+        margin-bottom: 5px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .muted {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 13px;
+        margin-top: 17px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 15px;
+        color: var(--dark);
+        background: #f8fafc;
+        outline: none;
+      }
+
+      textarea {
+        min-height: 145px;
+        resize: vertical;
+        line-height: 1.55;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      .check-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 800;
+      }
+
+      .check-row input {
+        width: 19px;
+        height: 19px;
+        accent-color: var(--primary);
+      }
+
+      .list {
+        display: grid;
+        gap: 11px;
+        margin-top: 15px;
+      }
+
+      .field-card,
+      .group-card {
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: 19px;
+        background: #ffffff;
+      }
+
+      .field-card.inactive {
+        opacity: 0.68;
+        background: #f8fafc;
+      }
+
+      .field-title,
+      .group-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .badges {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin: 10px 0 12px;
+      }
+
+      .badge {
+        display: inline-flex;
+        padding: 5px 9px;
+        border-radius: 999px;
+        color: #1d4ed8;
+        background: #dbeafe;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .badge.required {
+        color: #9a3412;
+        background: #ffedd5;
+      }
+
+      .badge.active {
+        color: #15803d;
+        background: #dcfce7;
+      }
+
+      .badge.inactive {
+        color: #64748b;
+        background: #e2e8f0;
+      }
+
+      .groups {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+      }
+
+      .group-card {
+        border-top: 5px solid var(--primary);
+      }
+
+      .group-meta {
+        margin: 7px 0 13px;
+        color: var(--muted);
+        font-weight: 750;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .actions button {
+        min-height: 39px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .empty {
+        padding: 22px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 18px;
+        color: var(--muted);
+        text-align: center;
+        font-weight: 750;
+      }
+
+      .link-box {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        background: #eff6ff;
+        font-size: 13px;
+      }
+
+      @media (max-width: 820px) {
+        .layout,
+        .groups {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 12px 8px 28px;
+        }
+
+        .hero,
+        .card {
+          padding: 18px;
+          border-radius: 22px;
+        }
+
+        .topbar .back-link,
+        .topbar button,
+        .actions button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="topbar">
+        <a class="back-link secondary" href="/admin-session.html">← Dashboard</a>
+        <button type="button" class="secondary" onclick="loadAll()">
+          Muat Ulang
+        </button>
+      </nav>
+
+      <section class="hero">
+        <h1>Database Peserta</h1>
+        <p>Field dinamis dan link pengisian khusus untuk setiap kelompok.</p>
+      </section>
+
+      <div class="layout">
+        <section class="card">
+          <p class="kicker">Field Dinamis</p>
+          <h2 id="fieldFormTitle">Tambah Field</h2>
+
+          <div class="form-grid">
+            <div>
+              <label for="fieldLabel">Nama field</label>
+              <input
+                id="fieldLabel"
+                type="text"
+                maxlength="80"
+                placeholder="Contoh: Status Kesibukan"
+              />
+            </div>
+
+            <div>
+              <label for="fieldOptions">Pilihan, satu per baris</label>
+              <textarea
+                id="fieldOptions"
+                placeholder="Pekerja&#10;Belum Bekerja&#10;Mahasiswa&#10;Mahasiswa + Pekerja"
+              ></textarea>
+            </div>
+
+            <label class="check-row">
+              <input id="fieldRequired" type="checkbox" />
+              Wajib diisi
+            </label>
+
+            <div class="actions">
+              <button id="saveFieldBtn" type="button" onclick="saveField()">
+                Tambah Field
+              </button>
+              <button
+                id="cancelFieldBtn"
+                class="secondary"
+                type="button"
+                onclick="resetFieldForm()"
+                hidden
+              >
+                Batal Edit
+              </button>
+            </div>
+          </div>
+
+          <div id="fieldList" class="list">
+            <div class="empty">Memuat field...</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <p class="kicker">Akses Ketua Kelompok</p>
+              <h2>Link per Kelompok</h2>
+            </div>
+          </div>
+
+          <div id="groupList" class="groups">
+            <div class="empty">Memuat kelompok...</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/auth-config.js"></script>
+    <script src="/admin-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      protectAdminPage();
+
+      let fields = [];
+      let groups = [];
+      let editingFieldId = null;
+
+      function safeText(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      async function adminHeaders() {
+        const {
+          data: { session },
+        } = await authClient.auth.getSession();
+
+        if (!session) {
+          window.location.href = "/login.html";
+          throw new Error("Sesi admin tidak ditemukan.");
+        }
+
+        return {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        };
+      }
+
+      async function request(url, options = {}) {
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            ...(await adminHeaders()),
+            ...(options.headers || {}),
+          },
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Permintaan gagal diproses.");
+        }
+
+        return result;
+      }
+
+      function fieldOptionsFromInput() {
+        return document
+          .getElementById("fieldOptions")
+          .value.split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function resetFieldForm() {
+        editingFieldId = null;
+        document.getElementById("fieldLabel").value = "";
+        document.getElementById("fieldOptions").value = "";
+        document.getElementById("fieldRequired").checked = false;
+        document.getElementById("fieldFormTitle").textContent = "Tambah Field";
+        document.getElementById("saveFieldBtn").textContent = "Tambah Field";
+        document.getElementById("cancelFieldBtn").hidden = true;
+      }
+
+      function editField(field) {
+        editingFieldId = field.id;
+        document.getElementById("fieldLabel").value = field.label;
+        document.getElementById("fieldOptions").value = (field.options || []).join("\n");
+        document.getElementById("fieldRequired").checked = field.is_required === true;
+        document.getElementById("fieldFormTitle").textContent = "Edit Field";
+        document.getElementById("saveFieldBtn").textContent = "Simpan Perubahan";
+        document.getElementById("cancelFieldBtn").hidden = false;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      async function saveField() {
+        const label = document.getElementById("fieldLabel").value.trim();
+        const options = fieldOptionsFromInput();
+        const button = document.getElementById("saveFieldBtn");
+
+        if (!label || options.length === 0) {
+          return Swal.fire({
+            icon: "warning",
+            title: "Field belum lengkap",
+            text: "Isi nama field dan minimal satu pilihan.",
+          });
+        }
+
+        button.disabled = true;
+        try {
+          const currentField = fields.find((item) => item.id === editingFieldId);
+          const payload = {
+            label,
+            options,
+            is_required: document.getElementById("fieldRequired").checked,
+            is_active: currentField?.is_active !== false,
+          };
+          const url = editingFieldId
+            ? `/api/participant-database/fields/${editingFieldId}`
+            : "/api/participant-database/fields";
+          const result = await request(url, {
+            method: editingFieldId ? "PUT" : "POST",
+            body: JSON.stringify(payload),
+          });
+
+          resetFieldForm();
+          await loadFields();
+          Swal.fire({
+            icon: "success",
+            title: "Tersimpan",
+            text: result.message,
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Gagal", text: error.message });
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function toggleField(field) {
+        try {
+          await request(`/api/participant-database/fields/${field.id}`, {
+            method: "PUT",
+            body: JSON.stringify({
+              label: field.label,
+              options: field.options,
+              is_required: field.is_required,
+              is_active: !field.is_active,
+            }),
+          });
+          await loadFields();
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Gagal", text: error.message });
+        }
+      }
+
+      function renderFields() {
+        const box = document.getElementById("fieldList");
+
+        if (!fields.length) {
+          box.innerHTML = '<div class="empty">Belum ada field tambahan.</div>';
+          return;
+        }
+
+        box.innerHTML = "";
+        fields.forEach((field) => {
+          const card = document.createElement("article");
+          card.className = `field-card${field.is_active ? "" : " inactive"}`;
+          card.innerHTML = `
+            <div class="field-head">
+              <h3 class="field-title">${safeText(field.label)}</h3>
+              <span class="badge ${field.is_active ? "active" : "inactive"}">
+                ${field.is_active ? "Aktif" : "Nonaktif"}
+              </span>
+            </div>
+            <div class="badges">
+              ${(field.options || []).map((option) => `<span class="badge">${safeText(option)}</span>`).join("")}
+              ${field.is_required ? '<span class="badge required">Wajib</span>' : ""}
+            </div>
+            <div class="actions">
+              <button class="edit-field" type="button">Edit</button>
+              <button class="toggle-field secondary" type="button">
+                ${field.is_active ? "Nonaktifkan" : "Aktifkan"}
+              </button>
+            </div>
+          `;
+          card.querySelector(".edit-field").addEventListener("click", () => editField(field));
+          card.querySelector(".toggle-field").addEventListener("click", () => toggleField(field));
+          box.appendChild(card);
+        });
+      }
+
+      async function loadFields() {
+        const result = await request("/api/participant-database/fields");
+        fields = result.fields || [];
+        renderFields();
+      }
+
+      async function copyText(value) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+
+        const input = document.createElement("textarea");
+        input.value = value;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        input.remove();
+      }
+
+      async function createGroupLink(group) {
+        if (group.has_active_link) {
+          const confirmation = await Swal.fire({
+            icon: "question",
+            title: "Buat ulang link?",
+            text: "Link lama akan langsung tidak berlaku.",
+            showCancelButton: true,
+            confirmButtonText: "Ya, buat ulang",
+            cancelButtonText: "Batal",
+          });
+          if (!confirmation.isConfirmed) return;
+        }
+
+        try {
+          const result = await request(
+            `/api/participant-database/groups/${group.id}/link`,
+            { method: "POST", body: "{}" },
+          );
+          await loadGroups();
+          const popup = await Swal.fire({
+            icon: "success",
+            title: `Link ${group.name}`,
+            html: `<input id="generatedGroupLink" class="link-box" readonly value="${safeText(result.link)}">`,
+            confirmButtonText: "Salin Link",
+            showCancelButton: true,
+            cancelButtonText: "Tutup",
+          });
+
+          if (popup.isConfirmed) {
+            await copyText(result.link);
+            Swal.fire({
+              icon: "success",
+              title: "Link disalin",
+              timer: 1200,
+              showConfirmButton: false,
+            });
+          }
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Gagal", text: error.message });
+        }
+      }
+
+      async function copyGroupLink(group) {
+        try {
+          await copyText(group.link);
+          Swal.fire({
+            icon: "success",
+            title: "Link disalin",
+            timer: 1200,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Gagal menyalin", text: error.message });
+        }
+      }
+
+      async function revokeGroupLink(group) {
+        const confirmation = await Swal.fire({
+          icon: "warning",
+          title: "Nonaktifkan link?",
+          text: `Link untuk ${group.name} tidak dapat dipakai lagi.`,
+          showCancelButton: true,
+          confirmButtonText: "Nonaktifkan",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#dc2626",
+        });
+        if (!confirmation.isConfirmed) return;
+
+        try {
+          await request(`/api/participant-database/groups/${group.id}/link`, {
+            method: "DELETE",
+          });
+          await loadGroups();
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Gagal", text: error.message });
+        }
+      }
+
+      function renderGroups() {
+        const box = document.getElementById("groupList");
+
+        if (!groups.length) {
+          box.innerHTML = '<div class="empty">Belum ada kelompok peserta.</div>';
+          return;
+        }
+
+        box.innerHTML = "";
+        groups.forEach((group) => {
+          const card = document.createElement("article");
+          card.className = "group-card";
+          card.innerHTML = `
+            <h3 class="group-title">${safeText(group.name)}</h3>
+            <p class="group-meta">${group.participant_count} peserta aktif</p>
+            <div class="badges">
+              <span class="badge ${group.has_active_link ? "active" : "inactive"}">
+                ${group.has_active_link ? "Link aktif" : "Belum ada link"}
+              </span>
+            </div>
+            <div class="actions">
+              ${group.has_active_link ? '<button class="open-link" type="button">Buka Daftar</button>' : ""}
+              ${group.has_active_link ? '<button class="copy-link success" type="button">Salin Link</button>' : ""}
+              <button class="create-link success" type="button">
+                ${group.has_active_link ? "Buat Ulang Link" : "Buat Link"}
+              </button>
+              ${group.has_active_link ? '<button class="revoke-link danger" type="button">Nonaktifkan</button>' : ""}
+            </div>
+          `;
+          card.querySelector(".open-link")?.addEventListener("click", () => {
+            window.open(group.link, "_blank", "noopener");
+          });
+          card.querySelector(".copy-link")?.addEventListener("click", () => copyGroupLink(group));
+          card.querySelector(".create-link").addEventListener("click", () => createGroupLink(group));
+          card.querySelector(".revoke-link")?.addEventListener("click", () => revokeGroupLink(group));
+          box.appendChild(card);
+        });
+      }
+
+      async function loadGroups() {
+        const result = await request("/api/participant-database/groups");
+        groups = result.groups || [];
+        renderGroups();
+      }
+
+      async function loadAll() {
+        document.getElementById("fieldList").innerHTML = '<div class="empty">Memuat field...</div>';
+        document.getElementById("groupList").innerHTML = '<div class="empty">Memuat kelompok...</div>';
+
+        try {
+          await Promise.all([loadFields(), loadGroups()]);
+        } catch (error) {
+          document.getElementById("fieldList").innerHTML = `<div class="empty">${safeText(error.message)}</div>`;
+          document.getElementById("groupList").innerHTML = `<div class="empty">${safeText(error.message)}</div>`;
+          Swal.fire({ icon: "error", title: "Data belum dapat dimuat", text: error.message });
+        }
+      }
+
+      loadAll();
+    </script>
+  </body>
+</html>

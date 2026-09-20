@@ -1,6 +1,6 @@
 # Feature Baseline
 
-Terakhir diperbarui: 2026-09-15
+Terakhir diperbarui: 2026-09-20
 
 ## Ringkasan Status
 
@@ -28,6 +28,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Status japri WhatsApp Alfa | WORKING | Warna/statistik/filter berubah saat tautan dibuka, persisten dan realtime pada browser admin yang sama. |
 | Pengumuman WhatsApp sesi | WORKING | Pesan dapat diedit, disimpan sebagai custom template per sesi pada browser admin, dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
 | Status japri pengumuman | WORKING | Dipisahkan per session ID dan dari status Alfa; dapat dikembalikan menjadi belum dijapri. |
+| Database peserta per kelompok | PARTIAL | Field pilihan dinamis, link rahasia, picker, progress, dan autosave diimplementasikan serta diuji statis; migration dan Supabase end-to-end belum dijalankan. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
 | Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
 | Prototipe `server.js` | DEPRECATED | Backend in-memory terpisah dari implementasi Supabase/Vercel dan tidak menyajikan fitur terbaru. |
@@ -128,6 +129,23 @@ Perilaku yang harus dipertahankan:
 - Riwayat attendance lama tidak dihapus saat peserta dinonaktifkan.
 
 File penting: `api/index.js`, `public/peserta.html`, dan migration `supabase/migrations/20260912000000_add_participant_is_active.sql`.
+
+### Database Peserta Dinamis
+
+Status: `PARTIAL` / kandidat baseline setelah migration
+
+Perilaku yang harus dipertahankan:
+
+- Admin dapat menambah banyak field pilihan yang berlaku untuk seluruh kelompok tanpa menambah kolom `participants`.
+- Link kelompok tidak membutuhkan login, memakai token acak/ter-hash, dan dapat dicabut atau dibuat ulang admin.
+- Token hanya mengembalikan peserta aktif pada kelompoknya sendiri dan backend menolak participant ID dari kelompok lain.
+- Pilihan harus termasuk opsi field aktif; nilai lain ditolak server.
+- Perubahan tersimpan otomatis per peserta/field tanpa tombol kirim dan kegagalan tidak boleh tampil seolah berhasil.
+- Field inti peserta dan seluruh alur absensi lama tidak berubah.
+
+File penting: `api/index.js`, `public/database-peserta.html`, `public/isi-data-kelompok.html`, dan migration `supabase/migrations/20260920000000_add_dynamic_participant_database.sql`.
+
+Cara verifikasi: buat dua kelompok dan satu field, buat link masing-masing, pastikan tiap link hanya menampilkan kelompoknya, isi nilai dari HP, refresh, uji participant ID kelompok lain lewat request manual, lalu cabut link.
 
 ## Promosi Menjadi STABLE
 
