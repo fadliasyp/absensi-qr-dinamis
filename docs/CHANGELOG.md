@@ -10,6 +10,7 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 - Menambahkan link akses tanpa login yang terpisah untuk setiap kelompok, dapat disalin, dibuka, dicabut, dan dibuat ulang.
 - Menyimpan hanya hash dan nonce token di database; token link dibentuk backend menggunakan secret server.
 - Menambahkan halaman mobile ketua kelompok dengan pencarian, filter kelengkapan, picker besar, progress, dan autosave per pilihan.
+- Menempatkan picker pilihan di tengah layar dan menampilkan nama peserta pada header field yang sedang diisi.
 - Membatasi setiap token pada peserta aktif kelompok terkait serta memvalidasi field dan pilihan di backend.
 - Menambahkan migration additive, RLS/revoke untuk tabel baru, pemeriksaan sintaks, smoke route, dan regression test.
 

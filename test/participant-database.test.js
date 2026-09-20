@@ -34,5 +34,11 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(adminPage, /Authorization: `Bearer \$\{session\.access_token\}`/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);
   assert.match(groupPage, /"X-Group-Access-Token": accessToken/);
+  assert.match(groupPage, /align-items: center/);
+  assert.match(groupPage, /id="pickerParticipant"/);
+  assert.match(
+    groupPage,
+    /document\.getElementById\("pickerParticipant"\)\.textContent/,
+  );
   assert.doesNotMatch(groupPage, /auth-config\.js|admin-auth\.js/);
 });

@@ -268,7 +268,8 @@
         inset: 0;
         z-index: 20;
         display: none;
-        align-items: flex-end;
+        align-items: center;
+        justify-content: center;
         padding: 12px;
         background: rgba(15, 23, 42, 0.55);
       }
@@ -299,10 +300,24 @@
         background: #ffffff;
       }
 
+      .sheet-heading {
+        min-width: 0;
+      }
+
       .sheet-title {
         margin: 0;
         font-size: 19px;
         font-weight: 900;
+      }
+
+      .sheet-participant {
+        margin: 4px 0 0;
+        overflow: hidden;
+        color: var(--primary-dark);
+        font-size: 14px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .close-sheet {
@@ -421,7 +436,10 @@
     <div id="pickerBackdrop" class="sheet-backdrop" role="presentation">
       <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
         <div class="sheet-head">
-          <h2 id="pickerTitle" class="sheet-title">Pilih</h2>
+          <div class="sheet-heading">
+            <h2 id="pickerTitle" class="sheet-title">Pilih</h2>
+            <p id="pickerParticipant" class="sheet-participant"></p>
+          </div>
           <button id="closePickerBtn" class="close-sheet" type="button" aria-label="Tutup">×</button>
         </div>
         <div id="pickerOptions" class="sheet-options"></div>
@@ -504,6 +522,8 @@
         const current = currentValue(participant.id, field.id);
         activePicker = { participant, field };
         document.getElementById("pickerTitle").textContent = field.label;
+        document.getElementById("pickerParticipant").textContent =
+          participant.nama || "Peserta";
         const box = document.getElementById("pickerOptions");
         box.innerHTML = "";
 
