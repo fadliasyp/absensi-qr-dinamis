@@ -3309,6 +3309,55 @@ app.put("/api/participant-database/fields/:fieldId", async (req, res) => {
   }
 });
 
+app.get("/api/participant-database/results", async (req, res) => {
+  try {
+    const access = await getApprovedAdmin(req);
+    if (!access.admin) {
+      return res.status(access.status).json({
+        success: false,
+        message: access.message,
+      });
+    }
+
+    const [
+      { data: participants, error: participantError },
+      { data: values, error: valueError },
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("participants")
+        .select("id, nama, kelompok, is_active")
+        .order("kelompok", { ascending: true })
+        .order("nama", { ascending: true }),
+      supabaseAdmin
+        .from("participant_custom_values")
+        .select("participant_id, field_id, value, updated_at"),
+    ]);
+
+    if (participantError || valueError) {
+      logDatabaseError(
+        "Gagal mengambil hasil database peserta",
+        participantError || valueError,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Hasil pengisian gagal dimuat.",
+      });
+    }
+
+    res.json({
+      success: true,
+      participants: participants || [],
+      values: values || [],
+    });
+  } catch (error) {
+    logDatabaseError("Hasil database peserta gagal dimuat", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memuat hasil pengisian.",
+    });
+  }
+});
+
 app.get("/api/group-participant-database", async (req, res) => {
   try {
     const access = await getParticipantGroupFromToken(req);

@@ -11,6 +11,9 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 - Menyimpan hanya hash dan nonce token di database; token link dibentuk backend menggunakan secret server.
 - Menambahkan halaman mobile ketua kelompok dengan pencarian, filter kelengkapan, picker besar, progress, dan autosave per pilihan.
 - Menempatkan picker pilihan di tengah layar dan menampilkan nama peserta pada header field yang sedang diisi.
+- Menambahkan rekap hasil seluruh kelompok pada halaman admin dengan progress, jumlah per pilihan, pencarian, dan filter.
+- Mengganti konsep field nonaktif menjadi arsip; field tidak tampil pada link kelompok, sedangkan hasil lama tetap tersimpan dan dapat dipantau admin.
+- Memindahkan form tambah/edit field ke modal dan menambahkan kartu ringkasan agar UI admin lebih ringkas.
 - Membatasi setiap token pada peserta aktif kelompok terkait serta memvalidasi field dan pilihan di backend.
 - Menambahkan migration additive, RLS/revoke untuk tabel baru, pemeriksaan sintaks, smoke route, dan regression test.
 

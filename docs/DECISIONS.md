@@ -1,5 +1,23 @@
 # Decision Log
 
+## 2026-09-20 — Field Dinamis Diarsipkan, Bukan Dihapus
+
+### Status
+
+ACCEPTED
+
+### Decision
+
+Menonaktifkan field diperlakukan sebagai arsip. Field tersebut disembunyikan dari link pengisian ketua kelompok, tetapi definisi serta semua nilai peserta tetap berada di database dan tetap dapat dipantau admin.
+
+### Context
+
+Data seperti Status Kesibukan masih dibutuhkan sebagai riwayat ketika admin menambahkan field baru seperti Hobi pada waktu berikutnya.
+
+### Consequences
+
+Admin dapat melihat hasil lintas kelompok, mengaktifkan kembali field, dan mengenali nilai lama setelah opsi diedit. Penghapusan permanen field tidak disediakan pada UI.
+
 ## 2026-09-20 — Link Rahasia Menggantikan Login Ketua Kelompok
 
 ### Status

@@ -30,8 +30,14 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(api, /Peserta tidak termasuk dalam kelompok link ini/);
   assert.match(api, /validOptions\.includes\(value\)/);
   assert.match(api, /onConflict: "participant_id,field_id"/);
+  assert.match(api, /app\.get\("\/api\/participant-database\/results"/);
+  assert.match(api, /\.from\("participant_custom_values"\)/);
   assert.match(adminPage, /protectAdminPage\(\)/);
   assert.match(adminPage, /Authorization: `Bearer \$\{session\.access_token\}`/);
+  assert.match(adminPage, /id="resultsSection"/);
+  assert.match(adminPage, /id="fieldModal"/);
+  assert.match(adminPage, /Arsipkan/);
+  assert.match(adminPage, /Lihat Hasil/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);
   assert.match(groupPage, /"X-Group-Access-Token": accessToken/);
   assert.match(groupPage, /align-items: center/);

@@ -40,7 +40,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 - Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
-- Database peserta per kelompok dengan field pilihan dinamis, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
+- Database peserta per kelompok dengan field pilihan dinamis, arsip yang mempertahankan hasil, rekap admin lintas kelompok, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
@@ -75,6 +75,7 @@ Belum diprioritaskan oleh pengguna:
 - Custom template WhatsApp disimpan terpisah berdasarkan session ID dan jenis `alfa`/`announcement` di localStorage; template tidak tersedia lintas HP/browser.
 - Ketua kelompok mengakses database melalui token link tanpa login. Token hanya boleh membaca peserta aktif dan menyimpan field tambahan pada kelompok yang sama.
 - Field inti peserta tetap dipakai alur lama; field tambahan pilihan berlaku global dan nilainya disimpan terpisah per peserta.
+- Field tambahan yang diarsipkan tidak tampil pada link ketua, tetapi definisi dan nilai lamanya tetap tersimpan serta dapat dilihat admin.
 
 ## Technical Facts
 
@@ -119,7 +120,7 @@ Belum diprioritaskan oleh pengguna:
 - `public/pengumuman-wa.html`: generator pengumuman dan daftar japri peserta
 - `public/wa-contact-status.js`: status japri lokal dan sinkronisasi antar-tab
 - `public/wa-message-template.js`: penyimpanan serta substitusi variabel template WhatsApp
-- `public/database-peserta.html`: pengelolaan field dinamis dan link kelompok oleh admin
+- `public/database-peserta.html`: pengelolaan/arsip field, rekap hasil lintas kelompok, dan link kelompok oleh admin
 - `public/isi-data-kelompok.html`: pengisian autosave tanpa login untuk ketua kelompok
 - `public/admin-auth.js`: guard halaman dan timeout login
 - `public/login.html`, `public/register.html`, `public/admin-approval.html`: alur admin

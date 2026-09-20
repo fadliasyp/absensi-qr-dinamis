@@ -67,6 +67,7 @@ Definisi field pilihan tambahan yang berlaku untuk seluruh kelompok:
 - `created_at`, `updated_at`
 
 Nama field unik tanpa membedakan kapitalisasi. Tahap awal hanya mendukung field dengan pilihan yang ditentukan admin.
+`is_active = false` berarti field diarsipkan: field tidak dikirim ke halaman ketua kelompok, tetapi row field dan nilai terkait tidak dihapus. Field dapat diaktifkan kembali.
 
 ### `participant_custom_values`
 
@@ -78,6 +79,7 @@ Nilai field dinamis setiap peserta:
 - `updated_at`
 
 Foreign key peserta dan field memakai `ON DELETE CASCADE`; referensi kelompok pengisi memakai `ON DELETE SET NULL`. API memastikan nilai termasuk opsi aktif dan peserta berada pada kelompok token.
+Rekap admin tetap dapat membaca nilai field yang diarsipkan. Jika daftar opsi field berubah, nilai lama dipertahankan dan UI admin menandainya sebagai nilai lama.
 
 ### `attendance`
 

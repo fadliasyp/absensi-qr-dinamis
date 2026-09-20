@@ -33,7 +33,7 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
 - `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.
 - `wa-message-template.js`: penyimpanan dan substitusi variabel template WhatsApp lokal per sesi/jenis.
-- `database-peserta.html`: definisi field dinamis dan pengelolaan link kelompok oleh admin.
+- `database-peserta.html`: definisi/arsip field dinamis, rekap hasil lintas kelompok, dan pengelolaan link kelompok oleh admin.
 - `isi-data-kelompok.html`: pengisian field peserta per kelompok tanpa login dengan autosave.
 - `admin-approval.html`: status akun admin.
 - `absen.html`: UI publik peserta dengan custom picker serta popup pemberitahuan lokal tanpa dependency CDN.
@@ -65,6 +65,7 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | GET | `/api/participant-database/groups` | Sinkronkan/daftar kelompok dan link untuk admin terautentikasi. |
 | POST, DELETE | `/api/participant-database/groups/:groupId/link` | Buat ulang atau cabut link kelompok. |
 | GET, POST, PUT | `/api/participant-database/fields` | Kelola definisi field pilihan dinamis. |
+| GET | `/api/participant-database/results` | Peserta dan nilai field seluruh kelompok untuk rekap admin. |
 | GET | `/api/group-participant-database` | Data peserta aktif satu kelompok berdasarkan token link. |
 | PUT | `/api/group-participant-database/value` | Autosave nilai peserta dengan validasi token, kelompok, field, dan opsi. |
 
