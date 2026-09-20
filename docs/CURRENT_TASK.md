@@ -20,6 +20,7 @@ Database peserta dinamis per kelompok selesai diimplementasikan secara lokal pad
 - Memindahkan aksi field ke menu titik tiga serta mengganti filter kelompok/jawaban native dengan dropdown custom.
 - Menambahkan export PDF per kelompok dengan pilihan 1–6 field, default Nama/Gender/Kelompok, serta layout A4 potret sekitar 40 peserta per halaman.
 - Menambahkan judul desa dan highlight kelompok, total muda-mudi, laki-laki, serta perempuan di atas tabel PDF.
+- Memasang Logo Absenku sebagai favicon dan Apple touch icon pada seluruh halaman aktif.
 - Membatasi endpoint link agar hanya dapat membaca peserta aktif dan mengubah field peserta pada kelompoknya sendiri.
 - Menambahkan migration additive serta regression test; seluruh 26 test lokal lulus.
 

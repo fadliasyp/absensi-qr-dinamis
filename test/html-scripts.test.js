@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 for (const file of [
@@ -20,6 +20,20 @@ for (const file of [
     scripts.forEach(([, source]) => new Function(source));
   });
 }
+
+test("active pages use the public Absenku logo", async () => {
+  const logo = await readFile("public/logo-absenku.jpeg");
+  const pages = (await readdir("public")).filter(
+    (file) => file.endsWith(".html") && !file.startsWith("backup-"),
+  );
+
+  assert.ok(logo.length > 0);
+  for (const page of pages) {
+    const html = await readFile(`public/${page}`, "utf8");
+    assert.match(html, /<link rel="icon" type="image\/jpeg" href="\/logo-absenku\.jpeg" \/>/);
+    assert.match(html, /<link rel="apple-touch-icon" href="\/logo-absenku\.jpeg" \/>/);
+  }
+});
 
 test("manual attendance uses styled local pickers for group and participant", async () => {
   const html = await readFile("public/manual.html", "utf8");

@@ -4,6 +4,10 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-21
 
+### Changed — Logo Browser
+
+- Menyalin Logo Absenku ke aset publik dengan nama URL aman dan memasangnya sebagai favicon serta Apple touch icon pada seluruh halaman aktif.
+
 ### Changed — Tab Database Peserta
 
 - Memisahkan field/hasil peserta dan pengelolaan link kelompok ke tab tersendiri agar daftar link tidak berada di bawah daftar peserta yang panjang.
