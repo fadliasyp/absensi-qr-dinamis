@@ -40,6 +40,11 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(adminPage, /id="linksTab"/);
   assert.match(adminPage, /function showDashboardTab\(tabName, updateHash = true\)/);
   assert.match(adminPage, /location\.hash === "#links"/);
+  assert.match(adminPage, /const activeFields = fields\.filter\(\(field\) => field\.is_active\)/);
+  assert.match(adminPage, /class="field-actions"/);
+  assert.match(adminPage, /id="resultGroupPicker"/);
+  assert.match(adminPage, /id="resultAnswerPicker"/);
+  assert.doesNotMatch(adminPage, /<select id="result(?:Group|Answer)Filter"/);
   assert.match(adminPage, /Arsipkan/);
   assert.match(adminPage, /Lihat Hasil/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);

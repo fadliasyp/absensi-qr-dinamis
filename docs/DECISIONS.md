@@ -8,7 +8,7 @@ ACCEPTED
 
 ### Decision
 
-Menonaktifkan field diperlakukan sebagai arsip. Field tersebut disembunyikan dari link pengisian ketua kelompok, tetapi definisi serta semua nilai peserta tetap berada di database dan tetap dapat dipantau admin.
+Menonaktifkan field diperlakukan sebagai arsip. Field tersebut disembunyikan dari link pengisian dan rekap hasil admin, tetapi definisi serta semua nilai peserta tetap berada di database.
 
 ### Context
 
@@ -16,7 +16,7 @@ Data seperti Status Kesibukan masih dibutuhkan sebagai riwayat ketika admin mena
 
 ### Consequences
 
-Admin dapat melihat hasil lintas kelompok, mengaktifkan kembali field, dan mengenali nilai lama setelah opsi diedit. Penghapusan permanen field tidak disediakan pada UI.
+Admin dapat mengaktifkan kembali field untuk menampilkan hasil lamanya dan mengenali nilai lama setelah opsi diedit. Penghapusan permanen field tidak disediakan pada UI.
 
 ## 2026-09-20 — Link Rahasia Menggantikan Login Ketua Kelompok
 

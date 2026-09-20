@@ -28,7 +28,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Status japri WhatsApp Alfa | WORKING | Warna/statistik/filter berubah saat tautan dibuka, persisten dan realtime pada browser admin yang sama. |
 | Pengumuman WhatsApp sesi | WORKING | Pesan dapat diedit, disimpan sebagai custom template per sesi pada browser admin, dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
 | Status japri pengumuman | WORKING | Dipisahkan per session ID dan dari status Alfa; dapat dikembalikan menjadi belum dijapri. |
-| Database peserta per kelompok | PARTIAL | Tab Peserta/Link Kelompok, field pilihan dinamis, arsip tanpa menghapus hasil, rekap admin lintas kelompok, link rahasia, picker, progress, dan autosave diimplementasikan serta diuji statis; migration dan Supabase end-to-end belum dijalankan. |
+| Database peserta per kelompok | PARTIAL | Tab Peserta/Link Kelompok, menu aksi ringkas, filter custom, field pilihan dinamis, arsip tanpa menghapus data, rekap field aktif, link rahasia, picker, progress, dan autosave diimplementasikan serta diuji statis; migration dan Supabase end-to-end belum dijalankan. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
 | Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
 | Prototipe `server.js` | DEPRECATED | Backend in-memory terpisah dari implementasi Supabase/Vercel dan tidak menyajikan fitur terbaru. |
@@ -141,6 +141,7 @@ Perilaku yang harus dipertahankan:
 - Token hanya mengembalikan peserta aktif pada kelompoknya sendiri dan backend menolak participant ID dari kelompok lain.
 - Pilihan harus termasuk opsi field aktif; nilai lain ditolak server.
 - Perubahan tersimpan otomatis per peserta/field tanpa tombol kirim dan kegagalan tidak boleh tampil seolah berhasil.
+- Field arsip tetap tersimpan tetapi tidak tampil pada link kelompok atau rekap hasil sampai diaktifkan kembali.
 - Field inti peserta dan seluruh alur absensi lama tidak berubah.
 
 File penting: `api/index.js`, `public/database-peserta.html`, `public/isi-data-kelompok.html`, dan migration `supabase/migrations/20260920000000_add_dynamic_participant_database.sql`.

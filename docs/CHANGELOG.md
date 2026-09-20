@@ -10,6 +10,12 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 - Membuat navigasi tab tetap terlihat saat scroll, mengembalikan posisi ke area tab ketika berpindah, dan mempertahankan tab melalui hash URL.
 - Memakai HTML, CSS, dan JavaScript bawaan tanpa dependency baru serta mempertahankan pemuatan data dan aksi link yang sudah ada.
 
+### Changed — Rekap dan Kontrol Field
+
+- Menampilkan hanya field aktif pada rekap hasil; field arsip dan nilainya tetap tersimpan serta muncul kembali ketika diaktifkan.
+- Memindahkan aksi setiap field ke menu titik tiga agar kartu field lebih ringkas.
+- Mengganti filter Kelompok dan Jawaban native dengan dropdown custom bergaya biru yang mendukung klik luar dan tombol Escape.
+
 ## 2026-09-20
 
 ### Added — Database Peserta Dinamis per Kelompok

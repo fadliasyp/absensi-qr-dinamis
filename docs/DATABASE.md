@@ -79,7 +79,7 @@ Nilai field dinamis setiap peserta:
 - `updated_at`
 
 Foreign key peserta dan field memakai `ON DELETE CASCADE`; referensi kelompok pengisi memakai `ON DELETE SET NULL`. API memastikan nilai termasuk opsi aktif dan peserta berada pada kelompok token.
-Rekap admin tetap dapat membaca nilai field yang diarsipkan. Jika daftar opsi field berubah, nilai lama dipertahankan dan UI admin menandainya sebagai nilai lama.
+Endpoint admin tetap mengambil nilai field yang diarsipkan, tetapi UI rekap hanya menampilkan field aktif. Nilai arsip muncul kembali ketika field diaktifkan. Jika daftar opsi berubah, nilai lama dipertahankan dan UI menandainya sebagai nilai lama.
 
 ### `attendance`
 

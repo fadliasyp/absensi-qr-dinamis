@@ -33,7 +33,7 @@ Frontend adalah kumpulan halaman statis, masing-masing berisi HTML, CSS, dan Jav
 - `pengumuman-wa.html`: generator pengumuman sesi dan japri seluruh peserta.
 - `wa-contact-status.js`: penyimpanan status japri lokal per sesi/jenis dan event sinkronisasi antar-tab.
 - `wa-message-template.js`: penyimpanan dan substitusi variabel template WhatsApp lokal per sesi/jenis.
-- `database-peserta.html`: tab Peserta/Link Kelompok untuk definisi/arsip field, rekap lintas kelompok, dan pengelolaan link oleh admin.
+- `database-peserta.html`: tab Peserta/Link Kelompok, menu aksi field, filter custom, rekap field aktif, dan pengelolaan link oleh admin.
 - `isi-data-kelompok.html`: pengisian field peserta per kelompok tanpa login dengan autosave.
 - `admin-approval.html`: status akun admin.
 - `absen.html`: UI publik peserta dengan custom picker serta popup pemberitahuan lokal tanpa dependency CDN.
