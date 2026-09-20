@@ -21,6 +21,7 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 - Menambahkan tombol Export PDF pada setiap kelompok dengan modal pilihan field.
 - Mendukung field inti dan field dinamis aktif, default Nama/Gender/Kelompok, serta validasi 1–6 field di UI dan backend.
 - Menghasilkan A4 potret dengan kolom nomor dan baris setinggi 16 poin agar sekitar 40 peserta aktif muat per halaman.
+- Mengganti judul menjadi “Database Muda Mudi Desa Periuk Jaya” dan menambahkan highlight Kelompok, Total Muda Mudi, Laki-laki, serta Perempuan di atas tabel.
 - Melindungi endpoint export dengan verifikasi admin dan tidak menambah migration atau dependency.
 
 ## 2026-09-20

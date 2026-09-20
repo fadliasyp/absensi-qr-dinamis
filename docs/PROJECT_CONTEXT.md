@@ -76,7 +76,7 @@ Belum diprioritaskan oleh pengguna:
 - Ketua kelompok mengakses database melalui token link tanpa login. Token hanya boleh membaca peserta aktif dan menyimpan field tambahan pada kelompok yang sama.
 - Field inti peserta tetap dipakai alur lama; field tambahan pilihan berlaku global dan nilainya disimpan terpisah per peserta.
 - Field tambahan yang diarsipkan tidak tampil pada link ketua maupun rekap hasil admin. Definisi dan nilainya tetap tersimpan dan muncul kembali jika field diaktifkan.
-- Export database PDF memuat peserta aktif satu kelompok, kolom nomor, serta 1–6 field inti/dinamis aktif yang dipilih admin. Layout A4 potret memakai baris rapat untuk sekitar 40 peserta per halaman.
+- Export database PDF memuat peserta aktif satu kelompok, kolom nomor, serta 1–6 field inti/dinamis aktif yang dipilih admin. Layout A4 potret memakai baris rapat untuk sekitar 40 peserta per halaman serta ringkasan kelompok, total, laki-laki, dan perempuan.
 
 ## Technical Facts
 

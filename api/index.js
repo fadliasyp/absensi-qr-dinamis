@@ -3197,6 +3197,13 @@ app.post(
       const headerHeight = 22;
       const rowHeight = 16;
       const bottomLimit = pageHeight - 34;
+      const totalParticipants = participants?.length || 0;
+      const totalMale = (participants || []).filter(
+        (participant) => participant.gender?.trim().toLowerCase() === "laki-laki",
+      ).length;
+      const totalFemale = (participants || []).filter(
+        (participant) => participant.gender?.trim().toLowerCase() === "perempuan",
+      ).length;
       let pageNumber = 1;
       let y = 0;
 
@@ -3229,23 +3236,48 @@ app.post(
       }
 
       function drawPageHeader(isContinuation = false) {
+        const summaryGap = 6;
+        const summaryItems = [
+          { text: `Kelompok: ${group.name}`, weight: 1.65, color: "#1d4ed8", background: "#eff6ff" },
+          { text: `Total Muda Mudi: ${totalParticipants}`, weight: 1.25, color: "#334155", background: "#f1f5f9" },
+          { text: `Laki-laki: ${totalMale}`, weight: 1, color: "#1e40af", background: "#dbeafe" },
+          { text: `Perempuan: ${totalFemale}`, weight: 1, color: "#be185d", background: "#fce7f3" },
+        ];
+        const summaryWidth = tableWidth - summaryGap * (summaryItems.length - 1);
+        const summaryWeight = summaryItems.reduce((total, item) => total + item.weight, 0);
+
         doc
           .font("Helvetica-Bold")
-          .fontSize(17)
+          .fontSize(15.5)
           .fillColor("#0f172a")
-          .text(isContinuation ? "Database Peserta (Lanjutan)" : "Database Peserta", margin, 27, {
+          .text(
+            `Database Muda Mudi Desa Periuk Jaya${isContinuation ? " (Lanjutan)" : ""}`,
+            margin,
+            24,
+            {
             width: tableWidth,
             align: "center",
-          });
-        doc
-          .font("Helvetica")
-          .fontSize(8.5)
-          .fillColor("#475569")
-          .text(`Kelompok ${group.name} · ${participants?.length || 0} peserta aktif`, margin, 51, {
-            width: tableWidth,
-            align: "center",
-          });
-        doc.moveTo(margin, 72).lineTo(pageWidth - margin, 72).lineWidth(1).strokeColor("#bfdbfe").stroke();
+            },
+          );
+
+        let summaryX = margin;
+        summaryItems.forEach((item) => {
+          const width = summaryWidth * (item.weight / summaryWeight);
+          doc.roundedRect(summaryX, 50, width, 24, 7).fill(item.background);
+          doc
+            .font("Helvetica-Bold")
+            .fontSize(7.2)
+            .fillColor(item.color)
+            .text(item.text, summaryX + 6, 59, {
+              width: width - 12,
+              height: 8,
+              align: "center",
+              ellipsis: true,
+              lineBreak: false,
+            });
+          summaryX += width + summaryGap;
+        });
+
         y = 82;
         drawTableHeader();
         drawFooter();

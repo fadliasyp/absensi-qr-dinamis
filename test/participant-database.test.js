@@ -38,6 +38,10 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   );
   assert.match(api, /requestedFields\.length === 0 \|\| requestedFields\.length > 6/);
   assert.match(api, /const rowHeight = 16/);
+  assert.match(api, /Database Muda Mudi Desa Periuk Jaya/);
+  assert.match(api, /Total Muda Mudi: \$\{totalParticipants\}/);
+  assert.match(api, /Laki-laki: \$\{totalMale\}/);
+  assert.match(api, /Perempuan: \$\{totalFemale\}/);
   assert.match(adminPage, /protectAdminPage\(\)/);
   assert.match(adminPage, /Authorization: `Bearer \$\{session\.access_token\}`/);
   assert.match(adminPage, /id="resultsSection"/);
