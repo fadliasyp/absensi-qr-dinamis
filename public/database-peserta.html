@@ -653,6 +653,52 @@
         font-size: 23px;
       }
 
+      .export-group-name {
+        margin: 14px 0 0;
+        padding: 11px 13px;
+        border-radius: 14px;
+        color: #1d4ed8;
+        background: #eff6ff;
+        font-weight: 900;
+      }
+
+      .export-hint {
+        margin: 14px 0 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .export-field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .export-field-option {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 46px;
+        margin: 0;
+        padding: 10px 12px;
+        border: 1px solid #dbe3ef;
+        border-radius: 14px;
+        background: #f8fafc;
+        cursor: pointer;
+      }
+
+      .export-field-option input {
+        width: 19px;
+        height: 19px;
+        flex: 0 0 auto;
+        accent-color: var(--primary);
+      }
+
+      .export-modal-actions {
+        margin-top: 16px;
+      }
+
       .actions {
         justify-content: flex-start;
       }
@@ -723,6 +769,10 @@
         .result-progress .progress-track {
           grid-column: 1 / -1;
           grid-row: 2;
+        }
+
+        .export-field-grid {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -879,6 +929,27 @@
       </section>
     </div>
 
+    <div id="exportModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+      <section class="field-modal">
+        <div class="section-head">
+          <div>
+            <p class="kicker">PDF Potret</p>
+            <h2 id="exportModalTitle">Export Database</h2>
+          </div>
+          <button class="modal-close secondary" type="button" onclick="closeExportModal()" aria-label="Tutup">&times;</button>
+        </div>
+
+        <p id="exportGroupName" class="export-group-name"></p>
+        <p class="export-hint">Pilih 1–6 field. Kolom nomor selalu disertakan.</p>
+        <div id="exportFieldList" class="export-field-grid"></div>
+
+        <div class="actions export-modal-actions">
+          <button id="downloadGroupPdfBtn" type="button" onclick="downloadGroupPdf()">Unduh PDF</button>
+          <button class="secondary" type="button" onclick="closeExportModal()">Batal</button>
+        </div>
+      </section>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/auth-config.js"></script>
     <script src="/admin-auth.js"></script>
@@ -892,6 +963,8 @@
       let resultValues = new Map();
       let selectedResultFieldId = "";
       let editingFieldId = null;
+      let exportingGroup = null;
+      let lastExportFields = new Set(["nama", "gender", "kelompok"]);
 
       function showDashboardTab(tabName, updateHash = true) {
         const showLinks = tabName === "links";
@@ -1343,6 +1416,99 @@
         renderResults();
       }
 
+      function updateExportFieldLimit() {
+        const inputs = [...document.querySelectorAll('#exportFieldList input[type="checkbox"]')];
+        const checkedCount = inputs.filter((input) => input.checked).length;
+        inputs.forEach((input) => {
+          input.disabled = !input.checked && checkedCount >= 6;
+        });
+      }
+
+      function openGroupExport(group) {
+        exportingGroup = group;
+        const exportFields = [
+          { value: "nama", label: "Nama" },
+          { value: "gender", label: "Gender" },
+          { value: "kelompok", label: "Kelompok" },
+          { value: "no_wa", label: "No. HP" },
+          ...fields
+            .filter((field) => field.is_active)
+            .map((field) => ({ value: `custom:${field.id}`, label: field.label })),
+        ];
+
+        document.getElementById("exportGroupName").textContent = group.name;
+        document.getElementById("exportFieldList").innerHTML = exportFields.map((field) => `
+          <label class="export-field-option">
+            <input type="checkbox" value="${safeText(field.value)}"${lastExportFields.has(field.value) ? " checked" : ""}>
+            <span>${safeText(field.label)}</span>
+          </label>
+        `).join("");
+        document.querySelectorAll('#exportFieldList input[type="checkbox"]').forEach((input) => {
+          input.addEventListener("change", updateExportFieldLimit);
+        });
+        updateExportFieldLimit();
+        document.getElementById("exportModal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeExportModal() {
+        document.getElementById("exportModal").classList.remove("open");
+        document.body.style.overflow = "";
+        exportingGroup = null;
+      }
+
+      async function downloadGroupPdf() {
+        if (!exportingGroup) return;
+        const selectedFields = [...document.querySelectorAll('#exportFieldList input[type="checkbox"]:checked')]
+          .map((input) => input.value);
+        if (selectedFields.length === 0 || selectedFields.length > 6) {
+          return Swal.fire({
+            icon: "warning",
+            title: "Pilih field",
+            text: "Pilih minimal satu dan maksimal enam field.",
+          });
+        }
+
+        const button = document.getElementById("downloadGroupPdfBtn");
+        const group = exportingGroup;
+        button.disabled = true;
+        button.textContent = "Membuat PDF...";
+        try {
+          const response = await fetch(
+            `/api/participant-database/groups/${group.id}/export-pdf`,
+            {
+              method: "POST",
+              headers: await adminHeaders(),
+              body: JSON.stringify({ fields: selectedFields }),
+            },
+          );
+          if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            throw new Error(result.message || "PDF gagal dibuat.");
+          }
+
+          const blobUrl = URL.createObjectURL(await response.blob());
+          const link = document.createElement("a");
+          const safeGroupName = group.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "") || "kelompok";
+          link.href = blobUrl;
+          link.download = `database-${safeGroupName}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+          lastExportFields = new Set(selectedFields);
+          closeExportModal();
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Export gagal", text: error.message });
+        } finally {
+          button.disabled = false;
+          button.textContent = "Unduh PDF";
+        }
+      }
+
       async function copyText(value) {
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(value);
@@ -1457,6 +1623,7 @@
               </span>
             </div>
             <div class="actions">
+              <button class="export-group" type="button">Export PDF</button>
               ${group.has_active_link ? '<button class="open-link" type="button">Buka Daftar</button>' : ""}
               ${group.has_active_link ? '<button class="copy-link success" type="button">Salin Link</button>' : ""}
               <button class="create-link success" type="button">
@@ -1465,6 +1632,7 @@
               ${group.has_active_link ? '<button class="revoke-link danger" type="button">Nonaktifkan</button>' : ""}
             </div>
           `;
+          card.querySelector(".export-group").addEventListener("click", () => openGroupExport(group));
           card.querySelector(".open-link")?.addEventListener("click", () => {
             window.open(group.link, "_blank", "noopener");
           });
@@ -1503,6 +1671,9 @@
       document.getElementById("fieldModal").addEventListener("click", (event) => {
         if (event.target.id === "fieldModal") closeFieldForm();
       });
+      document.getElementById("exportModal").addEventListener("click", (event) => {
+        if (event.target.id === "exportModal") closeExportModal();
+      });
       document.addEventListener("click", (event) => {
         if (!event.target.closest(".filter-picker")) closeFilterPickers();
         if (!event.target.closest(".field-actions")) {
@@ -1512,6 +1683,7 @@
       document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
         closeFieldForm();
+        closeExportModal();
         closeFilterPickers();
         document.querySelectorAll(".field-actions[open]").forEach((menu) => menu.removeAttribute("open"));
       });

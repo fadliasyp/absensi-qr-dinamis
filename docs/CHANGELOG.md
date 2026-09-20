@@ -16,6 +16,13 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 - Memindahkan aksi setiap field ke menu titik tiga agar kartu field lebih ringkas.
 - Mengganti filter Kelompok dan Jawaban native dengan dropdown custom bergaya biru yang mendukung klik luar dan tombol Escape.
 
+### Added — Export Database PDF per Kelompok
+
+- Menambahkan tombol Export PDF pada setiap kelompok dengan modal pilihan field.
+- Mendukung field inti dan field dinamis aktif, default Nama/Gender/Kelompok, serta validasi 1–6 field di UI dan backend.
+- Menghasilkan A4 potret dengan kolom nomor dan baris setinggi 16 poin agar sekitar 40 peserta aktif muat per halaman.
+- Melindungi endpoint export dengan verifikasi admin dan tidak menambah migration atau dependency.
+
 ## 2026-09-20
 
 ### Added — Database Peserta Dinamis per Kelompok

@@ -3039,6 +3039,288 @@ app.get("/api/participant-database/groups", async (req, res) => {
   }
 });
 
+app.post(
+  "/api/participant-database/groups/:groupId/export-pdf",
+  async (req, res) => {
+    try {
+      const access = await getApprovedAdmin(req);
+      if (!access.admin) {
+        return res.status(access.status).json({
+          success: false,
+          message: access.message,
+        });
+      }
+
+      const requestedFields = Array.isArray(req.body.fields)
+        ? [...new Set(req.body.fields.filter((field) => typeof field === "string"))]
+        : [];
+      if (requestedFields.length === 0 || requestedFields.length > 6) {
+        return res.status(400).json({
+          success: false,
+          message: "Pilih minimal satu dan maksimal enam field untuk PDF.",
+        });
+      }
+
+      const coreFields = new Map([
+        ["nama", { key: "nama", label: "Nama", weight: 1.8 }],
+        ["gender", { key: "gender", label: "Gender", weight: 1 }],
+        ["kelompok", { key: "kelompok", label: "Kelompok", weight: 1.1 }],
+        ["no_wa", { key: "no_wa", label: "No. HP", weight: 1.25 }],
+      ]);
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const customFieldIds = requestedFields
+        .filter((field) => field.startsWith("custom:"))
+        .map((field) => field.slice(7));
+      const hasInvalidField = requestedFields.some((field) => {
+        if (coreFields.has(field)) return false;
+        return !field.startsWith("custom:") || !uuidPattern.test(field.slice(7));
+      });
+      if (hasInvalidField) {
+        return res.status(400).json({
+          success: false,
+          message: "Pilihan field PDF tidak valid.",
+        });
+      }
+
+      const groupQuery = supabaseAdmin
+        .from("participant_groups")
+        .select("id, name")
+        .eq("id", req.params.groupId)
+        .maybeSingle();
+      const customFieldQuery = customFieldIds.length
+        ? supabaseAdmin
+            .from("participant_custom_fields")
+            .select("id, label")
+            .in("id", customFieldIds)
+            .eq("is_active", true)
+        : Promise.resolve({ data: [], error: null });
+      const [
+        { data: group, error: groupError },
+        { data: customFields, error: customFieldError },
+      ] = await Promise.all([groupQuery, customFieldQuery]);
+
+      if (groupError || customFieldError) {
+        logDatabaseError(
+          "Gagal menyiapkan export database kelompok",
+          groupError || customFieldError,
+        );
+        return res.status(500).json({
+          success: false,
+          message: "Data export kelompok gagal disiapkan.",
+        });
+      }
+      if (!group) {
+        return res.status(404).json({
+          success: false,
+          message: "Kelompok tidak ditemukan.",
+        });
+      }
+      if ((customFields || []).length !== customFieldIds.length) {
+        return res.status(400).json({
+          success: false,
+          message: "Field dinamis tidak ditemukan atau sedang diarsipkan.",
+        });
+      }
+
+      const { data: participants, error: participantError } = await supabaseAdmin
+        .from("participants")
+        .select("id, nama, gender, kelompok, no_wa")
+        .eq("kelompok", group.name)
+        .eq("is_active", true)
+        .order("nama", { ascending: true });
+      if (participantError) {
+        logDatabaseError("Gagal mengambil peserta untuk export PDF", participantError);
+        return res.status(500).json({
+          success: false,
+          message: "Peserta kelompok gagal dimuat.",
+        });
+      }
+
+      let customValues = [];
+      if (customFieldIds.length && participants?.length) {
+        const { data, error } = await supabaseAdmin
+          .from("participant_custom_values")
+          .select("participant_id, field_id, value")
+          .in("participant_id", participants.map((participant) => participant.id))
+          .in("field_id", customFieldIds);
+        if (error) {
+          logDatabaseError("Gagal mengambil nilai untuk export PDF", error);
+          return res.status(500).json({
+            success: false,
+            message: "Nilai field peserta gagal dimuat.",
+          });
+        }
+        customValues = data || [];
+      }
+
+      const customFieldsById = new Map(
+        (customFields || []).map((field) => [field.id, field]),
+      );
+      const columns = requestedFields.map((field) => {
+        if (coreFields.has(field)) return coreFields.get(field);
+        const id = field.slice(7);
+        return {
+          key: field,
+          label: customFieldsById.get(id).label,
+          fieldId: id,
+          weight: 1.25,
+        };
+      });
+      const valuesByParticipantAndField = new Map(
+        customValues.map((item) => [
+          `${item.participant_id}:${item.field_id}`,
+          item.value,
+        ]),
+      );
+
+      const safeGroupName = group.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") || "kelompok";
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="database-${safeGroupName}.pdf"`,
+      );
+
+      const doc = new PDFDocument({ size: "A4", layout: "portrait", margin: 0 });
+      doc.pipe(res);
+
+      const pageWidth = doc.page.width;
+      const pageHeight = doc.page.height;
+      const margin = 26;
+      const numberWidth = 28;
+      const tableWidth = pageWidth - margin * 2;
+      const dataWidth = tableWidth - numberWidth;
+      const totalWeight = columns.reduce((total, column) => total + column.weight, 0);
+      const columnWidths = columns.map((column) => dataWidth * (column.weight / totalWeight));
+      const headerHeight = 22;
+      const rowHeight = 16;
+      const bottomLimit = pageHeight - 34;
+      let pageNumber = 1;
+      let y = 0;
+
+      function drawFooter() {
+        doc
+          .font("Helvetica")
+          .fontSize(7)
+          .fillColor("#94a3b8")
+          .text(`Absenku! · Halaman ${pageNumber}`, margin, pageHeight - 22, {
+            width: tableWidth,
+            align: "center",
+          });
+      }
+
+      function drawTableHeader() {
+        let x = margin;
+        doc.rect(margin, y, tableWidth, headerHeight).fill("#1d4ed8");
+        doc.font("Helvetica-Bold").fontSize(7.2).fillColor("#ffffff");
+        doc.text("No", x + 4, y + 7, { width: numberWidth - 8, align: "center" });
+        x += numberWidth;
+        columns.forEach((column, index) => {
+          doc.text(column.label, x + 4, y + 7, {
+            width: columnWidths[index] - 8,
+            height: 9,
+            ellipsis: true,
+          });
+          x += columnWidths[index];
+        });
+        y += headerHeight;
+      }
+
+      function drawPageHeader(isContinuation = false) {
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(17)
+          .fillColor("#0f172a")
+          .text(isContinuation ? "Database Peserta (Lanjutan)" : "Database Peserta", margin, 27, {
+            width: tableWidth,
+            align: "center",
+          });
+        doc
+          .font("Helvetica")
+          .fontSize(8.5)
+          .fillColor("#475569")
+          .text(`Kelompok ${group.name} · ${participants?.length || 0} peserta aktif`, margin, 51, {
+            width: tableWidth,
+            align: "center",
+          });
+        doc.moveTo(margin, 72).lineTo(pageWidth - margin, 72).lineWidth(1).strokeColor("#bfdbfe").stroke();
+        y = 82;
+        drawTableHeader();
+        drawFooter();
+      }
+
+      function valueForColumn(participant, column) {
+        if (!column.fieldId) return participant[column.key] || "-";
+        return valuesByParticipantAndField.get(`${participant.id}:${column.fieldId}`) || "-";
+      }
+
+      function drawRow(participant, index) {
+        let x = margin;
+        doc.rect(margin, y, tableWidth, rowHeight).fill(index % 2 === 0 ? "#ffffff" : "#f8fafc");
+        doc.rect(x, y, numberWidth, rowHeight).lineWidth(0.35).strokeColor("#cbd5e1").stroke();
+        doc.font("Helvetica").fontSize(7).fillColor("#334155").text(String(index + 1), x + 3, y + 5, {
+          width: numberWidth - 6,
+          height: 8,
+          align: "center",
+        });
+        x += numberWidth;
+
+        columns.forEach((column, columnIndex) => {
+          const width = columnWidths[columnIndex];
+          doc.rect(x, y, width, rowHeight).lineWidth(0.35).strokeColor("#cbd5e1").stroke();
+          doc
+            .font(column.key === "nama" ? "Helvetica-Bold" : "Helvetica")
+            .fontSize(7)
+            .fillColor("#334155")
+            .text(String(valueForColumn(participant, column)), x + 4, y + 5, {
+              width: width - 8,
+              height: 8,
+              ellipsis: true,
+              lineBreak: false,
+            });
+          x += width;
+        });
+        y += rowHeight;
+      }
+
+      drawPageHeader();
+      if (!participants?.length) {
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(10)
+          .fillColor("#64748b")
+          .text("Belum ada peserta aktif pada kelompok ini.", margin, y + 22, {
+            width: tableWidth,
+            align: "center",
+          });
+      }
+
+      (participants || []).forEach((participant, index) => {
+        if (y + rowHeight > bottomLimit) {
+          doc.addPage({ size: "A4", layout: "portrait", margin: 0 });
+          pageNumber += 1;
+          drawPageHeader(true);
+        }
+        drawRow(participant, index);
+      });
+
+      doc.end();
+    } catch (error) {
+      logDatabaseError("Export PDF database kelompok gagal", error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: "Terjadi kesalahan saat membuat PDF kelompok.",
+        });
+      } else {
+        res.end();
+      }
+    }
+  },
+);
+
 app.post("/api/participant-database/groups/:groupId/link", async (req, res) => {
   try {
     const access = await getApprovedAdmin(req);

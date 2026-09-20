@@ -18,6 +18,7 @@ Database peserta dinamis per kelompok selesai diimplementasikan secara lokal pad
 - Merapikan halaman admin dengan kartu ringkasan dan modal tambah/edit field agar layar utama lebih ringkas.
 - Memisahkan rekap peserta dan link kelompok ke dua tab; navigasi tab tetap terlihat saat scroll dan dapat dibuka langsung melalui hash URL.
 - Memindahkan aksi field ke menu titik tiga serta mengganti filter kelompok/jawaban native dengan dropdown custom.
+- Menambahkan export PDF per kelompok dengan pilihan 1–6 field, default Nama/Gender/Kelompok, serta layout A4 potret sekitar 40 peserta per halaman.
 - Membatasi endpoint link agar hanya dapat membaca peserta aktif dan mengubah field peserta pada kelompoknya sendiri.
 - Menambahkan migration additive serta regression test; seluruh 26 test lokal lulus.
 

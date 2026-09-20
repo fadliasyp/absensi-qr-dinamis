@@ -32,6 +32,12 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(api, /onConflict: "participant_id,field_id"/);
   assert.match(api, /app\.get\("\/api\/participant-database\/results"/);
   assert.match(api, /\.from\("participant_custom_values"\)/);
+  assert.match(
+    api,
+    /app\.post\([\s\S]*?"\/api\/participant-database\/groups\/:groupId\/export-pdf"/,
+  );
+  assert.match(api, /requestedFields\.length === 0 \|\| requestedFields\.length > 6/);
+  assert.match(api, /const rowHeight = 16/);
   assert.match(adminPage, /protectAdminPage\(\)/);
   assert.match(adminPage, /Authorization: `Bearer \$\{session\.access_token\}`/);
   assert.match(adminPage, /id="resultsSection"/);
@@ -45,6 +51,9 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(adminPage, /id="resultGroupPicker"/);
   assert.match(adminPage, /id="resultAnswerPicker"/);
   assert.doesNotMatch(adminPage, /<select id="result(?:Group|Answer)Filter"/);
+  assert.match(adminPage, /id="exportModal"/);
+  assert.match(adminPage, /class="export-group"/);
+  assert.match(adminPage, /new Set\(\["nama", "gender", "kelompok"\]\)/);
   assert.match(adminPage, /Arsipkan/);
   assert.match(adminPage, /Lihat Hasil/);
   assert.match(groupPage, /location\.hash\.slice\(1\)/);

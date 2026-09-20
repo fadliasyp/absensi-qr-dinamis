@@ -29,6 +29,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Pengumuman WhatsApp sesi | WORKING | Pesan dapat diedit, disimpan sebagai custom template per sesi pada browser admin, dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
 | Status japri pengumuman | WORKING | Dipisahkan per session ID dan dari status Alfa; dapat dikembalikan menjadi belum dijapri. |
 | Database peserta per kelompok | PARTIAL | Tab Peserta/Link Kelompok, menu aksi ringkas, filter custom, field pilihan dinamis, arsip tanpa menghapus data, rekap field aktif, link rahasia, picker, progress, dan autosave diimplementasikan serta diuji statis; migration dan Supabase end-to-end belum dijalankan. |
+| Export database peserta PDF | PARTIAL | Export per kelompok mendukung pilihan 1–6 field inti/dinamis aktif, peserta aktif, kolom nomor, dan A4 potret dengan baris rapat; sintaks/regression test lulus tetapi output Supabase nyata belum diuji. |
 | Authorization API admin | BROKEN | Mayoritas endpoint sensitif tidak memeriksa bearer token/role server-side. |
 | Server development lokal | WORKING | `npm start` menyajikan `public/`; diverifikasi oleh smoke test Node. |
 | Prototipe `server.js` | DEPRECATED | Backend in-memory terpisah dari implementasi Supabase/Vercel dan tidak menyajikan fitur terbaru. |
@@ -142,6 +143,7 @@ Perilaku yang harus dipertahankan:
 - Pilihan harus termasuk opsi field aktif; nilai lain ditolak server.
 - Perubahan tersimpan otomatis per peserta/field tanpa tombol kirim dan kegagalan tidak boleh tampil seolah berhasil.
 - Field arsip tetap tersimpan tetapi tidak tampil pada link kelompok atau rekap hasil sampai diaktifkan kembali.
+- Export PDF hanya menerima field inti atau field dinamis aktif yang valid, maksimal enam field, dan hanya memuat peserta aktif dari kelompok terpilih.
 - Field inti peserta dan seluruh alur absensi lama tidak berubah.
 
 File penting: `api/index.js`, `public/database-peserta.html`, `public/isi-data-kelompok.html`, dan migration `supabase/migrations/20260920000000_add_dynamic_participant_database.sql`.
