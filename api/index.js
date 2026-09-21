@@ -2278,7 +2278,7 @@ app.get("/api/sessions/:sessionId/export-pdf", async (req, res) => {
 
     const tableWidth = columns.reduce((sum, col) => sum + col.width, 0);
     const tableX = (pageWidth - tableWidth) / 2;
-    const rowHeight = 26;
+    const rowHeight = 18;
     const headerHeight = 28;
 
     let pageNumber = 1;
@@ -2329,13 +2329,13 @@ app.get("/api/sessions/:sessionId/export-pdf", async (req, res) => {
           const status = item.keterangan || "-";
           const color = getStatusColor(status);
 
-          doc.roundedRect(x + 7, y + 6, col.width - 14, 14, 999).fill(color);
+          doc.roundedRect(x + 7, y + 2, col.width - 14, 14, 999).fill(color);
 
           doc
             .font("Helvetica-Bold")
             .fontSize(8)
             .fillColor("#ffffff")
-            .text(status, x + 7, y + 9, {
+            .text(status, x + 7, y + 5, {
               width: col.width - 14,
               align: "center",
             });
@@ -2344,10 +2344,12 @@ app.get("/api/sessions/:sessionId/export-pdf", async (req, res) => {
             .font(colIndex === 1 ? "Helvetica-Bold" : "Helvetica")
             .fontSize(8.5)
             .fillColor(colIndex === 1 ? "#111827" : "#334155")
-            .text(String(row[colIndex]), x + 6, y + 8, {
+            .text(String(row[colIndex]), x + 6, y + 4, {
               width: col.width - 12,
+              height: rowHeight - 8,
               align: "left",
               ellipsis: true,
+              lineBreak: false,
             });
         }
 

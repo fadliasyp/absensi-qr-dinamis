@@ -35,7 +35,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Halaman absensi membatasi waktu tunggu request menjadi 20 detik, menyediakan retry, dan menjelaskan kegagalan QR, sesi, peserta, duplikat, koneksi, serta server dengan pesan yang dapat ditindaklanjuti.
 - Input manual status `Hadir`, `Izin`, atau `Alfa` dengan custom picker Kelompok/Nama Peserta; gender dan status data lama tampil sebagai metadata/badge terpisah.
 - Finalisasi sesi: peserta yang belum tercatat menjadi `Alfa`.
-- Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF.
+- Rekap kehadiran, ringkasan/filter pada dashboard, dan export PDF landscape dengan baris tabel rapat agar hemat halaman cetak.
 - Daftar peserta Alfa serta penyusunan tautan/pesan WhatsApp; pengiriman tetap dilakukan manual oleh pengguna.
 - Pengumuman sesi melalui japri WhatsApp satu per satu untuk semua peserta yang terdaftar.
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.

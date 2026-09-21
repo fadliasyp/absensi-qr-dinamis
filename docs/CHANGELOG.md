@@ -4,9 +4,14 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-21
 
+### Changed — Baris PDF Rekap Absensi
+
+- Merapatkan tinggi baris peserta pada export hasil absensi sesi dari 26 menjadi 18 poin agar lebih banyak peserta muat per halaman.
+- Menyesuaikan posisi vertikal teks dan badge status tanpa mengubah warna, font, kolom, header, ringkasan, maupun layout landscape yang sudah ada.
+
 ### Added — Export PDF Gabungan Semua Kelompok
 
-- Menambahkan tombol Export Semua PDF pada tab Peserta dengan pilihan 1–6 field inti atau field dinamis aktif.
+- Menambahkan tombol Export PDF Semua Muda Mudi Desa Periuk Jaya pada tab Peserta dengan pilihan 1–6 field inti atau field dinamis aktif.
 - Menggabungkan seluruh peserta aktif ke satu PDF “Database Muda Mudi Desa Periuk Jaya” yang diurutkan berdasarkan kelompok lalu nama.
 - Memakai kembali layout A4 potret dengan baris 16 poin, ringkasan total/gender, dan loading pengunci agar hasil tetap padat serta hemat kertas.
 

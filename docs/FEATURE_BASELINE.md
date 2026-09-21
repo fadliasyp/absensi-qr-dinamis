@@ -23,7 +23,7 @@ Belum ada fitur bisnis berstatus `STABLE`. Repository kini memiliki smoke test s
 | Absensi manual | WORKING | Insert/update status `Hadir`, `Izin`, `Alfa`; pilihan Kelompok/Nama Peserta memakai custom picker dengan metadata gender dan badge data lama. |
 | Rekap dashboard | WORKING | Daftar attendance, ringkasan, filter, dan refresh tersedia. |
 | Finalisasi sesi | WORKING | Setelah sesi berakhir, peserta tanpa record menjadi Alfa dan sesi ditandai final. Tidak transaksional. |
-| Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel tersedia. |
+| Export rekap PDF | WORKING | PDF landscape dengan ringkasan dan tabel bergaya tetap tersedia; tinggi baris peserta dirapatkan menjadi 18 poin agar lebih hemat halaman cetak. |
 | Tindak lanjut WhatsApp Alfa | WORKING | Daftar/filter, preview/salin pesan, tautan `wa.me`, serta custom template per sesi pada browser admin; pengguna tetap menekan Kirim. |
 | Status japri WhatsApp Alfa | WORKING | Warna/statistik/filter berubah saat tautan dibuka, persisten dan realtime pada browser admin yang sama. |
 | Pengumuman WhatsApp sesi | WORKING | Pesan dapat diedit, disimpan sebagai custom template per sesi pada browser admin, dan dijapri satu per satu ke seluruh peserta dengan nomor WA. |
