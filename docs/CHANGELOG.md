@@ -4,6 +4,12 @@ Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang
 
 ## 2026-09-21
 
+### Added — Export PDF Gabungan Semua Kelompok
+
+- Menambahkan tombol Export Semua PDF pada tab Peserta dengan pilihan 1–6 field inti atau field dinamis aktif.
+- Menggabungkan seluruh peserta aktif ke satu PDF “Database Muda Mudi Desa Periuk Jaya” yang diurutkan berdasarkan kelompok lalu nama.
+- Memakai kembali layout A4 potret dengan baris 16 poin, ringkasan total/gender, dan loading pengunci agar hasil tetap padat serta hemat kertas.
+
 ### Changed — Loading Aksi Link Kelompok
 
 - Menampilkan spinner pengunci layar selama pembuatan, regenerasi, dan penonaktifan link serta pembuatan PDF berlangsung.

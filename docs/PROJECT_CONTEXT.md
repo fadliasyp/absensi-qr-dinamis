@@ -41,7 +41,7 @@ Source JavaScript utama lolos pemeriksaan sintaks pada 2026-09-12. Smoke test se
 - Status “Sudah/Belum dijapri” untuk pengumuman dan Alfa, tersimpan serta sinkron antar-tab pada browser admin yang sama.
 - Custom template Alfa dan Pengumuman yang tersimpan terpisah per sesi/jenis pada browser admin yang sama.
 - Logo Absenku dipakai sebagai favicon dan Apple touch icon pada seluruh halaman aktif.
-- Database peserta per kelompok dengan tab Peserta/Link Kelompok, field pilihan dinamis, arsip yang mempertahankan data, rekap field aktif, filter custom, export PDF per kelompok, loading pengunci aksi link, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
+- Database peserta per kelompok dengan tab Peserta/Link Kelompok, field pilihan dinamis, arsip yang mempertahankan data, rekap field aktif, filter custom, export PDF per kelompok maupun gabungan seluruh kelompok, loading pengunci aksi link, link ketua tanpa login, progress, dan autosave. Implementasi lokal selesai; migration belum diterapkan.
 
 Status per fitur ada di `FEATURE_BASELINE.md`.
 
@@ -77,7 +77,7 @@ Belum diprioritaskan oleh pengguna:
 - Ketua kelompok mengakses database melalui token link tanpa login. Token hanya boleh membaca peserta aktif dan menyimpan field tambahan pada kelompok yang sama.
 - Field inti peserta tetap dipakai alur lama; field tambahan pilihan berlaku global dan nilainya disimpan terpisah per peserta.
 - Field tambahan yang diarsipkan tidak tampil pada link ketua maupun rekap hasil admin. Definisi dan nilainya tetap tersimpan dan muncul kembali jika field diaktifkan.
-- Export database PDF memuat peserta aktif satu kelompok, kolom nomor, serta 1–6 field inti/dinamis aktif yang dipilih admin. Layout A4 potret memakai baris rapat untuk sekitar 40 peserta per halaman serta ringkasan kelompok, total, laki-laki, dan perempuan.
+- Export database PDF dapat memuat peserta aktif satu kelompok atau gabungan seluruh kelompok, kolom nomor, serta 1–6 field inti/dinamis aktif yang dipilih admin. Layout A4 potret memakai baris rapat untuk sekitar 40 peserta per halaman serta ringkasan cakupan, total, laki-laki, dan perempuan.
 
 ## Technical Facts
 

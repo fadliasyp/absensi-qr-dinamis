@@ -842,6 +842,7 @@
                 <p class="kicker">Rekap Semua Kelompok</p>
                 <h2>Hasil Pengisian</h2>
               </div>
+              <button type="button" onclick="openAllExport()">Export Semua PDF</button>
             </div>
 
             <div id="resultFieldTabs" class="field-tabs"></div>
@@ -1450,6 +1451,9 @@
             .map((field) => ({ value: `custom:${field.id}`, label: field.label })),
         ];
 
+        document.getElementById("exportModalTitle").textContent = group.exportAll
+          ? "Export Semua Peserta"
+          : "Export Database";
         document.getElementById("exportGroupName").textContent = group.name;
         document.getElementById("exportFieldList").innerHTML = exportFields.map((field) => `
           <label class="export-field-option">
@@ -1463,6 +1467,14 @@
         updateExportFieldLimit();
         document.getElementById("exportModal").classList.add("open");
         document.body.style.overflow = "hidden";
+      }
+
+      function openAllExport() {
+        openGroupExport({
+          id: "",
+          name: "Muda Mudi Desa Periuk Jaya",
+          exportAll: true,
+        });
       }
 
       function closeExportModal() {
@@ -1490,7 +1502,9 @@
         showBlockingLoading("Membuat PDF...");
         try {
           const response = await fetch(
-            `/api/participant-database/groups/${group.id}/export-pdf`,
+            group.exportAll
+              ? "/api/participant-database/export-pdf"
+              : `/api/participant-database/groups/${group.id}/export-pdf`,
             {
               method: "POST",
               headers: await adminHeaders(),
@@ -1504,10 +1518,12 @@
 
           const blobUrl = URL.createObjectURL(await response.blob());
           const link = document.createElement("a");
-          const safeGroupName = group.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "") || "kelompok";
+          const safeGroupName = group.exportAll
+            ? "muda-mudi-desa-periuk-jaya"
+            : group.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "") || "kelompok";
           link.href = blobUrl;
           link.download = `database-${safeGroupName}.pdf`;
           document.body.appendChild(link);

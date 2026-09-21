@@ -22,8 +22,9 @@ Database peserta dinamis per kelompok selesai diimplementasikan secara lokal pad
 - Menambahkan judul desa dan highlight kelompok, total muda-mudi, laki-laki, serta perempuan di atas tabel PDF.
 - Memasang Logo Absenku sebagai favicon dan Apple touch icon pada seluruh halaman aktif.
 - Menambahkan loading pengunci layar saat membuat/membuat ulang/menonaktifkan link kelompok dan membuat PDF.
+- Menambahkan export satu PDF gabungan seluruh kelompok dengan pilihan field dinamis, urutan kelompok/nama, dan layout baris rapat yang sama seperti export per kelompok.
 - Membatasi endpoint link agar hanya dapat membaca peserta aktif dan mengubah field peserta pada kelompoknya sendiri.
-- Menambahkan migration additive serta regression test; seluruh 26 test lokal lulus.
+- Menambahkan migration additive serta regression test; seluruh 27 test lokal lulus.
 
 ## Files Being Modified
 

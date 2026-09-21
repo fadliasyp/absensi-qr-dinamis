@@ -63,6 +63,7 @@ Halaman admin memuat `auth-config.js` dan `admin-auth.js`. Guard memeriksa sesi 
 | PUT, DELETE | `/api/participants/:participantId` | Edit/hapus peserta. |
 | DELETE | `/api/admin-users/:adminId` | Hapus admin dengan verifikasi bearer token dan role super admin. |
 | GET | `/api/participant-database/groups` | Sinkronkan/daftar kelompok dan link untuk admin terautentikasi. |
+| POST | `/api/participant-database/export-pdf` | Export seluruh peserta aktif lintas kelompok ke satu PDF dengan field pilihan admin. |
 | POST | `/api/participant-database/groups/:groupId/export-pdf` | Export peserta aktif satu kelompok ke PDF dengan field pilihan admin. |
 | POST, DELETE | `/api/participant-database/groups/:groupId/link` | Buat ulang atau cabut link kelompok. |
 | GET, POST, PUT | `/api/participant-database/fields` | Kelola definisi field pilihan dinamis. |

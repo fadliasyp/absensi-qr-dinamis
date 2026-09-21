@@ -36,6 +36,9 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
     api,
     /app\.post\([\s\S]*?"\/api\/participant-database\/groups\/:groupId\/export-pdf"/,
   );
+  assert.match(api, /"\/api\/participant-database\/export-pdf"/);
+  assert.match(api, /const exportAllGroups = !req\.params\.groupId/);
+  assert.match(api, /Data: Muda Mudi Desa Periuk Jaya/);
   assert.match(api, /requestedFields\.length === 0 \|\| requestedFields\.length > 6/);
   assert.match(api, /const rowHeight = 16/);
   assert.match(api, /Database Muda Mudi Desa Periuk Jaya/);
@@ -57,6 +60,9 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.doesNotMatch(adminPage, /<select id="result(?:Group|Answer)Filter"/);
   assert.match(adminPage, /id="exportModal"/);
   assert.match(adminPage, /class="export-group"/);
+  assert.match(adminPage, /onclick="openAllExport\(\)"/);
+  assert.match(adminPage, /function openAllExport\(\)/);
+  assert.match(adminPage, /"\/api\/participant-database\/export-pdf"/);
   assert.match(adminPage, /new Set\(\["nama", "gender", "kelompok"\]\)/);
   assert.match(adminPage, /function showBlockingLoading\(title\)/);
   assert.match(adminPage, /allowOutsideClick: false/);

@@ -3040,7 +3040,10 @@ app.get("/api/participant-database/groups", async (req, res) => {
 });
 
 app.post(
-  "/api/participant-database/groups/:groupId/export-pdf",
+  [
+    "/api/participant-database/export-pdf",
+    "/api/participant-database/groups/:groupId/export-pdf",
+  ],
   async (req, res) => {
     try {
       const access = await getApprovedAdmin(req);
@@ -3082,11 +3085,17 @@ app.post(
         });
       }
 
-      const groupQuery = supabaseAdmin
-        .from("participant_groups")
-        .select("id, name")
-        .eq("id", req.params.groupId)
-        .maybeSingle();
+      const exportAllGroups = !req.params.groupId;
+      const groupQuery = exportAllGroups
+        ? Promise.resolve({
+            data: { id: null, name: "Muda Mudi Desa Periuk Jaya" },
+            error: null,
+          })
+        : supabaseAdmin
+            .from("participant_groups")
+            .select("id, name")
+            .eq("id", req.params.groupId)
+            .maybeSingle();
       const customFieldQuery = customFieldIds.length
         ? supabaseAdmin
             .from("participant_custom_fields")
@@ -3122,12 +3131,18 @@ app.post(
         });
       }
 
-      const { data: participants, error: participantError } = await supabaseAdmin
+      let participantQuery = supabaseAdmin
         .from("participants")
         .select("id, nama, gender, kelompok, no_wa")
-        .eq("kelompok", group.name)
-        .eq("is_active", true)
-        .order("nama", { ascending: true });
+        .eq("is_active", true);
+      participantQuery = exportAllGroups
+        ? participantQuery
+            .order("kelompok", { ascending: true })
+            .order("nama", { ascending: true })
+        : participantQuery
+            .eq("kelompok", group.name)
+            .order("nama", { ascending: true });
+      const { data: participants, error: participantError } = await participantQuery;
       if (participantError) {
         logDatabaseError("Gagal mengambil peserta untuk export PDF", participantError);
         return res.status(500).json({
@@ -3173,10 +3188,12 @@ app.post(
         ]),
       );
 
-      const safeGroupName = group.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "") || "kelompok";
+      const safeGroupName = exportAllGroups
+        ? "muda-mudi-desa-periuk-jaya"
+        : group.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "") || "kelompok";
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
@@ -3238,7 +3255,14 @@ app.post(
       function drawPageHeader(isContinuation = false) {
         const summaryGap = 6;
         const summaryItems = [
-          { text: `Kelompok: ${group.name}`, weight: 1.65, color: "#1d4ed8", background: "#eff6ff" },
+          {
+            text: exportAllGroups
+              ? "Data: Muda Mudi Desa Periuk Jaya"
+              : `Kelompok: ${group.name}`,
+            weight: 1.65,
+            color: "#1d4ed8",
+            background: "#eff6ff",
+          },
           { text: `Total Muda Mudi: ${totalParticipants}`, weight: 1.25, color: "#334155", background: "#f1f5f9" },
           { text: `Laki-laki: ${totalMale}`, weight: 1, color: "#1e40af", background: "#dbeafe" },
           { text: `Perempuan: ${totalFemale}`, weight: 1, color: "#be185d", background: "#fce7f3" },
@@ -3323,10 +3347,17 @@ app.post(
           .font("Helvetica-Bold")
           .fontSize(10)
           .fillColor("#64748b")
-          .text("Belum ada peserta aktif pada kelompok ini.", margin, y + 22, {
-            width: tableWidth,
-            align: "center",
-          });
+          .text(
+            exportAllGroups
+              ? "Belum ada peserta aktif."
+              : "Belum ada peserta aktif pada kelompok ini.",
+            margin,
+            y + 22,
+            {
+              width: tableWidth,
+              align: "center",
+            },
+          );
       }
 
       (participants || []).forEach((participant, index) => {
@@ -3340,11 +3371,11 @@ app.post(
 
       doc.end();
     } catch (error) {
-      logDatabaseError("Export PDF database kelompok gagal", error);
+      logDatabaseError("Export PDF database peserta gagal", error);
       if (!res.headersSent) {
         res.status(500).json({
           success: false,
-          message: "Terjadi kesalahan saat membuat PDF kelompok.",
+          message: "Terjadi kesalahan saat membuat PDF database peserta.",
         });
       } else {
         res.end();
