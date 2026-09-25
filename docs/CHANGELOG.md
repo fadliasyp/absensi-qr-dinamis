@@ -2,6 +2,14 @@
 
 Perubahan dicatat sejak bootstrap dokumentasi; tidak ada sejarah fitur lama yang direkonstruksi tanpa bukti.
 
+## 2026-09-25
+
+### Added — Ringkasan Status Kesibukan pada Export Semua PDF
+
+- Menampilkan catatan kecil di atas tabel halaman pertama berisi jumlah setiap pilihan Status Kesibukan serta peserta yang belum mengisi.
+- Mengambil ringkasan secara otomatis meskipun Status Kesibukan tidak dipilih sebagai kolom tabel atau field sedang diarsipkan.
+- Mempertahankan export per kelompok dan layout tabel rapat tanpa perubahan.
+
 ## 2026-09-21
 
 ### Changed — Baris PDF Rekap Absensi

@@ -3105,15 +3105,23 @@ app.post(
             .in("id", customFieldIds)
             .eq("is_active", true)
         : Promise.resolve({ data: [], error: null });
+      const statusFieldQuery = exportAllGroups
+        ? supabaseAdmin
+            .from("participant_custom_fields")
+            .select("id, label, options")
+            .ilike("label", "Status Kesibukan")
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null });
       const [
         { data: group, error: groupError },
         { data: customFields, error: customFieldError },
-      ] = await Promise.all([groupQuery, customFieldQuery]);
+        { data: statusField, error: statusFieldError },
+      ] = await Promise.all([groupQuery, customFieldQuery, statusFieldQuery]);
 
-      if (groupError || customFieldError) {
+      if (groupError || customFieldError || statusFieldError) {
         logDatabaseError(
           "Gagal menyiapkan export database kelompok",
-          groupError || customFieldError,
+          groupError || customFieldError || statusFieldError,
         );
         return res.status(500).json({
           success: false,
@@ -3153,13 +3161,16 @@ app.post(
         });
       }
 
+      const valueFieldIds = [
+        ...new Set([...customFieldIds, statusField?.id].filter(Boolean)),
+      ];
       let customValues = [];
-      if (customFieldIds.length && participants?.length) {
+      if (valueFieldIds.length && participants?.length) {
         const { data, error } = await supabaseAdmin
           .from("participant_custom_values")
           .select("participant_id, field_id, value")
           .in("participant_id", participants.map((participant) => participant.id))
-          .in("field_id", customFieldIds);
+          .in("field_id", valueFieldIds);
         if (error) {
           logDatabaseError("Gagal mengambil nilai untuk export PDF", error);
           return res.status(500).json({
@@ -3189,6 +3200,37 @@ app.post(
           item.value,
         ]),
       );
+      const statusSummaryText = (() => {
+        if (!exportAllGroups) return "";
+        if (!statusField) return "Status Kesibukan: field belum tersedia.";
+
+        const options = Array.isArray(statusField.options)
+          ? statusField.options.filter(
+              (option) => typeof option === "string" && option.trim(),
+            )
+          : [];
+        const counts = new Map(options.map((option) => [option, 0]));
+        const filledParticipantIds = new Set();
+        let oldValueCount = 0;
+
+        customValues
+          .filter((item) => item.field_id === statusField.id)
+          .forEach((item) => {
+            filledParticipantIds.add(item.participant_id);
+            if (counts.has(item.value)) {
+              counts.set(item.value, counts.get(item.value) + 1);
+            } else {
+              oldValueCount += 1;
+            }
+          });
+
+        const items = [
+          ...Array.from(counts, ([label, count]) => `${label}: ${count}`),
+          ...(oldValueCount ? [`Nilai lama: ${oldValueCount}`] : []),
+          `Belum diisi: ${Math.max(0, (participants?.length || 0) - filledParticipantIds.size)}`,
+        ];
+        return `${statusField.label}: ${items.join("  •  ")}`;
+      })();
 
       const safeGroupName = exportAllGroups
         ? "muda-mudi-desa-periuk-jaya"
@@ -3305,6 +3347,27 @@ app.post(
         });
 
         y = 82;
+        if (exportAllGroups && !isContinuation) {
+          doc.font("Helvetica").fontSize(7).fillColor("#475569");
+          const noteHeight = Math.max(
+            18,
+            doc.heightOfString(statusSummaryText, {
+              width: tableWidth - 16,
+              lineGap: 1,
+            }) + 8,
+          );
+          doc.roundedRect(margin, 80, tableWidth, noteHeight, 6).fill("#f8fafc");
+          doc
+            .font("Helvetica")
+            .fontSize(7)
+            .fillColor("#475569")
+            .text(statusSummaryText, margin + 8, 84, {
+              width: tableWidth - 16,
+              lineGap: 1,
+              align: "center",
+            });
+          y = 80 + noteHeight + 6;
+        }
         drawTableHeader();
         drawFooter();
       }

@@ -39,6 +39,11 @@ test("group links are hashed, scoped, and validate dynamic choices", async () =>
   assert.match(api, /"\/api\/participant-database\/export-pdf"/);
   assert.match(api, /const exportAllGroups = !req\.params\.groupId/);
   assert.match(api, /Data: Muda Mudi Desa Periuk Jaya/);
+  assert.match(api, /\.ilike\("label", "Status Kesibukan"\)/);
+  assert.match(api, /const statusSummaryText = \(\(\) =>/);
+  assert.match(api, /Belum diisi:/);
+  assert.match(api, /exportAllGroups && !isContinuation/);
+  assert.match(api, /doc\.heightOfString\(statusSummaryText/);
   assert.match(api, /requestedFields\.length === 0 \|\| requestedFields\.length > 6/);
   assert.match(api, /const rowHeight = 16/);
   assert.match(api, /Database Muda Mudi Desa Periuk Jaya/);
